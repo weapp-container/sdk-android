@@ -1,0 +1,6 @@
+.gradle/
+.cxx/
+**/build/
+artifacts/
+.runtime/
+local.properties

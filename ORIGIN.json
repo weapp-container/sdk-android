@@ -1,0 +1,314 @@
+{
+  "schemaVersion": 1,
+  "sourceRepository": "git@github.com:sonofmagic/weapp-container.git",
+  "sourceCommit": "63c003e328ecee3e91ffe1185462a7f63ea96f0b",
+  "newRepository": "https://github.com/weapp-container/sdk-android",
+  "sdkVersion": "0.1.0-preview.2",
+  "license": "Apache-2.0",
+  "extraction": "Reviewed source allowlist only; no history, core implementation, native binaries or caches.",
+  "contract": {
+    "abi": 1,
+    "headerPath": "include/weapp_container_sdk.h",
+    "headerSha256": "2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b"
+  },
+  "sources": [
+    {
+      "sourcePath": "sdk/android/.gitignore",
+      "destinationPath": ".gitignore",
+      "sourceSha256": "8cecd75930846f7cc7fc701a8032879da0a0405af8b27586a0b7e9e6ed74bf51",
+      "destinationSha256": "1c5d41cae26964e446fe781579e3d422f9a65e4ab7e5c0a0d91d29b8dba859be",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/android/README.md",
+      "destinationPath": "docs/EMBEDDING.md",
+      "sourceSha256": "9799fc1fcf09e3c5f675ce5a4744b06ae50f4b9b7b8023fe9bec3e5a4f1dcc6a",
+      "destinationSha256": "f48720fbafe53fc1d4a7ab2aa49700b71605fd88119683b8638e8fcf2406b08c",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/android/build.gradle.kts",
+      "destinationPath": "build.gradle.kts",
+      "sourceSha256": "3602e32f35bf6287d2b8e209cbef783e24a1bc6a473de0d175e7d7d0820fdfab",
+      "destinationSha256": "3602e32f35bf6287d2b8e209cbef783e24a1bc6a473de0d175e7d7d0820fdfab",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/consumer/build.gradle.kts",
+      "destinationPath": "consumer/build.gradle.kts",
+      "sourceSha256": "ba881cf6a1b9a559aef76913f225e387079a94b4de53aa17a5a28dd0991e6dbd",
+      "destinationSha256": "b9a5f38004eeb6dc106b5730843c80ef2f5a7176b1c0430cf20669cf9901b8bb",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/android/consumer/consumer-test.pro",
+      "destinationPath": "consumer/consumer-test.pro",
+      "sourceSha256": "725fe5513b4a1ceb7c0864dbc9d0c8cc52db2b6c410c97a115f817dd69fa8ecc",
+      "destinationSha256": "725fe5513b4a1ceb7c0864dbc9d0c8cc52db2b6c410c97a115f817dd69fa8ecc",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/consumer/gradle.properties",
+      "destinationPath": "consumer/gradle.properties",
+      "sourceSha256": "496a6daf2ad5a72c1e8d5eaecb776cf2cd0e3879d039e92dd685e8717b41b6a8",
+      "destinationSha256": "496a6daf2ad5a72c1e8d5eaecb776cf2cd0e3879d039e92dd685e8717b41b6a8",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/consumer/settings.gradle.kts",
+      "destinationPath": "consumer/settings.gradle.kts",
+      "sourceSha256": "6123cefe116367cfb860391914f7903405e3240f7ce803bb06d92b3db03e8e6b",
+      "destinationSha256": "6123cefe116367cfb860391914f7903405e3240f7ce803bb06d92b3db03e8e6b",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/consumer/src/androidTest/AndroidManifest.xml",
+      "destinationPath": "consumer/src/androidTest/AndroidManifest.xml",
+      "sourceSha256": "f61c53687d11bbfa67faea9cafc0704ccae0e1f5e31c9260cb54c515366b9340",
+      "destinationSha256": "f61c53687d11bbfa67faea9cafc0704ccae0e1f5e31c9260cb54c515366b9340",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/consumer/src/androidTest/java/com/sonofmagic/weapp/container/consumer/SdkInstrumentation.kt",
+      "destinationPath": "consumer/src/androidTest/java/com/sonofmagic/weapp/container/consumer/SdkInstrumentation.kt",
+      "sourceSha256": "cd24ec832b1949136021bcc3d293e686ffa9cf435a3ec796c0a31de389a3e03b",
+      "destinationSha256": "f4c8b5ea78a2396872af9587259b439256ffb69f10fdaf912862b9c40124d920",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/android/consumer/src/main/AndroidManifest.xml",
+      "destinationPath": "consumer/src/main/AndroidManifest.xml",
+      "sourceSha256": "0d2d2c56d9436be7d5d6529783a334a9d89adec999ba9b9ea8d607ae709bec43",
+      "destinationSha256": "0d2d2c56d9436be7d5d6529783a334a9d89adec999ba9b9ea8d607ae709bec43",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/consumer/src/main/java/com/sonofmagic/weapp/container/consumer/ConsumerActivity.kt",
+      "destinationPath": "consumer/src/main/java/com/sonofmagic/weapp/container/consumer/ConsumerActivity.kt",
+      "sourceSha256": "e3ff6a67d358744ec2d4b001ed81c88d63e666528d0e4a1b56b678dd31c8db5a",
+      "destinationSha256": "e3ff6a67d358744ec2d4b001ed81c88d63e666528d0e4a1b56b678dd31c8db5a",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/gradle.properties",
+      "destinationPath": "gradle.properties",
+      "sourceSha256": "e43a00491832254a35cf5a979ef6de17f78c4e159d446be39319d2e3d3e46325",
+      "destinationSha256": "e43a00491832254a35cf5a979ef6de17f78c4e159d446be39319d2e3d3e46325",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/build.gradle.kts",
+      "destinationPath": "library/build.gradle.kts",
+      "sourceSha256": "902166d85af61725fb98a05d455eb3e84063e3c570e737f4ae0e9de6eab5581e",
+      "destinationSha256": "72ea162f64d1b8f6d3f4352704b9d8219fdb3ef63e847b5a7069253056282c82",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/android/library/consumer-rules.pro",
+      "destinationPath": "library/consumer-rules.pro",
+      "sourceSha256": "0958ec2d8bb434036a785925bb62bd3c4043b1a96392cbe1468b35cdfe27157c",
+      "destinationSha256": "0958ec2d8bb434036a785925bb62bd3c4043b1a96392cbe1468b35cdfe27157c",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/androidTest/AndroidManifest.xml",
+      "destinationPath": "library/src/androidTest/AndroidManifest.xml",
+      "sourceSha256": "a0a9df02f2aec2efd52590287832b3233ae7a65a29fdce50fc17708158b18f3d",
+      "destinationSha256": "a0a9df02f2aec2efd52590287832b3233ae7a65a29fdce50fc17708158b18f3d",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/androidTest/java/com/sonofmagic/weapp/container/sdk/GlesRecoveryInstrumentation.kt",
+      "destinationPath": "library/src/androidTest/java/com/sonofmagic/weapp/container/sdk/GlesRecoveryInstrumentation.kt",
+      "sourceSha256": "034efe4fe4e2996bd2c56c946add1a55148ab397bf8b9574efccf4752fb60132",
+      "destinationSha256": "034efe4fe4e2996bd2c56c946add1a55148ab397bf8b9574efccf4752fb60132",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/AndroidManifest.xml",
+      "destinationPath": "library/src/main/AndroidManifest.xml",
+      "sourceSha256": "2acf9505c90ae038da8545d4891c4b7a8ad6d61b812476725c1148bcfd8b4f6e",
+      "destinationSha256": "2acf9505c90ae038da8545d4891c4b7a8ad6d61b812476725c1148bcfd8b4f6e",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/cpp/CMakeLists.txt",
+      "destinationPath": "library/src/main/cpp/CMakeLists.txt",
+      "sourceSha256": "e9e7b61a93f93268475f85037712cdbe62ef84c5bc58f105c6eea4ba4498553e",
+      "destinationSha256": "e9e7b61a93f93268475f85037712cdbe62ef84c5bc58f105c6eea4ba4498553e",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/cpp/weapp_jni.cpp",
+      "destinationPath": "library/src/main/cpp/weapp_jni.cpp",
+      "sourceSha256": "741723cb63e2c2151e921d4f4806c163a534e15bcb5d3284ec466ef98c10910c",
+      "destinationSha256": "741723cb63e2c2151e921d4f4806c163a534e15bcb5d3284ec466ef98c10910c",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/EglPresenter.kt",
+      "destinationPath": "library/src/main/java/com/sonofmagic/weapp/container/sdk/EglPresenter.kt",
+      "sourceSha256": "dffb0f44eaf60abe7086cb2292022b686e78e438d4449f8ed98aec02f358212e",
+      "destinationSha256": "dffb0f44eaf60abe7086cb2292022b686e78e438d4449f8ed98aec02f358212e",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
+      "destinationPath": "library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
+      "sourceSha256": "647bab09cac4bb6000c41a2ef403657f5c3830102a759749cb67194ac7fd6771",
+      "destinationSha256": "647bab09cac4bb6000c41a2ef403657f5c3830102a759749cb67194ac7fd6771",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/NativeBridge.kt",
+      "destinationPath": "library/src/main/java/com/sonofmagic/weapp/container/sdk/NativeBridge.kt",
+      "sourceSha256": "59542a5b6e80e618571f888fade92d31af377632371f54b9ac499b07c59dfa09",
+      "destinationSha256": "59542a5b6e80e618571f888fade92d31af377632371f54b9ac499b07c59dfa09",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
+      "destinationPath": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
+      "sourceSha256": "6c1a8f02871f30afbf7c1240694684dc4a980a48856c2025fc375ea1492f7331",
+      "destinationSha256": "06637aecb97bd43a970e45f62a0b1f0a48d067107e2df904814bef596b8a47ef",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerView.kt",
+      "destinationPath": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerView.kt",
+      "sourceSha256": "1e206f4d55af5d2626c6ba38cfc8f1931c58bbe5dcb6dbf517a9b67481ffbcab",
+      "destinationSha256": "1e206f4d55af5d2626c6ba38cfc8f1931c58bbe5dcb6dbf517a9b67481ffbcab",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/android/settings.gradle.kts",
+      "destinationPath": "settings.gradle.kts",
+      "sourceSha256": "705e77903d91198e4e288dfa59a8c0f62922136fc5b6b91a2c0c4f2883176367",
+      "destinationSha256": "705e77903d91198e4e288dfa59a8c0f62922136fc5b6b91a2c0c4f2883176367",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/LICENSE",
+      "destinationPath": "LICENSE",
+      "sourceSha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "destinationSha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "transformed": false
+    },
+    {
+      "sourcePath": "sdk/CONTRACT.md",
+      "destinationPath": "CONTRACT.md",
+      "sourceSha256": "be8e15cde918c30569640b60c4cff9fe29f2c9bc1054fcb4d516882b15019402",
+      "destinationSha256": "8196aa203908de36d50ff7adf002ea07752a52c0b3a1723fb1f090f6a20d2af9",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/include/weapp_container_sdk.h",
+      "destinationPath": "include/weapp_container_sdk.h",
+      "sourceSha256": "2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b",
+      "destinationSha256": "2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b",
+      "transformed": false
+    },
+    {
+      "sourcePath": "scripts/sdk-android-build.mjs",
+      "destinationPath": "tools/build.mjs",
+      "sourceSha256": "11b361b186a263e882e76a0ecc7d3e8bd0762043fd473f81be674191f38161ba",
+      "destinationSha256": "9ff7d8b4d6ff7881da6829d76fee19f38bba7ec5d6d3b833b3fd31d5e17e35ed",
+      "transformed": true
+    },
+    {
+      "sourcePath": "scripts/sdk-android-smoke.mjs",
+      "destinationPath": "tools/device-smoke.mjs",
+      "sourceSha256": "b2ea115cf035c13ec58d7e2c365ad569471140aa6d3f3b29b5829d26ba6badaf",
+      "destinationSha256": "90cdaf30fd8bf45a36c0d51120ed68641dee3e02bfee826188440adb23560778",
+      "transformed": true
+    },
+    {
+      "sourcePath": "scripts/sdk-android-gles-recovery.mjs",
+      "destinationPath": "tools/gles-recovery.mjs",
+      "sourceSha256": "399534cbd65bf9e40fa4e887c11b757fcebf4339afef5c173c3a1b49587d484e",
+      "destinationSha256": "d08ca0052146c080af202adb7110e82b18f0d37635a1d2990adfd07c1b94c0e3",
+      "transformed": true
+    },
+    {
+      "sourcePath": "sdk/types/weapp-container.d.ts",
+      "destinationPath": "types/weapp-container.d.ts",
+      "sourceSha256": "3a5bedab2f7b32d23aaf0e36a33cf675d8111b87948f9d1a5cf9ee765caa8b9a",
+      "destinationSha256": "3a5bedab2f7b32d23aaf0e36a33cf675d8111b87948f9d1a5cf9ee765caa8b9a",
+      "transformed": false
+    }
+  ],
+  "runtime": {
+    "repository": "weapp-container/runtime-artifacts",
+    "version": "0.1.0-preview.2",
+    "abiVersion": 1,
+    "license": "Separate private binary license; no runtime source included",
+    "pinFile": "runtime-artifacts.lock.json"
+  },
+  "reviewedCopies": [
+    {
+      "repository": "weapp-container/sdk-contract",
+      "version": "0.1.0-preview.2",
+      "path": "tools/runtime-artifacts.mjs",
+      "sha256": "a00382730316f1105e685ebefbe61e0533b8da1280c548f6eb58e77f71f4a3e8"
+    },
+    {
+      "repository": "weapp-container/sdk-contract",
+      "version": "0.1.0-preview.2",
+      "path": "tools/unpack-runtime.py",
+      "sha256": "d4f49e8aa2541ca01670a4fd10330e6bc4b470cf95452b0585605bae09f76f89"
+    },
+    {
+      "repository": "weapp-container/sdk-contract",
+      "version": "0.1.0-preview.2",
+      "path": "CONTRACT.md",
+      "sha256": "8196aa203908de36d50ff7adf002ea07752a52c0b3a1723fb1f090f6a20d2af9"
+    }
+  ],
+  "generated": [
+    {
+      "destinationPath": "README.md",
+      "destinationSha256": "292ed5c1745d4ffbb50fbbcacdef8cc1ae41d0e5ae1518557f3ad84e3e6b1feb",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": "package.json",
+      "destinationSha256": "46bb42b82fad3ce051e1e6e3c9785f9f7f2f6b95f4eaf43d2819f69359877cf7",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": "test/native-input.test.mjs",
+      "destinationSha256": "56e3b8bf6b0eeb65c7a3ad8d76ff2296b22589e39754453cad2e56f1cb92f508",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": "tools/check-origin.mjs",
+      "destinationSha256": "10901cb5df489c56f3745ff5420f6c6319233ab9b3a844ff794ccff1146a4561",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": "tools/native-input.mjs",
+      "destinationSha256": "34b2b22c44d02acce80e9432a77a1357439fb8edc9348a82b4b0c9825f582f8b",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": "tools/prepare-runtime.mjs",
+      "destinationSha256": "d314aceabcea7a5dfcaef7502f0206f9f78c8661f22fd0dfe7c324ec35f43dc1",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": "tools/runtime-artifacts.mjs",
+      "destinationSha256": "a00382730316f1105e685ebefbe61e0533b8da1280c548f6eb58e77f71f4a3e8",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": "tools/unpack-runtime.py",
+      "destinationSha256": "d4f49e8aa2541ca01670a4fd10330e6bc4b470cf95452b0585605bae09f76f89",
+      "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
+    },
+    {
+      "destinationPath": ".github/workflows/checks.yml",
+      "destinationSha256": "25bd65ad89c1686fd5866e359788028fe9a5772cacb5f1ceae405ab2e8c2da4f",
+      "purpose": "Manual-only independent SDK source checks; no automatic push/PR builds"
+    }
+  ]
+}
