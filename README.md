@@ -20,6 +20,8 @@ For an authorized offline copy use `--artifact-dir /absolute/runtime-archives`, 
 
 Preparation atomically installs verified inputs under `.runtime/install/native` and `.runtime/install/licenses`. It preserves the prior installation on failure. Generated archives, binaries, caches and credentials are excluded from Git. `--native-root` below also accepts an explicitly supplied local distribution with matching per-target `build.json`, SHA-256, the reviewed C header and runtime license; local input does not imply private-release authentication.
 
+Exact runtime distributions retain the producer's original `build.json` and bind its bytes with `runtime-distribution.json`. The selection accounts for every producer artifact and can omit only the unused iOS dynamic library or Android static archive. Required libraries, the reviewed header and platform notices remain mandatory. Inputs without this selection receipt continue to verify the full producer inventory.
+
 ## Build and embed
 
 Requirements: JDK 17+ (Java bytecode target 17), Android SDK platform/build-tools 36, NDK 27.1.12297006, CMake 3.22.1 and Gradle 8.9. Set `ANDROID_HOME`, optionally `ANDROID_NDK_HOME` and `GRADLE`. The Maven coordinate and Kotlin/JNI namespace remain stable.
@@ -29,6 +31,8 @@ node tools/build.mjs --native-root .runtime/install/native --licenses-root .runt
 ```
 
 This builds the wrapper's release AAR, local Maven repository and an independent R8-enabled consumer under `artifacts/android`. The consumer depends only on `com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.2`. Applications need Android API 26+ and `arm64-v8a` or `x86_64`. The builder verifies both ELF architectures and 16 KB ELF/APK alignment; this does not establish a 16 KB device boot.
+
+The library and sample consumer preserve the pinned core and `libc++_shared.so` bytes with explicit `jniLibs.keepDebugSymbols` rules. The builder checks that both ABI copies in the AAR and consumer APK exactly match the verified runtime distribution. The host JNI adapter has its own recorded hash.
 
 `distribution.json` records the portable source identity, verified native inputs and Maven file hashes. Local commands and paths remain in the separate `validation.json` build evidence. Neither receipt claims a device test when `deviceExecution` is `not-run`.
 
@@ -48,5 +52,7 @@ npm test
 ```
 
 These are wrapper input-contract tests, not runtime, GPU, device, performance or WeChat parity results. This split starts with a new version: historical preview.1 results are not attributed to preview.2. Platform build/UI reports must be regenerated against the exact pinned runtime before claiming that scope passed. Native IME, complete accessibility and advanced gestures remain separate limitations.
+
+The 2026-10-27 preview.2 report for wrapper source `a448373` records 19 native checks on an arm64 API 30 emulator with host GLES, including actual EGL swap acknowledgement, MotionEvent input/scrolling, navigation, async completion, timeout/cancellation, reload rollback, storage reopening and concurrent session retirement. Both ABI binaries passed ELF and 16 KB alignment checks, and the release consumer passed R8 and exact runtime-byte validation. Physical-device, x86_64 execution, 16 KB device boot, performance and WeChat parity remain unmeasured. Device evidence is separate from the build receipt.
 
 `ORIGIN.json` lists the allowlisted source paths, original source SHA-256, transformed destination SHA-256 and reviewed C-header contract hash. This repository includes no core implementation, Git history from the original repository, binary runtime, cache or credentials.
