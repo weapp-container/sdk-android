@@ -212,7 +212,7 @@
       "sourcePath": "scripts/sdk-android-build.mjs",
       "destinationPath": "tools/build.mjs",
       "sourceSha256": "11b361b186a263e882e76a0ecc7d3e8bd0762043fd473f81be674191f38161ba",
-      "destinationSha256": "9ff7d8b4d6ff7881da6829d76fee19f38bba7ec5d6d3b833b3fd31d5e17e35ed",
+      "destinationSha256": "010d9ad9cd945891b9cb62e739d2b872f2d43a7fb499f412d240484e4f79329d",
       "transformed": true
     },
     {
@@ -267,7 +267,7 @@
   "generated": [
     {
       "destinationPath": "README.md",
-      "destinationSha256": "292ed5c1745d4ffbb50fbbcacdef8cc1ae41d0e5ae1518557f3ad84e3e6b1feb",
+      "destinationSha256": "ad91744823997052ef7a22a59c6f549b5dc1bd49af7cd5af02598fc7875030b0",
       "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
     },
     {

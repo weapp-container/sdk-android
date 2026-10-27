@@ -5,7 +5,7 @@ import { createHash } from 'node:crypto';
 import { resolve, dirname, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import os from 'node:os';
-import { copyPack, readNative, readNotices, requireNativeRoot, sourceProvenance, SDK_VERSION } from './native-input.mjs';
+import { copyPack, readNative, readNotices, requireNativeRoot, sourceProvenance, nativeIdentity, SDK_VERSION } from './native-input.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2);
@@ -32,12 +32,27 @@ function findGradle() {
 const gradle=findGradle();
 const common=['--no-daemon','--console=plain']; if(args.includes('--offline')) common.push('--offline');
 const receiptPath=join(out,'validation.json');
-const receipt={schemaVersion:1,sdkVersion:SDK_VERSION,status:'building',...sourceProvenance(root),startedAt:new Date().toISOString(),nativeRoot:native,licensesRoot,deviceExecution:'not-run'};
-const save=()=>writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
+const receipt={schemaVersion:1,sdkVersion:SDK_VERSION,status:'building',...sourceProvenance(root),startedAt:new Date().toISOString(),nativeRoot:native,licensesRoot,native:[],deviceExecution:'not-run'};
+const save=()=>{
+  writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
+  // Keep command paths and local build directories in external evidence only.
+  // The Maven installation has a separate portable, source-bound receipt.
+  const publicError = receipt.error && [root,native,licensesRoot,out,sdk,gradle]
+    .sort((a,b)=>b.length-a.length).reduce((text,path)=>text.replaceAll(path,'<local-build-directory>'),receipt.error);
+  const distribution = Object.fromEntries([
+    'schemaVersion','sdkVersion','status','sourceCommit','sourceDirty','sourceKind',
+    'originSourceCommit','originManifestSha256','startedAt','finishedAt','native',
+    'mavenArtifacts','binaries','checks','deviceExecution','fixtureIntegrity',
+  ].filter(key=>receipt[key]!==undefined).map(key=>[key,receipt[key]]));
+  distribution.artifactRoot = 'maven';
+  if(publicError)distribution.error=publicError;
+  writeFileSync(join(out,'distribution.json'),JSON.stringify(distribution,null,2)+'\n');
+};
 save();
 try {
 for (const target of ['aarch64-linux-android', 'x86_64-linux-android']) {
-  readNative(native, target, ['libweapp_container_sdk.so', 'libc++_shared.so']);
+  const input = readNative(native, target, ['libweapp_container_sdk.so', 'libc++_shared.so']);
+  receipt.native.push(nativeIdentity(input.receipt));
   readNotices(native, licensesRoot, target);
 }
 run(gradle,[...common,':library:assembleRelease',':library:publishReleasePublicationToLocalSdkRepository',`-PweappSdkNativeDir=${native}`,`-PweappSdkMavenDir=${maven}`,`-PweappSdkLicensesDir=${licensesRoot}`],root);

@@ -30,6 +30,8 @@ node tools/build.mjs --native-root .runtime/install/native --licenses-root .runt
 
 This builds the wrapper's release AAR, local Maven repository and an independent R8-enabled consumer under `artifacts/android`. The consumer depends only on `com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.2`. Applications need Android API 26+ and `arm64-v8a` or `x86_64`. The builder verifies both ELF architectures and 16 KB ELF/APK alignment; this does not establish a 16 KB device boot.
 
+`distribution.json` records the portable source identity, verified native inputs and Maven file hashes. Local commands and paths remain in the separate `validation.json` build evidence. Neither receipt claims a device test when `deviceExecution` is `not-run`.
+
 Add `artifacts/android/maven` as a Maven repository and depend on that coordinate. `WeappContainerSession` owns state; `WeappContainerView` embeds its GLES TextureView as a normal subrectangle. [Embedding and lifecycle details](docs/EMBEDDING.md).
 
 ```sh
