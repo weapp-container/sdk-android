@@ -250,7 +250,7 @@
       "repository": "weapp-container/sdk-contract",
       "version": "0.1.0-preview.2",
       "path": "tools/runtime-artifacts.mjs",
-      "sha256": "a00382730316f1105e685ebefbe61e0533b8da1280c548f6eb58e77f71f4a3e8"
+      "sha256": "25cf17edc7ebd6349abaa08151d73f91767e2dc2b74702e84f031663149df2f0"
     },
     {
       "repository": "weapp-container/sdk-contract",
@@ -268,7 +268,7 @@
   "generated": [
     {
       "destinationPath": "README.md",
-      "destinationSha256": "3a01fd440acb2cb817fb17470d1a51ffad7077cfa12e6df9a58e1567b1f979ca",
+      "destinationSha256": "47478a75a10c2229198ac7876f7fd33bc5c94a6f42edb546e86db213812bc063",
       "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
     },
     {
@@ -298,7 +298,7 @@
     },
     {
       "destinationPath": "tools/runtime-artifacts.mjs",
-      "destinationSha256": "a00382730316f1105e685ebefbe61e0533b8da1280c548f6eb58e77f71f4a3e8",
+      "destinationSha256": "25cf17edc7ebd6349abaa08151d73f91767e2dc2b74702e84f031663149df2f0",
       "purpose": "Independent SDK wrapper tooling, validation or distribution documentation"
     },
     {
