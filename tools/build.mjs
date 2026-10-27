@@ -42,7 +42,7 @@ const save=()=>{
   const distribution = Object.fromEntries([
     'schemaVersion','sdkVersion','status','sourceCommit','sourceDirty','sourceKind',
     'originSourceCommit','originManifestSha256','startedAt','finishedAt','native',
-    'mavenArtifacts','binaries','checks','deviceExecution','fixtureIntegrity',
+    'mavenArtifacts','binaries','checks','deviceExecution','fixtureIntegrity','pinnedRuntimeBytes',
   ].filter(key=>receipt[key]!==undefined).map(key=>[key,receipt[key]]));
   distribution.artifactRoot = 'maven';
   if(publicError)distribution.error=publicError;
@@ -72,6 +72,10 @@ const readelf=join(llvmRoot,llvmHost,'bin/llvm-readelf');
 const binaries=[];
 for(const [abi,machine] of [['arm64-v8a',183],['x86_64',62]]) for(const lib of ['libweapp_container_sdk.so','libweapp_container_android.so','libc++_shared.so']) {
   const path=join(unpacked,'jni',abi,lib); const data=readFileSync(path);
+  if (lib !== 'libweapp_container_android.so') {
+    const target = abi === 'arm64-v8a' ? 'aarch64-linux-android' : 'x86_64-linux-android';
+    if (createHash('sha256').update(data).digest('hex') !== createHash('sha256').update(readFileSync(join(native,target,lib))).digest('hex')) throw new Error(`AAR changed the pinned runtime bytes: ${abi}/${lib}`);
+  }
   if(data.subarray(0,4).toString('hex')!=='7f454c46'||data[4]!==2||data[5]!==1||data.readUInt16LE(18)!==machine) throw new Error(`Wrong ELF architecture: ${path}`);
   const phoff=Number(data.readBigUInt64LE(32)); const size=data.readUInt16LE(54); const count=data.readUInt16LE(56); const loads=[];
   for(let i=0;i<count;i++){const at=phoff+i*size;if(data.readUInt32LE(at)===1){const alignment=Number(data.readBigUInt64LE(at+48));const offset=Number(data.readBigUInt64LE(at+8));const vaddr=Number(data.readBigUInt64LE(at+16));if(alignment<16384||offset%16384!==vaddr%16384)throw new Error(`ELF is not 16 KB compatible: ${path}`);loads.push(alignment);}}
@@ -85,6 +89,16 @@ for(const [abi,machine] of [['arm64-v8a',183],['x86_64',62]]) for(const lib of [
 const releaseDir=join(consumer,'build/outputs/apk/release'); const testDir=join(consumer,'build/outputs/apk/androidTest/release');
 const apkIn=directory=>{const files=readdirSync(directory).filter(name=>name.endsWith('.apk'));if(files.length!==1)throw new Error(`Expected one APK in ${directory}`);return join(directory,files[0]);};
 run(join(sdk,'build-tools/36.0.0/zipalign'),['-c','-P','16','4',apkIn(releaseDir)]);
+const retained = spawnSync('python3', ['-c', `import hashlib,json,pathlib,sys,zipfile
+native=pathlib.Path(sys.argv[1]); archive=zipfile.ZipFile(sys.argv[2]); results=[]
+for abi,target in [('arm64-v8a','aarch64-linux-android'),('x86_64','x86_64-linux-android')]:
+ for library in ['libweapp_container_sdk.so','libc++_shared.so']:
+  expected=(native/target/library).read_bytes(); actual=archive.read('lib/'+abi+'/'+library)
+  if actual!=expected: raise SystemExit('APK changed pinned runtime bytes: '+abi+'/'+library)
+  results.append(dict(abi=abi,library=library,bytes=len(actual),sha256=hashlib.sha256(actual).hexdigest()))
+print(json.dumps(results))`, native, apkIn(releaseDir)], {encoding:'utf8'});
+if (retained.status !== 0) throw new Error(retained.stderr || retained.stdout || 'APK pinned runtime byte verification failed');
+const pinnedRuntimeBytes = JSON.parse(retained.stdout);
 function artifactFiles(directory, prefix='') {
   return readdirSync(directory,{withFileTypes:true}).flatMap(entry => {
     const relative=prefix+entry.name;
@@ -94,6 +108,6 @@ function artifactFiles(directory, prefix='') {
 const mavenArtifacts=artifactFiles(maven);
 Object.assign(receipt,{status:'passed',fixtureIntegrity,mavenArtifacts,aar,maven,consumer,
   releaseApk:apkIn(releaseDir),testApk:apkIn(testDir),
-  binaries,checks:['release-AAR','local-Maven-publication','independent-no-Rust-consumer','R8-release-application','arm64-and-x86_64-ELF','16KB-ELF-load-alignment','16KB-APK-ZIP-alignment','portable-ELF-SONAME-and-dependencies','packaged-Apache2-and-native-notices'],deviceExecution:'not-run'});
+  binaries,pinnedRuntimeBytes,checks:['release-AAR','local-Maven-publication','independent-no-Rust-consumer','R8-release-application','arm64-and-x86_64-ELF','16KB-ELF-load-alignment','16KB-APK-ZIP-alignment','portable-ELF-SONAME-and-dependencies','packaged-Apache2-and-native-notices','byte-identical-pinned-runtime-AAR-and-APK'],deviceExecution:'not-run'});
 } catch(error) {receipt.status='failed';receipt.error=error.message;process.exitCode=1;}
 receipt.finishedAt=new Date().toISOString();save();console.log(JSON.stringify(receipt,null,2));

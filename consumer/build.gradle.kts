@@ -12,5 +12,6 @@ android {
     kotlinOptions { jvmTarget = "17" }
     buildTypes { release { isMinifyEnabled = true; signingConfig = signingConfigs.getByName("debug"); proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "consumer-test.pro") } }
     testBuildType = "release"
+    packaging { jniLibs.keepDebugSymbols += setOf("**/libweapp_container_sdk.so", "**/libc++_shared.so") }
 }
 dependencies { implementation("com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.2") }

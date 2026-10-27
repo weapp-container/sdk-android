@@ -37,7 +37,7 @@
       "sourcePath": "sdk/android/consumer/build.gradle.kts",
       "destinationPath": "consumer/build.gradle.kts",
       "sourceSha256": "ba881cf6a1b9a559aef76913f225e387079a94b4de53aa17a5a28dd0991e6dbd",
-      "destinationSha256": "b9a5f38004eeb6dc106b5730843c80ef2f5a7176b1c0430cf20669cf9901b8bb",
+      "destinationSha256": "523fdd8fb31ef0d233da1ec39287a13a53fd86b2a6c43b7ba4143ec32bf8e9e9",
       "transformed": true
     },
     {
@@ -100,7 +100,7 @@
       "sourcePath": "sdk/android/library/build.gradle.kts",
       "destinationPath": "library/build.gradle.kts",
       "sourceSha256": "902166d85af61725fb98a05d455eb3e84063e3c570e737f4ae0e9de6eab5581e",
-      "destinationSha256": "72ea162f64d1b8f6d3f4352704b9d8219fdb3ef63e847b5a7069253056282c82",
+      "destinationSha256": "cddcda15096ccd176e79feab79ed65de4de9504d5ca90fb192d304d7df68678f",
       "transformed": true
     },
     {
@@ -212,7 +212,7 @@
       "sourcePath": "scripts/sdk-android-build.mjs",
       "destinationPath": "tools/build.mjs",
       "sourceSha256": "11b361b186a263e882e76a0ecc7d3e8bd0762043fd473f81be674191f38161ba",
-      "destinationSha256": "010d9ad9cd945891b9cb62e739d2b872f2d43a7fb499f412d240484e4f79329d",
+      "destinationSha256": "1678dba30135019352775b9b59030f6e5ac52c1064495833bc924cfabe96aa14",
       "transformed": true
     },
     {

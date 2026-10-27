@@ -27,6 +27,9 @@ android {
     sourceSets["main"].jniLibs.srcDir(generatedJni)
     sourceSets["main"].assets.srcDir(generatedNotices)
     sourceSets["androidTest"].assets.srcDir(layout.buildDirectory.dir("generated/recoveryAssets"))
+    // These are already reviewed, hash-pinned runtime artifacts. Re-stripping
+    // them would invalidate the identity proven by the runtime distribution.
+    packaging { jniLibs.keepDebugSymbols += setOf("**/libweapp_container_sdk.so", "**/libc++_shared.so") }
     publishing { singleVariant("release") { withSourcesJar() } }
 }
 val copyNativeLibraries = tasks.register<Copy>("copyNativeLibraries") {
