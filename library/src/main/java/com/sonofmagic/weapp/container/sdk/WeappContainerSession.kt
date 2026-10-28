@@ -62,6 +62,7 @@ class WeappContainerSession internal constructor(
     private val methods = linkedMapOf<String, HostMethod>()
     private val calls = mutableMapOf<String, HostCall>()
     private val pendingLoads = ArrayDeque<PendingLoad>()
+    private val pendingPrepares = ArrayDeque<CompletableFuture<JSONObject>>()
     private var boundView: WeakReference<WeappContainerView>? = null // main thread only
     @Volatile var eventListener: ContainerEventListener? = null
 
@@ -127,6 +128,17 @@ class WeappContainerSession internal constructor(
     fun sendMessage(message: Any?): CompletableFuture<Unit> = operation("sendMessage", JSONObject().put("message", jsonCopy(message)))
     fun state(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("state") as JSONObject }
     fun capabilities(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("capabilities") as JSONObject }
+    /** Measured-view preflight creates an empty native runtime, never App/Page JS. */
+    fun prepareView(): CompletableFuture<JSONObject> {
+        val result = CompletableFuture<JSONObject>()
+        enqueue(result) {
+            ensureOpen()
+            if (pendingPrepares.size >= 8) throw ContainerException("ERR_BUSY", "Too many measured-view preparations")
+            pendingPrepares.add(result)
+            drainLoads()
+        }
+        return result
+    }
     fun snapshot(): CompletableFuture<ContainerSnapshot> = task { ensureLoaded(); ContainerSnapshot.decode(NativeBridge.snapshot(handle)) }
     fun setForeground(visible: Boolean): CompletableFuture<Unit> {
         if (!visible) return task { ensureOpen(); desiredForeground = false; applyForeground() }
@@ -161,6 +173,7 @@ class WeappContainerSession internal constructor(
             enqueue(result) {
                 if (closed) { finish(result, Unit); return@enqueue }
                 closing = true; cleanupNeedsRetry = false
+                while (pendingPrepares.isNotEmpty()) fail(pendingPrepares.removeFirst(), ContainerException("ERR_CLOSED", "Session closed before measured-view preparation"))
                 while (pendingLoads.isNotEmpty()) fail(pendingLoads.removeFirst().result, ContainerException("ERR_CLOSED", "Session closed before layout/load"))
                 try {
                     retireSurface()
@@ -273,9 +286,18 @@ class WeappContainerSession internal constructor(
     }
     private fun drainLoads() {
         val observation = metrics ?: return
+        while (pendingPrepares.isNotEmpty() && !closing) {
+            val pending = pendingPrepares.removeFirst()
+            try { if (handle == 0L) createNative(observation); finish(pending, command("capabilities") as JSONObject) }
+            catch (error: Throwable) { fail(pending, error) }
+        }
         while (pendingLoads.isNotEmpty() && !closing) {
             val pending = pendingLoads.removeFirst()
             try {
+                // A staged view may have resized since capability preflight.
+                // Initialize guest JS with the latest measured metrics, never
+                // with the empty preflight runtime's earlier configuration.
+                if (!loaded && handle != 0L) { unwrap(NativeBridge.destroy(handle)); handle = 0L }
                 if (handle == 0L) createNative(observation)
                 presenterAttachmentFailed = false // Explicit load begins a new attachment attempt.
                 presenter.detachRuntime()

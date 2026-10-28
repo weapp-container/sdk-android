@@ -53,6 +53,14 @@ The library and sample consumer preserve the pinned core and `libc++_shared.so` 
 
 Add `artifacts/android/maven` as a Maven repository and depend on that coordinate. `WeappContainerSession` owns state; `WeappContainerView` embeds its GLES TextureView as a normal subrectangle. [Embedding and lifecycle details](docs/EMBEDDING.md).
 
+Dev clients can mount a candidate view, then await `session.prepareView()` before
+the first `load` to inspect compiled capabilities. It waits for actual measured
+view metrics and creates only an empty runtime: no App/Page JS executes and no
+frame is acknowledged. Keep the view attached while waiting; `closeAsync`
+cancels pending preparation. Use `load` for initial startup and `applyDevPack`
+for updates to a loaded session. This additive wrapper API leaves the C ABI
+unchanged.
+
 ```sh
 node tools/device-smoke.mjs --serial YOUR_ALREADY_RUNNING_TARGET
 node tools/gles-recovery.mjs --serial YOUR_ALREADY_RUNNING_TARGET --native-root .runtime/install/native --licenses-root .runtime/install/licenses --pack /absolute/verified-portable-pack
