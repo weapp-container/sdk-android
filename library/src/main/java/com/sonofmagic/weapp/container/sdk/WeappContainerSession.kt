@@ -23,8 +23,13 @@ class WeappContainerSession internal constructor(
     initialMetrics: WindowMetrics?,
     presenterFactory: (() -> Long) -> EglPresenter,
 ) {
-    @JvmOverloads constructor(context: Context, storageKey: String?, initialMetrics: WindowMetrics? = null) :
-        this(context, storageKey, initialMetrics, { EglPresenter(handle = it) })
+    @JvmOverloads constructor(context: Context, storageKey: String?, initialMetrics: WindowMetrics? = null, gpuRequired: Boolean? = null, devDiagnostics: Boolean = false) :
+        this(context, storageKey, initialMetrics.also { require(gpuRequired != false) { "Android native preview requires GPU" } }, { EglPresenter(handle = it) }) {
+        requiredGpu = gpuRequired
+        diagnosticsEnabled = devDiagnostics
+    }
+    private var requiredGpu: Boolean? = null
+    private var diagnosticsEnabled = false
     // Validation must precede allocating a thread or any native resources.
     private val app = context.applicationContext.also {
         require(storageKey == null || storageKey.isNotBlank()) { "storageKey must be stable and nonblank; null explicitly selects memory storage" }
@@ -72,6 +77,41 @@ class WeappContainerSession internal constructor(
         }
         return result
     }
+    /** Verify and classify before releasing GPU ownership. The runtime repeats
+     * validation when applying, so classification is never an authorization. */
+    @JvmOverloads fun applyDevPack(source: PackSource, options: LoadOptions = LoadOptions()): CompletableFuture<JSONObject> {
+        val copied = JSONObject(options.options.toString())
+        return task {
+            ensureLoaded()
+            source.withDirectory(app) { directory ->
+                val payload = JSONObject().put("packPath", directory.absolutePath).put("options", copied)
+                options.route?.let { payload.put("route", it) }
+                val classification = command("classifyDevPack", payload) as JSONObject
+                val kind = classification.getString("reloadKind")
+                require(kind == "inPlace" || kind == "restart") { "Invalid development reload classification" }
+                val restart = kind == "restart"
+                if (restart) {
+                    presenterAttachmentFailed = false
+                    presenter.detachRuntime()
+                    presentedRevision = -1
+                }
+                try {
+                    val result = command("applyDevPack", payload) as JSONObject
+                    if (restart) foreground = true
+                    presentedRevision = -1
+                    result
+                } finally {
+                    try {
+                        if (restart && loaded) { ensurePresenter(); applyForeground() }
+                    } finally { drainEvents() }
+                    present()
+                }
+            }
+        }
+    }
+    fun devState(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("devState") as JSONObject }
+    fun clearDevStorage(): CompletableFuture<Unit> = task { ensureLoaded(); command("clearDevStorage"); Unit }.thenCompose { flushStorage() }
+
     fun registerHostMethod(name: String, method: HostMethod): CompletableFuture<Unit> = task {
         ensureOpen(); check(!loaded && pendingLoads.isEmpty()) { "Register host methods before load" }
         require(name.isNotBlank() && !name.startsWith("wx."))
@@ -221,9 +261,11 @@ class WeappContainerSession internal constructor(
     }
     private fun createNative(observation: WindowMetrics) {
         val host = JSONObject().put("kind", "android").put("platform", "android").put("version", Build.VERSION.RELEASE)
-            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.2").put("windowWidth", observation.windowWidth)
+            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.3").put("windowWidth", observation.windowWidth)
             .put("windowHeight", observation.windowHeight).put("displayMetrics", observation.displayJson())
         val config = JSONObject().put("engine", "quickjs").put("host", host)
+        requiredGpu?.let { config.put("gpuRequired", it) }
+        if (diagnosticsEnabled) config.put("devDiagnostics", true)
         if (storageKey != null) config.put("storageKey", storageKey).put("storageRoot", File(app.filesDir, "weapp-container/storage").absolutePath)
         handle = NativeBridge.create(config.toString())
         for (name in methods.keys) command("registerHostMethod", JSONObject().put("name", name))
