@@ -123,6 +123,12 @@ class WeappContainerSession internal constructor(
         val copied = JSONObject(payload.toString())
         return task {
             ensureOpen()
+            if (operation == "queryDevPackAttempt") {
+                // Durable journal observation must not create a runtime, pump
+                // JS, drain/replay events, change loaded or touch presentation.
+                if (handle == 0L) throw ContainerException("ERR_NOT_READY", "A native owner is required for journal observation")
+                return@task command(operation, copied)
+            }
             if (handle == 0L) createNative(metrics ?: throw ContainerException("ERR_NOT_READY", "A measured native view is required"))
             if (operation == "applyDevPackAttempt") {
                 val identity = JSONObject().put("ownerId", copied.getString("ownerId")).put("attemptId", copied.getString("attemptId"))
@@ -146,14 +152,24 @@ class WeappContainerSession internal constructor(
                 }
             } else {
                 try {
-                    val result = command(operation, copied)
-                    if (operation == "queryDevPackAttempt" && (result as? JSONObject)?.optString("status") == "accepted") {
-                        // The durable outcome query must survive GPU failure.
-                        loaded = true
-                    }
-                    result
+                    command(operation, copied)
                 } finally { drainEvents(); presentedRevision = -1; present() }
             }
+        }
+    }
+    /** One passive owner-thread metadata snapshot for prepare-only geometry.
+     * The caller validates the journal receipt against the same native state;
+     * querying cannot run a damaged View, grant input or acknowledge a frame. */
+    @JvmOverloads fun hostLayoutPreparationState(restartAttempt: JSONObject? = null): CompletableFuture<JSONObject> {
+        val copied = restartAttempt?.let { JSONObject(it.toString()) }
+        return task {
+            ensureOpen()
+            if (handle == 0L) throw ContainerException("ERR_NOT_READY", "A native owner is required for layout preparation")
+            val receipt = copied?.let {
+                val identity = JSONObject().put("ownerId", it.getString("ownerId")).put("attemptId", it.getString("attemptId"))
+                command("queryDevPackAttempt", identity)
+            }
+            JSONObject().put("state", command("state")).put("journalReceipt", receipt ?: JSONObject.NULL)
         }
     }
     /** Same-size native observations also require a complete shell response. */
@@ -375,7 +391,7 @@ class WeappContainerSession internal constructor(
     }
     private fun createNative(observation: WindowMetrics) {
         val host = JSONObject().put("kind", "android").put("platform", "android").put("version", Build.VERSION.RELEASE)
-            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.5.1").put("windowWidth", observation.windowWidth)
+            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.5.2").put("windowWidth", observation.windowWidth)
             .put("windowHeight", observation.windowHeight).put("displayMetrics", observation.displayJson())
         val config = JSONObject().put("engine", "quickjs").put("host", host)
         requiredGpu?.let { config.put("gpuRequired", it) }

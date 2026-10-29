@@ -5,7 +5,7 @@ import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, symlinkSync, writ
 import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
-import { copyPack, HEADER_SHA256, inside, nativeIdentity, readNative, readNotices, requireNativeRoot, SDK_VERSION, sha256 } from '../tools/native-input.mjs';
+import { copyPack, HEADER_SHA256, inside, nativeIdentity, readNative, readNotices, requireNativeRoot, NATIVE_RUNTIME_VERSION, SDK_VERSION, sha256 } from '../tools/native-input.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -16,7 +16,7 @@ function fixture(t) {
   mkdirSync(input, { recursive: true });
   writeFileSync(resolve(input, 'libfixture.a'), 'test bytes: not an executable runtime');
   cpSync(resolve(root, 'include/weapp_container_sdk.h'), resolve(input, 'weapp_container_sdk.h'));
-  const receipt = { schemaVersion: 1, sdkVersion: SDK_VERSION, abiVersion: 1, target, status: 'built', artifacts: [{ file: 'libfixture.a', sha256: sha256(resolve(input, 'libfixture.a')) }] };
+  const receipt = { schemaVersion: 1, sdkVersion: NATIVE_RUNTIME_VERSION, abiVersion: 1, target, status: 'built', artifacts: [{ file: 'libfixture.a', sha256: sha256(resolve(input, 'libfixture.a')) }] };
   const save = () => writeFileSync(resolve(input, 'build.json'), JSON.stringify(receipt)); save();
   return { directory, native, target, input, receipt, save };
 }
@@ -24,7 +24,7 @@ function fixture(t) {
 test('a matching receipt accepts only the reviewed ABI header and hashed input', t => {
   const f = fixture(t);
   assert.equal(sha256(resolve(root, 'include/weapp_container_sdk.h')), HEADER_SHA256);
-  assert.equal(readNative(f.native, f.target, ['libfixture.a']).receipt.sdkVersion, SDK_VERSION);
+  assert.equal(readNative(f.native, f.target, ['libfixture.a']).receipt.sdkVersion, NATIVE_RUNTIME_VERSION);
 });
 test('binary tampering cannot reuse an otherwise successful receipt', t => {
   const f = fixture(t); writeFileSync(resolve(f.input, 'libfixture.a'), 'changed bytes');
@@ -33,7 +33,7 @@ test('binary tampering cannot reuse an otherwise successful receipt', t => {
 test('older versions, incompatible ABIs and mislabeled targets are rejected before packaging', t => {
   const f = fixture(t); f.receipt.sdkVersion = '0.1.0-preview.1'; f.save();
   assert.throws(() => readNative(f.native, f.target, ['libfixture.a']), /runtime receipt/);
-  f.receipt.sdkVersion = SDK_VERSION; f.receipt.abiVersion = 2; f.save();
+  f.receipt.sdkVersion = NATIVE_RUNTIME_VERSION; f.receipt.abiVersion = 2; f.save();
   assert.throws(() => readNative(f.native, f.target, ['libfixture.a']), /runtime receipt/);
   f.receipt.abiVersion = 1; f.receipt.target = 'another-target'; f.save();
   assert.throws(() => readNative(f.native, f.target, ['libfixture.a']), /runtime receipt/);
@@ -85,7 +85,7 @@ test('an absent runtime input never invokes a compiler or searches a parent repo
   finally { if (prior !== undefined) process.env.WEAPP_CONTAINER_RUNTIME_NATIVE_ROOT = prior; }
 });
 test('packaged native identities exclude producer checkout, toolchain and command paths', () => {
-  const identity = nativeIdentity({ schemaVersion: 1, sdkVersion: SDK_VERSION, abiVersion: 1, target: 'fixture-target', status: 'built',
+  const identity = nativeIdentity({ schemaVersion: 1, sdkVersion: NATIVE_RUNTIME_VERSION, abiVersion: 1, target: 'fixture-target', status: 'built',
     toolchain: { androidNdk: '/private/producer/ndk' }, output: '/private/producer/build', commands: ['/private/producer/cargo'],
     artifacts: [{ file: 'libfixture.a', sha256: '0'.repeat(64), bytes: 10, producerPath: '/private/producer/libfixture.a' }],
   });
@@ -107,9 +107,9 @@ function distributionFixture(t, platform = 'ios') {
     else writeFileSync(resolve(f.input, name), `test-only ${name}`);
   }
   const metadata = file => ({ file, bytes: readFileSync(resolve(f.input, file)).length, sha256: sha256(resolve(f.input, file)) });
-  f.receipt = { schemaVersion: 1, sdkVersion: SDK_VERSION, abiVersion: 1, target: f.target, status: 'built', sourceCommit: 'a'.repeat(40), sourceDirty: false, artifacts: files.map(metadata) };
+  f.receipt = { schemaVersion: 1, sdkVersion: NATIVE_RUNTIME_VERSION, abiVersion: 1, target: f.target, status: 'built', sourceCommit: 'a'.repeat(40), sourceDirty: false, artifacts: files.map(metadata) };
   f.save = () => writeFileSync(resolve(f.input, 'build.json'), JSON.stringify(f.receipt)); f.save();
-  f.selection = { schemaVersion: 1, sdkVersion: SDK_VERSION, abiVersion: 1, target: f.target, sourceCommit: f.receipt.sourceCommit, sourceDirty: false,
+  f.selection = { schemaVersion: 1, sdkVersion: NATIVE_RUNTIME_VERSION, abiVersion: 1, target: f.target, sourceCommit: f.receipt.sourceCommit, sourceDirty: false,
     producerReceipt: { file: 'build.json', sha256: sha256(resolve(f.input, 'build.json')) },
     selectedArtifacts: f.receipt.artifacts.filter(item => item.file !== omitted), omittedArtifacts: f.receipt.artifacts.filter(item => item.file === omitted),
   };
@@ -176,4 +176,14 @@ test('distribution selection cannot relax native path and symlink rules', t => {
     const g = distributionFixture(t); rmSync(resolve(g.input, g.library)); symlinkSync(resolve(root, 'LICENSE'), resolve(g.input, g.library));
     assert.throws(() => readNative(g.native, g.target, [g.library]), /symlink/);
   }
+});
+
+// Wrapper evolution must never relabel the immutable native producer.
+test('wrapper preview5.2 consumes exact native preview5.1 and rejects relabelled native receipts', t => {
+  const f = fixture(t);
+  assert.equal(SDK_VERSION, '0.1.0-preview.5.2');
+  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.5.1');
+  assert.equal(readNative(f.native, f.target, ['libfixture.a']).receipt.sdkVersion, NATIVE_RUNTIME_VERSION);
+  f.receipt.sdkVersion = SDK_VERSION; f.save();
+  assert.throws(() => readNative(f.native, f.target, ['libfixture.a']), /runtime receipt/);
 });

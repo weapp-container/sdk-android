@@ -3,7 +3,9 @@ import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, isAbsolute, relative, resolve, sep } from 'node:path';
 
-export const SDK_VERSION = '0.1.0-preview.5.1';
+export const SDK_VERSION = '0.1.0-preview.5.2';
+// Wrapper changes do not rebind or rebuild the immutable Rust producer.
+export const NATIVE_RUNTIME_VERSION = '0.1.0-preview.5.1';
 export const HEADER_SHA256 = '2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b';
 export const sha256 = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 
@@ -54,8 +56,8 @@ export function readNative(nativeRoot, target, requiredLibraries) {
   const directory = inside(nativeRoot, target);
   const producerPath = inside(directory, 'build.json');
   const receipt = JSON.parse(readFileSync(producerPath, 'utf8'));
-  if (receipt.schemaVersion !== 1 || receipt.abiVersion !== 1 || receipt.status !== 'built' || receipt.target !== target || receipt.sdkVersion !== SDK_VERSION) {
-    throw new Error(`A successfully built ${SDK_VERSION} runtime receipt is required for ${target}`);
+  if (receipt.schemaVersion !== 1 || receipt.abiVersion !== 1 || receipt.status !== 'built' || receipt.target !== target || receipt.sdkVersion !== NATIVE_RUNTIME_VERSION) {
+    throw new Error(`A successfully built ${NATIVE_RUNTIME_VERSION} runtime receipt is required for ${target}`);
   }
   if (!Array.isArray(receipt.artifacts)) throw new Error('Native receipt is missing artifact hashes');
   const names = new Set();
