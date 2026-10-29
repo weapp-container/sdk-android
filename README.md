@@ -1,20 +1,19 @@
 # Weapp Container Android SDK
 
-Source version **0.1.0-preview.5** (unpublished) · [weapp-container organization](https://github.com/weapp-container) · [SDK contract](https://github.com/weapp-container/sdk-contract)
+Source version **0.1.0-preview.5** (private preview) · [weapp-container organization](https://github.com/weapp-container) · [SDK contract](https://github.com/weapp-container/sdk-contract)
 
 This independent repository contains the **Apache-2.0 host wrapper and consumer source**. The runtime implementation remains closed source. Its separately licensed binaries are obtained only from the private [`weapp-container/runtime-artifacts`](https://github.com/weapp-container/runtime-artifacts) repository. SDK source licensing does not grant a runtime binary license. Distributions retain `RUNTIME-LICENSE` and all third-party notices alongside the wrapper's `LICENSE`.
 
 A fresh clone needs Node.js 24+, Python 3 and the platform toolchain below. It does **not** need a parent monorepo, Rust, Cargo, a git submodule or private implementation source.
 
-This checkout develops **0.1.0-preview.5** for Dev Player; it is not a published
-binary release. The retained default runtime lock still pins the real private
-`runtime-v0.1.0-preview.4` release by exact size and SHA-256. The new preview.5
-defaults reject those old pins; use an explicitly reviewed preview.5 manifest
-only after its binaries have been built and checked. No older-runtime fallback
-is allowed. Historical releases, reports and source identities retain their
-original versions and do not establish preview.5 execution. Windows/Linux
-runtime distributions remain blocked. Binary download/installation does not
-establish Player, GPU or device acceptance.
+The default lock identifies the newly built **0.1.0-preview.5** QuickJS + Skia GPU
+artifacts by exact size and SHA-256. It contains seven runtime slices and Android,
+iOS and macOS universal SDK packages; native production is bound to
+`05aec6c4056a124a9c399c75b34d081cffbdaa5d`, while wrapper producer commits are
+recorded separately in archive provenance. Historical preview.2/3/4 releases,
+reports and source identities remain unchanged. No older-runtime fallback is
+allowed. Windows/Linux runtime distributions remain blocked. Archive validation,
+private publication and actual Player/GPU/device acceptance are separate gates.
 
 ## Obtain the native runtime
 
