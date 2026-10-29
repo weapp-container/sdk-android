@@ -4,3 +4,4 @@
 artifacts/
 .runtime/
 local.properties
+/.kotlin/
