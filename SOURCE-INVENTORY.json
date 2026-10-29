@@ -1,0 +1,289 @@
+{
+  "schemaVersion": 1,
+  "sdkVersion": "0.1.0-preview.4",
+  "sourceBaseCommit": "5a83d856424ae391453934d472915ac074681744",
+  "review": "Review preview.4 host chrome wrappers, standalone source inventories and unchanged historical ORIGIN. Runtime archive locks remain preview.3 pending separately verified preview.4 release bytes.",
+  "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
+  "historicalOrigin": {
+    "path": "ORIGIN.json",
+    "sha256": "b58ba8b41c2f7967e9110d77765ab4e91c5304ecb8d7684cd5ed42fc57bbf2c4"
+  },
+  "files": [
+    {
+      "path": ".github/workflows/checks.yml",
+      "sha256": "1c18982a507217a8bbac7e65279383e5df5c6460689d5d92ad3e3332658eff00",
+      "size": 483,
+      "mode": "100644"
+    },
+    {
+      "path": ".gitignore",
+      "sha256": "1c5d41cae26964e446fe781579e3d422f9a65e4ab7e5c0a0d91d29b8dba859be",
+      "size": 63,
+      "mode": "100644"
+    },
+    {
+      "path": "CONTRACT.md",
+      "sha256": "e1ae00fd1b55a952943ac025832eadc0384037e31f728fb703cc8729fde2547c",
+      "size": 13434,
+      "mode": "100644"
+    },
+    {
+      "path": "LICENSE",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "size": 10847,
+      "mode": "100644"
+    },
+    {
+      "path": "ORIGIN.json",
+      "sha256": "b58ba8b41c2f7967e9110d77765ab4e91c5304ecb8d7684cd5ed42fc57bbf2c4",
+      "size": 22359,
+      "mode": "100644"
+    },
+    {
+      "path": "README.md",
+      "sha256": "c8bbee2206782da84fb479203c604d417480192d81987f7aa884727ac34a297f",
+      "size": 8852,
+      "mode": "100644"
+    },
+    {
+      "path": "build.gradle.kts",
+      "sha256": "3602e32f35bf6287d2b8e209cbef783e24a1bc6a473de0d175e7d7d0820fdfab",
+      "size": 121,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/build.gradle.kts",
+      "sha256": "098220c3fa307e425ab7cae3348d2a469df06eb85b3113a38f1d8a6b1de199de",
+      "size": 1069,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/consumer-test.pro",
+      "sha256": "725fe5513b4a1ceb7c0864dbc9d0c8cc52db2b6c410c97a115f817dd69fa8ecc",
+      "size": 480,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/gradle.properties",
+      "sha256": "496a6daf2ad5a72c1e8d5eaecb776cf2cd0e3879d039e92dd685e8717b41b6a8",
+      "size": 73,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/settings.gradle.kts",
+      "sha256": "6123cefe116367cfb860391914f7903405e3240f7ce803bb06d92b3db03e8e6b",
+      "size": 693,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/src/androidTest/AndroidManifest.xml",
+      "sha256": "f61c53687d11bbfa67faea9cafc0704ccae0e1f5e31c9260cb54c515366b9340",
+      "size": 132,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/src/androidTest/java/com/sonofmagic/weapp/container/consumer/SdkInstrumentation.kt",
+      "sha256": "f4c8b5ea78a2396872af9587259b439256ffb69f10fdaf912862b9c40124d920",
+      "size": 14379,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/src/main/AndroidManifest.xml",
+      "sha256": "0d2d2c56d9436be7d5d6529783a334a9d89adec999ba9b9ea8d607ae709bec43",
+      "size": 585,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/src/main/java/com/sonofmagic/weapp/container/consumer/ConsumerActivity.kt",
+      "sha256": "e3ff6a67d358744ec2d4b001ed81c88d63e666528d0e4a1b56b678dd31c8db5a",
+      "size": 2372,
+      "mode": "100644"
+    },
+    {
+      "path": "docs/EMBEDDING.md",
+      "sha256": "f48720fbafe53fc1d4a7ab2aa49700b71605fd88119683b8638e8fcf2406b08c",
+      "size": 7447,
+      "mode": "100644"
+    },
+    {
+      "path": "gradle.properties",
+      "sha256": "e43a00491832254a35cf5a979ef6de17f78c4e159d446be39319d2e3d3e46325",
+      "size": 100,
+      "mode": "100644"
+    },
+    {
+      "path": "include/weapp_container_sdk.h",
+      "sha256": "2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b",
+      "size": 6842,
+      "mode": "100644"
+    },
+    {
+      "path": "library/build.gradle.kts",
+      "sha256": "0f71124568781c872275840af3ef8c72d891078101b5571ae307a02e98074085",
+      "size": 3895,
+      "mode": "100644"
+    },
+    {
+      "path": "library/consumer-rules.pro",
+      "sha256": "0958ec2d8bb434036a785925bb62bd3c4043b1a96392cbe1468b35cdfe27157c",
+      "size": 154,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/androidTest/AndroidManifest.xml",
+      "sha256": "a0a9df02f2aec2efd52590287832b3233ae7a65a29fdce50fc17708158b18f3d",
+      "size": 315,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/androidTest/java/com/sonofmagic/weapp/container/sdk/GlesRecoveryInstrumentation.kt",
+      "sha256": "034efe4fe4e2996bd2c56c946add1a55148ab397bf8b9574efccf4752fb60132",
+      "size": 14617,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/AndroidManifest.xml",
+      "sha256": "2acf9505c90ae038da8545d4891c4b7a8ad6d61b812476725c1148bcfd8b4f6e",
+      "size": 143,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/cpp/CMakeLists.txt",
+      "sha256": "e9e7b61a93f93268475f85037712cdbe62ef84c5bc58f105c6eea4ba4498553e",
+      "size": 1048,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/cpp/weapp_jni.cpp",
+      "sha256": "741723cb63e2c2151e921d4f4806c163a534e15bcb5d3284ec466ef98c10910c",
+      "size": 5966,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/EglPresenter.kt",
+      "sha256": "dffb0f44eaf60abe7086cb2292022b686e78e438d4449f8ed98aec02f358212e",
+      "size": 9888,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
+      "sha256": "9836d301fdbe90c547fb519c76914c0540fc5e9a45b264d927d641b2f2b07ad0",
+      "size": 6632,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/NativeBridge.kt",
+      "sha256": "59542a5b6e80e618571f888fade92d31af377632371f54b9ac499b07c59dfa09",
+      "size": 557,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
+      "sha256": "6d2c6e5d5051a23e52eb726bd0ea9ab3ad141148814d0a09dba649a16f602d1f",
+      "size": 29637,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerView.kt",
+      "sha256": "998d9df3054187dfef9717dd6a5efb85f9096515c7332bfdb6519b722aee37cb",
+      "size": 11720,
+      "mode": "100644"
+    },
+    {
+      "path": "package.json",
+      "sha256": "28b9d5766e555ed1fb444e6984552ba60e3889eeb6572982a7ac8e168e327b94",
+      "size": 498,
+      "mode": "100644"
+    },
+    {
+      "path": "runtime-artifacts.lock.json",
+      "sha256": "9e8edc773fae37d1a2a909f71b3b7aae5b289aa632941bd291d5b0119713808d",
+      "size": 3217,
+      "mode": "100644"
+    },
+    {
+      "path": "settings.gradle.kts",
+      "sha256": "705e77903d91198e4e288dfa59a8c0f62922136fc5b6b91a2c0c4f2883176367",
+      "size": 605,
+      "mode": "100644"
+    },
+    {
+      "path": "test/native-input.test.mjs",
+      "sha256": "8c9b31c462c0a8ccf384d7479c3b498ba3c43ffe8f96fc241fb89143550b6902",
+      "size": 12959,
+      "mode": "100644"
+    },
+    {
+      "path": "test/provenance.test.mjs",
+      "sha256": "a0f94207c7901f62b8c28e1fab8586deaf6cfdba30fec449a61e91042a7b1458",
+      "size": 2460,
+      "mode": "100644"
+    },
+    {
+      "path": "test/source-inventory.test.mjs",
+      "sha256": "fa7f6e0fdcc6c99a9d03619b5d1925079afe38ffc67071f31462c89698474592",
+      "size": 4319,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/build.mjs",
+      "sha256": "138e2a7270241805e6a3fbf437c524451c567378d39da6b94f08b0fa11319bd9",
+      "size": 9397,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/check-origin.mjs",
+      "sha256": "6d0bcbffc098f454dbd9125a6490298f9d98cf6a4b8b6de52cd350d776d08e27",
+      "size": 806,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/device-smoke.mjs",
+      "sha256": "90cdaf30fd8bf45a36c0d51120ed68641dee3e02bfee826188440adb23560778",
+      "size": 5127,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/gles-recovery.mjs",
+      "sha256": "d08ca0052146c080af202adb7110e82b18f0d37635a1d2990adfd07c1b94c0e3",
+      "size": 4924,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/native-input.mjs",
+      "sha256": "1e72f9dc75b99763fa4c32f3e45ac3b54d4461265445fcda4b6dcd78f45a9aef",
+      "size": 11274,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/prepare-runtime.mjs",
+      "sha256": "d314aceabcea7a5dfcaef7502f0206f9f78c8661f22fd0dfe7c324ec35f43dc1",
+      "size": 4281,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/runtime-artifacts.mjs",
+      "sha256": "ea87525bd7589c62a100ba3ead7f33f8fdc5eb05d04e7b0ee829b99093b99818",
+      "size": 19111,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/source-inventory.mjs",
+      "sha256": "e648d5631263c47b2b2565deb4d10ddc45fdaef76599dbd6929431492400ecf7",
+      "size": 6698,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/unpack-runtime.py",
+      "sha256": "d4f49e8aa2541ca01670a4fd10330e6bc4b470cf95452b0585605bae09f76f89",
+      "size": 9861,
+      "mode": "100644"
+    },
+    {
+      "path": "types/weapp-container.d.ts",
+      "sha256": "c951bcb61181a050f06049417d6db2b8e421b349092cce3bd19042426bb6080b",
+      "size": 1804,
+      "mode": "100644"
+    }
+  ]
+}

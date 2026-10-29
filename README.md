@@ -79,3 +79,19 @@ These are wrapper input-contract tests, not runtime, GPU, device, performance or
 The 2026-10-27 preview.2 report for wrapper source `a448373` records 19 native checks on an arm64 API 30 emulator with host GLES, including actual EGL swap acknowledgement, MotionEvent input/scrolling, navigation, async completion, timeout/cancellation, reload rollback, storage reopening and concurrent session retirement. Both ABI binaries passed ELF and 16 KB alignment checks, and the release consumer passed R8 and exact runtime-byte validation. Physical-device, x86_64 execution, 16 KB device boot, performance and WeChat parity remain unmeasured. Device evidence is separate from the build receipt.
 
 `ORIGIN.json` lists the allowlisted source paths, original source SHA-256, transformed destination SHA-256 and reviewed C-header contract hash. This repository includes no core implementation, Git history from the original repository, binary runtime, cache or credentials.
+
+### Reviewing later SDK source changes
+
+`ORIGIN.json` stays as the historical extraction receipt. `SOURCE-INVENTORY.json` records the current reviewed wrapper source paths, SHA-256, sizes and executable modes, including the historical receipt's unchanged hash. The origin check and package build verify this exact inventory in the standalone SDK checkout and reject untracked or unreviewed paths, modified bytes, symlinks, core sources, binaries and caches. This source review is separate from build, artifact and device acceptance evidence.
+
+After reviewing an update, stage all intended new source files, refresh explicitly, then stage the inventory:
+
+```sh
+git add <reviewed-files>
+node tools/source-inventory.mjs --write --version 0.1.0-preview.4 --reason "Describe the reviewed changes"
+git add SOURCE-INVENTORY.json
+node tools/check-origin.mjs
+npm test
+```
+
+Commit source and inventory together before building distributable packages. `sourceBaseCommit` identifies the checkout used to prepare the source review; it does not bind subsequent build evidence to that earlier commit. Never rewrite historical receipts or fabricate runtime archive lock hashes to make this check pass.

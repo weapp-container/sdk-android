@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { verifySourceInventory } from './source-inventory.mjs';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, cpSync, rmSync } from 'node:fs';
 import { createHash } from 'node:crypto';
@@ -8,6 +9,7 @@ import os from 'node:os';
 import { copyPack, readNative, readNotices, requireNativeRoot, sourceProvenance, nativeIdentity, SDK_VERSION } from './native-input.mjs';
 
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const reviewedSource = verifySourceInventory(root);
 const args = process.argv.slice(2);
 const sdk = process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT || join(os.homedir(), 'Library/Android/sdk');
 const buildEnv = { ...process.env, ANDROID_HOME: sdk };
@@ -32,7 +34,7 @@ function findGradle() {
 const gradle=findGradle();
 const common=['--no-daemon','--console=plain']; if(args.includes('--offline')) common.push('--offline');
 const receiptPath=join(out,'validation.json');
-const receipt={schemaVersion:1,sdkVersion:SDK_VERSION,status:'building',...sourceProvenance(root),startedAt:new Date().toISOString(),nativeRoot:native,licensesRoot,native:[],deviceExecution:'not-run'};
+const receipt={schemaVersion:1,sdkVersion:SDK_VERSION,status:'building',...sourceProvenance(root), sourceInventorySha256: reviewedSource.inventorySha256,startedAt:new Date().toISOString(),nativeRoot:native,licensesRoot,native:[],deviceExecution:'not-run'};
 const save=()=>{
   writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
   // Keep command paths and local build directories in external evidence only.
@@ -41,7 +43,7 @@ const save=()=>{
     .sort((a,b)=>b.length-a.length).reduce((text,path)=>text.replaceAll(path,'<local-build-directory>'),receipt.error);
   const distribution = Object.fromEntries([
     'schemaVersion','sdkVersion','status','sourceCommit','sourceDirty','sourceKind',
-    'originSourceCommit','originManifestSha256','startedAt','finishedAt','native',
+    'originSourceCommit','originManifestSha256','sourceInventorySha256','startedAt','finishedAt','native',
     'mavenArtifacts','binaries','checks','deviceExecution','fixtureIntegrity','pinnedRuntimeBytes',
   ].filter(key=>receipt[key]!==undefined).map(key=>[key,receipt[key]]));
   distribution.artifactRoot = 'maven';
