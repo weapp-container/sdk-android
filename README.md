@@ -2,13 +2,13 @@
 
 Source version **0.1.0-preview.5.3** (private, unpublished source preparation) · [weapp-container organization](https://github.com/weapp-container) · [SDK contract](https://github.com/weapp-container/sdk-contract)
 
-The current source requires a newly produced **0.1.0-preview.5.3** native runtime. Its native archives, wrapper distribution and exact new lock are **pending**. The committed `runtime-artifacts.lock.json` intentionally retains the historical preview.5.2 bytes, SHA-256 `10cf2f084601c9d0e2f06c54dcce4810527035beeee760f075b414651c67d829`; that lock does not satisfy this source. Default preparation must reject the version mismatch. Only actual preview.5.3 production and archive verification may update the pins; old preview.5.1 producer bytes cannot be reused or relabelled. AAR, consumer, publication, Player and GPU/device validation for preview.5.3 remain pending.
+The committed `runtime-artifacts.lock.json` now pins the **0.1.0-preview.5.3** archive set, SHA-256 `ee393000b5726172755b24a31812f9b55051e710c2714edadb9b3ac287b95388`. The lock contains exact sizes and hashes for seven runtime slices and three universal SDK packages. Native producer identity remains `012400d43cb20b4d91a73fbbde7e1cf11bd0bb6a`; the Android wrapper archive producer remains `e4fa84e784edc1a80d972655eea347537ca40774`. This lock-only maintenance commit and its installation-documentation updates do not rebuild or relabel those bytes. Private publication and authenticated download, current consumer/Player execution and GPU/device acceptance remain separate gates; the lock does not establish them.
 
 This independent repository contains the **Apache-2.0 host wrapper and consumer source**. The runtime implementation remains closed source. Its separately licensed binaries are obtained only from the private [`weapp-container/runtime-artifacts`](https://github.com/weapp-container/runtime-artifacts) repository. SDK source licensing does not grant a runtime binary license. Distributions retain `RUNTIME-LICENSE` and all third-party notices alongside the wrapper's `LICENSE`.
 
 A fresh clone needs Node.js 24+, Python 3 and the platform toolchain below. It does **not** need a parent monorepo, Rust, Cargo, a git submodule or private implementation source.
 
-Historical preview.5.2 distribution (preserved evidence): the retained lock identifies the **0.1.0-preview.5.2** archive bundle by exact
+Historical preview.5.2 distribution (preserved evidence): its historical lock identified the **0.1.0-preview.5.2** archive bundle by exact
 size and SHA-256: seven runtime slices and Android, iOS and macOS universal SDK
 packages. Its QuickJS + Skia GPU native bytes remain **0.1.0-preview.5.1**, produced
 from `747d0b02131d7f67b3adbdd7127abcd5e21ffdbe`. The Android wrapper archive was
@@ -27,7 +27,7 @@ and source identities keep their original bindings.
 
 Use the reviewed `runtime-artifacts.lock.json` shipped with the matching SDK release. It locks the exact runtime version, platform, architecture, ABI **1**, artifact size and SHA-256. An absent pin, missing architecture, hash/version mismatch or unavailable engine is an error; there is no download of `latest`, software substitution or silent fallback.
 
-The commands below require the pending matching preview.5.3 distribution. The retained preview.5.2 lock is historical input only and cannot currently prepare or build this source.
+The commands below use the committed preview.5.3 lock by default. Use an authorized offline archive directory until the matching private release is published and available to your credential. Historical preview.5.2 inputs remain preserved evidence and do not satisfy this source.
 
 Set `WEAPP_CONTAINER_RUNTIME_TOKEN` in your credential environment with read access to the private artifact repository. Do not place credentials in source files or CLI arguments. Then run:
 

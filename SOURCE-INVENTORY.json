@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.5.3",
-  "sourceBaseCommit": "b069f8f5496f9119d0690e2d9b3c49757100db45",
-  "review": "Prepare preview5.3 source for a newly built native runtime; preserve preview5.2 lock and historical evidence while production is pending",
+  "sourceBaseCommit": "e4fa84e784edc1a80d972655eea347537ca40774",
+  "review": "Lock-only update to the reviewed preview.5.3 manifest SHA-256 ee393000b5726172755b24a31812f9b55051e710c2714edadb9b3ac287b95388 and matching installation-documentation corrections; no wrapper implementation or native byte changes. Original Android archive producer e4fa84e784edc1a80d972655eea347537ca40774 and native producer 012400d43cb20b4d91a73fbbde7e1cf11bd0bb6a remain unchanged.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -41,8 +41,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "dec5b57afd93330c93fbe1be5daf87a5e04909c4e834a051b58d244e530ca608",
-      "size": 10263,
+      "sha256": "ac02e2cfea7f6eb2eac34b886bf08c26f9446019668493106c72fd39f72b0875",
+      "size": 10412,
       "mode": "100644"
     },
     {
@@ -197,7 +197,7 @@
     },
     {
       "path": "runtime-artifacts.lock.json",
-      "sha256": "10cf2f084601c9d0e2f06c54dcce4810527035beeee760f075b414651c67d829",
+      "sha256": "ee393000b5726172755b24a31812f9b55051e710c2714edadb9b3ac287b95388",
       "size": 3241,
       "mode": "100644"
     },

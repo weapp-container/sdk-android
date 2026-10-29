@@ -1,27 +1,27 @@
 {
   "schemaVersion": 1,
-  "runtimeVersion": "0.1.0-preview.5.2",
+  "runtimeVersion": "0.1.0-preview.5.3",
   "abiVersion": 1,
   "source": {
     "repository": "weapp-container/runtime-artifacts",
-    "releaseTag": "runtime-v0.1.0-preview.5.2"
+    "releaseTag": "runtime-v0.1.0-preview.5.3"
   },
   "artifacts": [
     {
       "component": "runtime",
       "platform": "android",
       "arch": "arm64-v8a",
-      "fileName": "runtime-0.1.0-preview.5.2-android-arm64-v8a.tar.gz",
-      "size": 9222794,
-      "sha256": "7e251a1531cc9124eee76c36cd4d2b7b7381b1e419db9939963670d10ae9c2aa"
+      "fileName": "runtime-0.1.0-preview.5.3-android-arm64-v8a.tar.gz",
+      "size": 9224854,
+      "sha256": "28dfc9505c07aec77d5fba9799c7cf44d26df9df494a4dc8c457e1100380ceca"
     },
     {
       "component": "runtime",
       "platform": "android",
       "arch": "x86_64",
-      "fileName": "runtime-0.1.0-preview.5.2-android-x86_64.tar.gz",
-      "size": 9395484,
-      "sha256": "5bce7d941262813b095f61b84a516b1f8ef9c04be2132accd5715c780cc0a68e"
+      "fileName": "runtime-0.1.0-preview.5.3-android-x86_64.tar.gz",
+      "size": 9397932,
+      "sha256": "5343f07fe646e6df8f768c909786a79628047336ba0a1a1a800059664f2d0bc6"
     },
     {
       "component": "android-sdk",
@@ -31,33 +31,33 @@
         "arm64-v8a",
         "x86_64"
       ],
-      "fileName": "android-sdk-0.1.0-preview.5.2-android-universal.tar.gz",
-      "size": 21461129,
-      "sha256": "6ab236ad0c4f4385596fd07d3b2b85c4107650b89eeeef11a2b460397dd03e05"
+      "fileName": "android-sdk-0.1.0-preview.5.3-android-universal.tar.gz",
+      "size": 21467394,
+      "sha256": "7bb4c345e6c7dcc4a13c5bc2ded6d131c97bb5651655f4df0a3c05cb9c7e4d2f"
     },
     {
       "component": "runtime",
       "platform": "ios",
       "arch": "arm64-device",
-      "fileName": "runtime-0.1.0-preview.5.2-ios-arm64-device.tar.gz",
-      "size": 21801221,
-      "sha256": "0f7fcad6783741f7e177898a8c2bef2a17edd3eb369168091e376c7da4277f61"
+      "fileName": "runtime-0.1.0-preview.5.3-ios-arm64-device.tar.gz",
+      "size": 21813904,
+      "sha256": "dc78a7a66ae8009c78bdf04f13732091695075766bb807e2120c68aceba65b22"
     },
     {
       "component": "runtime",
       "platform": "ios",
       "arch": "arm64-simulator",
-      "fileName": "runtime-0.1.0-preview.5.2-ios-arm64-simulator.tar.gz",
-      "size": 21815354,
-      "sha256": "4a998361f8ea6c236d524e4aa1d28de27876c8e5d8e0beab791ac881e1a98e87"
+      "fileName": "runtime-0.1.0-preview.5.3-ios-arm64-simulator.tar.gz",
+      "size": 21818129,
+      "sha256": "83cfbc5601c497580ff123ded943fc5b29b0bd696b60d5b190ed3a6cd599898f"
     },
     {
       "component": "runtime",
       "platform": "ios",
       "arch": "x86_64-simulator",
-      "fileName": "runtime-0.1.0-preview.5.2-ios-x86_64-simulator.tar.gz",
-      "size": 22086597,
-      "sha256": "0d2306861de89747bce29213f2552f70ffb53124218fe6495bf1daa8706b9ef7"
+      "fileName": "runtime-0.1.0-preview.5.3-ios-x86_64-simulator.tar.gz",
+      "size": 22091735,
+      "sha256": "69e4c13c614d7c97b6ac95ce957825321554e97a4fd5cfbea27d8682f5d30552"
     },
     {
       "component": "ios-sdk",
@@ -68,25 +68,25 @@
         "arm64-simulator",
         "x86_64-simulator"
       ],
-      "fileName": "ios-sdk-0.1.0-preview.5.2-ios-universal.tar.gz",
-      "size": 65766724,
-      "sha256": "a6a6fdcbb35c4e6e37f0f2c8b32b390560f75f05555ae02de26621620c2d579f"
+      "fileName": "ios-sdk-0.1.0-preview.5.3-ios-universal.tar.gz",
+      "size": 65766204,
+      "sha256": "db3d9e7a6b0f1ded0522bca440c110a7b79f048e43caf2de951da9cfe67a9e68"
     },
     {
       "component": "runtime",
       "platform": "macos",
       "arch": "arm64",
-      "fileName": "runtime-0.1.0-preview.5.2-macos-arm64.tar.gz",
-      "size": 28633326,
-      "sha256": "b274820a2c8ed8174c6ba9ea4e98ad5ef3717b64173a9f73f73f31cf27679a43"
+      "fileName": "runtime-0.1.0-preview.5.3-macos-arm64.tar.gz",
+      "size": 28639360,
+      "sha256": "b2a2f65838a881ceeae3358654e67fdfe984638c91951e03c1c18927aac15f23"
     },
     {
       "component": "runtime",
       "platform": "macos",
       "arch": "x86_64",
-      "fileName": "runtime-0.1.0-preview.5.2-macos-x86_64.tar.gz",
-      "size": 30358870,
-      "sha256": "c0af1d918071c404c45a255dbe03f2b55e68d2f56e85706ea49aa75ee693d3ad"
+      "fileName": "runtime-0.1.0-preview.5.3-macos-x86_64.tar.gz",
+      "size": 30363214,
+      "sha256": "472ab4c93354034287e6295e52298d67d194b347f90ee3bfa6a4e02c76570535"
     },
     {
       "component": "desktop-sdk",
@@ -96,9 +96,9 @@
         "arm64",
         "x86_64"
       ],
-      "fileName": "desktop-sdk-0.1.0-preview.5.2-macos-universal.tar.gz",
-      "size": 44537804,
-      "sha256": "a4ac644134713e67b77670406a86979266e80f949dedcfd6be8566598edd6da8"
+      "fileName": "desktop-sdk-0.1.0-preview.5.3-macos-universal.tar.gz",
+      "size": 44546695,
+      "sha256": "8789b4ba7444caa2da657823d77bc865fff0b750991c0c195d03f1780a72e164"
     }
   ]
 }
