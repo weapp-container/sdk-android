@@ -6,6 +6,7 @@ import { tmpdir } from 'node:os';
 import { resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { copyPack, HEADER_SHA256, inside, nativeIdentity, readNative, readNotices, requireNativeRoot, NATIVE_RUNTIME_VERSION, SDK_VERSION, sha256 } from '../tools/native-input.mjs';
+import { selectArtifact } from '../tools/runtime-artifacts.mjs';
 
 const root = fileURLToPath(new URL('../', import.meta.url));
 const hash = value => createHash('sha256').update(value).digest('hex');
@@ -178,12 +179,23 @@ test('distribution selection cannot relax native path and symlink rules', t => {
   }
 });
 
-// Wrapper evolution must never relabel the immutable native producer.
-test('wrapper preview5.2 consumes exact native preview5.1 and rejects relabelled native receipts', t => {
+// Native changes require a new producer; the retained old lock cannot relabel it.
+test('preview5.3 requires its exact native version and rejects every earlier preview producer', t => {
   const f = fixture(t);
-  assert.equal(SDK_VERSION, '0.1.0-preview.5.2');
-  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.5.1');
+  assert.equal(SDK_VERSION, '0.1.0-preview.5.3');
+  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.5.3');
   assert.equal(readNative(f.native, f.target, ['libfixture.a']).receipt.sdkVersion, NATIVE_RUNTIME_VERSION);
-  f.receipt.sdkVersion = SDK_VERSION; f.save();
-  assert.throws(() => readNative(f.native, f.target, ['libfixture.a']), /runtime receipt/);
+  for (const oldVersion of ['0.1.0-preview.5', '0.1.0-preview.5.1', '0.1.0-preview.5.2']) {
+    f.receipt.sdkVersion = oldVersion; f.save();
+    assert.throws(() => readNative(f.native, f.target, ['libfixture.a']), /runtime receipt/, oldVersion);
+  }
+});
+
+test('runtime preparation rejects an earlier distribution lock before download', () => {
+  const manifest = { schemaVersion: 1, runtimeVersion: '0.1.0-preview.5.2', abiVersion: 1,
+    source: { repository: 'weapp-container/runtime-artifacts', releaseTag: 'runtime-v0.1.0-preview.5.2' },
+    artifacts: [] };
+  assert.throws(() => selectArtifact(manifest, {
+    version: SDK_VERSION, platform: 'android', arch: 'arm64-v8a', component: 'runtime', abiVersion: 1,
+  }), { code: 'ERR_RUNTIME_MANIFEST' });
 });

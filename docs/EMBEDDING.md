@@ -1,6 +1,6 @@
 # Android SDK preview
 
-`com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.5.1` embeds the real
+`com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.5.3` embeds the real
 QuickJS runtime and Skia GLES renderer in an Android View. Minimum Android is
 API 26. The release AAR packages `arm64-v8a` and `x86_64`, JNI consumer R8 rules,
 and its C++ runtime. Applications do not install Rust or build JNI.

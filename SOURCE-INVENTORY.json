@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.1.0-preview.5.2",
-  "sourceBaseCommit": "c8241b83017d7f5f7fd614dc34bd9fbf00230c0f",
-  "review": "Pin the reviewed preview.5.2 archive manifest and current Android documentation while preserving the c8241 wrapper and 747d native producer identities",
+  "sdkVersion": "0.1.0-preview.5.3",
+  "sourceBaseCommit": "b069f8f5496f9119d0690e2d9b3c49757100db45",
+  "review": "Prepare preview5.3 source for a newly built native runtime; preserve preview5.2 lock and historical evidence while production is pending",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -23,7 +23,7 @@
     },
     {
       "path": "CONTRACT.md",
-      "sha256": "feccee042d10ee92f5269e68970f28117b554302e3b7a6e03dfa0bffe3b2d86d",
+      "sha256": "dce2228bf7704101dbc0e6873a860dcb7a1883edf1a10e43f8742cd9b913f5db",
       "size": 13457,
       "mode": "100644"
     },
@@ -41,8 +41,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "b5aa077e0105e551a6310695259e4038924ab7c95b5998d0e9269a1d2495c894",
-      "size": 9792,
+      "sha256": "dec5b57afd93330c93fbe1be5daf87a5e04909c4e834a051b58d244e530ca608",
+      "size": 10263,
       "mode": "100644"
     },
     {
@@ -53,7 +53,7 @@
     },
     {
       "path": "consumer/build.gradle.kts",
-      "sha256": "1db16001a75a184b84f2f8d25e4a9e4104ea15d6715083bf5853eb6490458e27",
+      "sha256": "16ec55e62b09e3537730ae57d2c7eff883ee0c35e9f049777cd60031a9536f86",
       "size": 1071,
       "mode": "100644"
     },
@@ -101,7 +101,7 @@
     },
     {
       "path": "docs/EMBEDDING.md",
-      "sha256": "10fdbe9f0a8a1ea8f6ee4f0d88130489a7839d87cec701145ea7f43936dcb302",
+      "sha256": "b7728e72f98944f7056f6076c42f825e4ad78334fe2c0bce522d4073e3ad7fc1",
       "size": 7449,
       "mode": "100644"
     },
@@ -119,7 +119,7 @@
     },
     {
       "path": "library/build.gradle.kts",
-      "sha256": "02641facc6a44e348a21b750985fd1d2b6993a449bb306938dea1ec7b6d8ca4e",
+      "sha256": "91a9491459cd74332463637244abda38a780fdd52eeb5662e89fc06efa4286c9",
       "size": 3897,
       "mode": "100644"
     },
@@ -179,7 +179,7 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
-      "sha256": "9cfbff4d8ffbca44dea4e26fb37b856d87209e92bfcb4fad0bd47aed26b1556a",
+      "sha256": "ef4b8c5a764299600f9597bd7b79780aec180795b5fe26f8f99a61c73f1656c4",
       "size": 36556,
       "mode": "100644"
     },
@@ -191,7 +191,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "3a9573c968e6dfd8163fc5c1e62f140beb8b05d50ad15bb8bf1fa132d4479967",
+      "sha256": "45327e03a4d9751417b6542966e4a648ba3798418e025250fbdfdd474bc62c7a",
       "size": 500,
       "mode": "100644"
     },
@@ -209,8 +209,8 @@
     },
     {
       "path": "test/native-input.test.mjs",
-      "sha256": "1d263ba0049922ffabd5be75c610a0034600fd39e205982918b4866bee508f85",
-      "size": 13615,
+      "sha256": "19428de6437bd8abef9a9586b23c9a01339679506f2027bbfc228e337898b291",
+      "size": 14306,
       "mode": "100644"
     },
     {
@@ -221,13 +221,13 @@
     },
     {
       "path": "test/provenance.test.mjs",
-      "sha256": "0cb4907a4a1a6f19da501be991121e2c1e326343db5fcc9ab76225a890d998dc",
+      "sha256": "5b915d104f9151121b3f5a857c448a604dc8160a547b08eb30b4f6410859c633",
       "size": 2462,
       "mode": "100644"
     },
     {
       "path": "test/source-inventory.test.mjs",
-      "sha256": "fc42cd669b99970d451d811b43faa60153d47dddf57595e70ac41568febe5d08",
+      "sha256": "fab8ff7803d0e56b89bbac22ce397a9d53daa202e47d705ae2e39039ced7d373",
       "size": 4335,
       "mode": "100644"
     },
@@ -257,8 +257,8 @@
     },
     {
       "path": "tools/native-input.mjs",
-      "sha256": "21da25701150293e05207a8c2030c00a24f20cf9eb003202a3d8c791b966ae2f",
-      "size": 11430,
+      "sha256": "8a9952472bcce34df1602f110159ffd189900d6016e8dfc079913390ead2d1d3",
+      "size": 11443,
       "mode": "100644"
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "tools/runtime-artifacts.mjs",
-      "sha256": "4aeb8cc5fd855ae99ceb695a12bf5e36065fc047bf15ac819678682f2765b4da",
+      "sha256": "d8cb43007799c4434efa2b06cdc13eaf233d5f0fd8e602d66a89410b1714dd55",
       "size": 19113,
       "mode": "100644"
     },

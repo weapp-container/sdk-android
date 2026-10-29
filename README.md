@@ -1,14 +1,14 @@
 # Weapp Container Android SDK
 
-Source version **0.1.0-preview.5.2** (private preview) · [weapp-container organization](https://github.com/weapp-container) · [SDK contract](https://github.com/weapp-container/sdk-contract)
+Source version **0.1.0-preview.5.3** (private, unpublished source preparation) · [weapp-container organization](https://github.com/weapp-container) · [SDK contract](https://github.com/weapp-container/sdk-contract)
 
-The current source and exact archive lock target `0.1.0-preview.5.2`. The lock SHA-256 is `10cf2f084601c9d0e2f06c54dcce4810527035beeee760f075b414651c67d829`; it pins ten reviewed archives. Native preparation verifies the preserved `0.1.0-preview.5.1` producer receipts and exact artifact bytes. The archive bundle version does not relabel its native producer. The lock does not assert private-release availability, Player installation or GPU/device acceptance.
+The current source requires a newly produced **0.1.0-preview.5.3** native runtime. Its native archives, wrapper distribution and exact new lock are **pending**. The committed `runtime-artifacts.lock.json` intentionally retains the historical preview.5.2 bytes, SHA-256 `10cf2f084601c9d0e2f06c54dcce4810527035beeee760f075b414651c67d829`; that lock does not satisfy this source. Default preparation must reject the version mismatch. Only actual preview.5.3 production and archive verification may update the pins; old preview.5.1 producer bytes cannot be reused or relabelled. AAR, consumer, publication, Player and GPU/device validation for preview.5.3 remain pending.
 
 This independent repository contains the **Apache-2.0 host wrapper and consumer source**. The runtime implementation remains closed source. Its separately licensed binaries are obtained only from the private [`weapp-container/runtime-artifacts`](https://github.com/weapp-container/runtime-artifacts) repository. SDK source licensing does not grant a runtime binary license. Distributions retain `RUNTIME-LICENSE` and all third-party notices alongside the wrapper's `LICENSE`.
 
 A fresh clone needs Node.js 24+, Python 3 and the platform toolchain below. It does **not** need a parent monorepo, Rust, Cargo, a git submodule or private implementation source.
 
-The default lock identifies the **0.1.0-preview.5.2** archive bundle by exact
+Historical preview.5.2 distribution (preserved evidence): the retained lock identifies the **0.1.0-preview.5.2** archive bundle by exact
 size and SHA-256: seven runtime slices and Android, iOS and macOS universal SDK
 packages. Its QuickJS + Skia GPU native bytes remain **0.1.0-preview.5.1**, produced
 from `747d0b02131d7f67b3adbdd7127abcd5e21ffdbe`. The Android wrapper archive was
@@ -26,6 +26,8 @@ and source identities keep their original bindings.
 ## Obtain the native runtime
 
 Use the reviewed `runtime-artifacts.lock.json` shipped with the matching SDK release. It locks the exact runtime version, platform, architecture, ABI **1**, artifact size and SHA-256. An absent pin, missing architecture, hash/version mismatch or unavailable engine is an error; there is no download of `latest`, software substitution or silent fallback.
+
+The commands below require the pending matching preview.5.3 distribution. The retained preview.5.2 lock is historical input only and cannot currently prepare or build this source.
 
 Set `WEAPP_CONTAINER_RUNTIME_TOKEN` in your credential environment with read access to the private artifact repository. Do not place credentials in source files or CLI arguments. Then run:
 
@@ -55,7 +57,7 @@ Requirements: JDK 17+ (Java bytecode target 17), Android SDK platform/build-tool
 node tools/build.mjs --native-root .runtime/install/native --licenses-root .runtime/install/licenses --pack /absolute/verified-portable-pack
 ```
 
-This builds the wrapper's release AAR, local Maven repository and an independent R8-enabled consumer under `artifacts/android`. The consumer depends only on `com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.5.2`. Applications need Android API 26+ and `arm64-v8a` or `x86_64`. The builder verifies both ELF architectures and 16 KB ELF/APK alignment; this does not establish a 16 KB device boot.
+This builds the wrapper's release AAR, local Maven repository and an independent R8-enabled consumer under `artifacts/android`. The consumer depends only on `com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.5.3`. Applications need Android API 26+ and `arm64-v8a` or `x86_64`. The builder verifies both ELF architectures and 16 KB ELF/APK alignment; this does not establish a 16 KB device boot.
 
 The library and sample consumer preserve the pinned core and `libc++_shared.so` bytes with explicit `jniLibs.keepDebugSymbols` rules. The builder checks that both ABI copies in the AAR and consumer APK exactly match the verified runtime distribution. The host JNI adapter has its own recorded hash.
 
@@ -98,7 +100,7 @@ After reviewing an update, stage all intended new source files, refresh explicit
 
 ```sh
 git add <reviewed-files>
-node tools/source-inventory.mjs --write --version 0.1.0-preview.5.2 --reason "Describe the reviewed changes"
+node tools/source-inventory.mjs --write --version 0.1.0-preview.5.3 --reason "Describe the reviewed changes"
 git add SOURCE-INVENTORY.json
 node tools/check-origin.mjs
 npm test
