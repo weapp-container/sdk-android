@@ -38,7 +38,7 @@ sealed class PackSource {
     }
 }
 
-data class LoadOptions(val route: String? = null, val options: JSONObject = JSONObject())
+data class LoadOptions(val route: String? = null, val options: JSONObject = JSONObject(), val initialHostChrome: JSONObject? = null)
 
 /** Observed logical viewport and physical display. Safe-area mapping is deliberately optional. */
 data class WindowMetrics(

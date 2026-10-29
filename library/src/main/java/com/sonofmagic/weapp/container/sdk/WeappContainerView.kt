@@ -117,7 +117,9 @@ class WeappContainerView @JvmOverloads constructor(context: Context, attrs: Attr
         val extent = Point(); display.getRealSize(extent)
         val density = resources.displayMetrics.density.toDouble()
         if (density <= 0 || extent.x <= 0 || extent.y <= 0) return
-        val position = IntArray(2); rootView.getLocationOnScreen(position)
+        // The mini-program content can sit below the host navigation bar.
+        // Observe this surface's origin, independently of system/root insets.
+        val position = IntArray(2); getLocationOnScreen(position)
         val status = if (Build.VERSION.SDK_INT >= 30) insets.getInsetsIgnoringVisibility(WindowInsets.Type.statusBars()).top else insets.stableInsetTop
         val logicalWidth = (textureWidth / density).roundToInt(); val logicalHeight = (textureHeight / density).roundToInt()
         val screenWidth = (extent.x / density).roundToInt(); val screenHeight = (extent.y / density).roundToInt()

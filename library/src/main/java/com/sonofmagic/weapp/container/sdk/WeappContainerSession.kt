@@ -52,6 +52,8 @@ class WeappContainerSession internal constructor(
     private var desiredForeground = true
     private var viewVisible = true
     private var foreground = true
+    private var previewOccluded = false
+    private var hostChrome: JSONObject? = null
     private var frameRevision = 0L
     private var presentedRevision = -1L
     private var closing = false
@@ -66,14 +68,14 @@ class WeappContainerSession internal constructor(
     private var boundView: WeakReference<WeappContainerView>? = null // main thread only
     @Volatile var eventListener: ContainerEventListener? = null
 
-    private data class PendingLoad(val source: PackSource, val route: String?, val options: JSONObject, val result: CompletableFuture<Unit>)
+    private data class PendingLoad(val source: PackSource, val route: String?, val options: JSONObject, val initialHostChrome: JSONObject?, val result: CompletableFuture<Unit>)
 
     /** May be queued before View layout; no module executes until real metrics exist. */
     @JvmOverloads fun load(source: PackSource, options: LoadOptions = LoadOptions()): CompletableFuture<Unit> {
         val result = CompletableFuture<Unit>(); val copied = JSONObject(options.options.toString())
         enqueue(result) {
             ensureOpen()
-            pendingLoads.add(PendingLoad(source, options.route, copied, result))
+            pendingLoads.add(PendingLoad(source, options.route, copied, options.initialHostChrome?.let { JSONObject(it.toString()) }, result))
             drainLoads()
         }
         return result
@@ -86,6 +88,7 @@ class WeappContainerSession internal constructor(
             ensureLoaded()
             source.withDirectory(app) { directory ->
                 val payload = JSONObject().put("packPath", directory.absolutePath).put("options", copied)
+                options.initialHostChrome?.let { payload.put("initialHostChrome", JSONObject(it.toString())) }
                 options.route?.let { payload.put("route", it) }
                 val classification = command("classifyDevPack", payload) as JSONObject
                 val kind = classification.getString("reloadKind")
@@ -98,6 +101,7 @@ class WeappContainerSession internal constructor(
                 }
                 try {
                     val result = command("applyDevPack", payload) as JSONObject
+                    if(restart) retainAcceptedChrome()
                     if (restart) foreground = true
                     presentedRevision = -1
                     result
@@ -125,6 +129,41 @@ class WeappContainerSession internal constructor(
         return operation("navigate", payload)
     }
     fun back(): CompletableFuture<Unit> = operation("back")
+    fun switchTab(route: String): CompletableFuture<Unit> = operation("switchTab", JSONObject().put("route", route))
+    @JvmOverloads fun inspectPackChrome(source: PackSource, route: String? = null): CompletableFuture<JSONObject> = task {
+        ensureOpen()
+        source.withDirectory(app) { directory ->
+            val temporary = NativeBridge.create(JSONObject().put("engine", "quickjs").toString())
+            try {
+                val payload = JSONObject().put("packPath", directory.absolutePath)
+                route?.let { payload.put("route", it) }
+                unwrap(NativeBridge.command(temporary, "inspectPackChrome", payload.toString())) as JSONObject
+            } finally { unwrap(NativeBridge.destroy(temporary)) }
+        }
+    }
+    /** Store a validated measured layout before load; guest code sees it from launch. */
+    fun updateHostChrome(value: JSONObject): CompletableFuture<Unit> {
+        val copied = JSONObject(value.toString())
+        return task {
+            ensureOpen()
+            if (handle != 0L) command("hostChrome", copied)
+            else {
+                val temporary = NativeBridge.create(JSONObject().put("engine", "quickjs").toString())
+                try { unwrap(NativeBridge.command(temporary, "hostChrome", copied.toString())) }
+                finally { unwrap(NativeBridge.destroy(temporary)) }
+            }
+            hostChrome = copied
+            drainEvents(); presentedRevision = -1; present()
+        }
+    }
+    /** Developer UI coverage never synthesizes App.onHide or stops timers. */
+    fun setPreviewOccluded(value: Boolean): CompletableFuture<Unit> = task {
+        ensureOpen()
+        if (handle != 0L) command("setPreviewOccluded", JSONObject().put("occluded", value))
+        previewOccluded = value
+        presentedRevision = -1
+        drainEvents(); present()
+    }
     fun sendMessage(message: Any?): CompletableFuture<Unit> = operation("sendMessage", JSONObject().put("message", jsonCopy(message)))
     fun state(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("state") as JSONObject }
     fun capabilities(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("capabilities") as JSONObject }
@@ -258,7 +297,7 @@ class WeappContainerSession internal constructor(
     internal fun input(events: JSONArray) {
         if (closed) return
         worker.post {
-            if (!loaded || closing || !foreground) return@post
+            if (!loaded || closing || !foreground || previewOccluded) return@post
             try { command("input", JSONObject().put("events", events)); drainEvents(); present() } catch (error: Throwable) { emitError(error) }
         }
     }
@@ -274,13 +313,15 @@ class WeappContainerSession internal constructor(
     }
     private fun createNative(observation: WindowMetrics) {
         val host = JSONObject().put("kind", "android").put("platform", "android").put("version", Build.VERSION.RELEASE)
-            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.3").put("windowWidth", observation.windowWidth)
+            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.4").put("windowWidth", observation.windowWidth)
             .put("windowHeight", observation.windowHeight).put("displayMetrics", observation.displayJson())
         val config = JSONObject().put("engine", "quickjs").put("host", host)
         requiredGpu?.let { config.put("gpuRequired", it) }
         if (diagnosticsEnabled) config.put("devDiagnostics", true)
         if (storageKey != null) config.put("storageKey", storageKey).put("storageRoot", File(app.filesDir, "weapp-container/storage").absolutePath)
         handle = NativeBridge.create(config.toString())
+        hostChrome?.let { command("hostChrome", it) }
+        if (previewOccluded) command("setPreviewOccluded", JSONObject().put("occluded", true))
         for (name in methods.keys) command("registerHostMethod", JSONObject().put("name", name))
         schedulePump()
     }
@@ -305,8 +346,10 @@ class WeappContainerSession internal constructor(
                 try {
                     pending.source.withDirectory(app) { directory ->
                         val payload = JSONObject().put("packPath", directory.absolutePath).put("options", pending.options)
+                        pending.initialHostChrome?.let { payload.put("initialHostChrome", it) }
                         pending.route?.let { payload.put("route", it) }
                         command("load", payload)
+                        retainAcceptedChrome()
                     }
                     loaded = true; foreground = true; presentedRevision = -1
                 } finally {
@@ -344,6 +387,11 @@ class WeappContainerSession internal constructor(
             throw error
         }
     }
+    private fun retainAcceptedChrome() {
+        val state=command("state") as JSONObject
+        val geometry=state.optJSONObject("hostChrome") ?: return
+        hostChrome=JSONObject(geometry.toString()).apply { remove("sessionId"); remove("pageId") }
+    }
     private fun applyForeground() {
         if (!loaded || closing) return
         val next = desiredForeground && viewVisible
@@ -354,10 +402,11 @@ class WeappContainerSession internal constructor(
         }
     }
     private fun present() {
-        if (!loaded || closing || retiringToken != null || !foreground || !presenter.isOpen || frameRevision == presentedRevision) return
+        if (!loaded || closing || retiringToken != null || !foreground || previewOccluded || !presenter.isOpen || frameRevision == presentedRevision) return
         // Capture the accepted frame after attachment and before drawing. The
         // acknowledgement can run onReady and create another frame for swap.
         val state = try { command("state") as JSONObject } catch (error: Throwable) { emitError(error); return }
+        if(!state.optBoolean("chromeGeometryReady",true))return
         val generation = state.getLong("generation")
         val revision = state.getLong("frameRevision")
         frameRevision = revision
