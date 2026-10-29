@@ -70,7 +70,7 @@ internal class EglPresenter(
             try { close() } catch (cleanup: Throwable) { failure.addSuppressed(cleanup); throw failure }
             if (attempt == 1) throw failure
             firstFailure = failure
-            Log.w("WeappContainer", "Recreating invalid owned GLES context once: session=${handle()}, thread=${Thread.currentThread().id}")
+            Log.w("WeappContainer", "Recreating invalid owned GLES context once: session=${handle()}, thread=${android.os.Process.myTid()}")
             try { open(ownedWindow) } catch (recreate: Throwable) { recreate.addSuppressed(failure); throw recreate }
         }
     }
@@ -81,7 +81,7 @@ internal class EglPresenter(
         try {
             val eglError = EGL14.eglGetError()
             val glError = GLES20.glGetError()
-            Log.e("WeappContainer", "GLES attach failed: session=${handle()}, thread=${Thread.currentThread().id}, " +
+            Log.e("WeappContainer", "GLES attach failed: session=${handle()}, thread=${android.os.Process.myTid()}, " +
                     "ownedContext=${context.nativeHandle}, currentContext=${EGL14.eglGetCurrentContext().nativeHandle}, " +
                     "ownedDisplay=${display.nativeHandle}, currentDisplay=${EGL14.eglGetCurrentDisplay().nativeHandle}, " +
                     "ownedSurface=${target.nativeHandle}, drawSurface=${EGL14.eglGetCurrentSurface(EGL14.EGL_DRAW).nativeHandle}, " +

@@ -21,15 +21,18 @@ class WeappContainerSession internal constructor(
     context: Context,
     val storageKey: String?,
     initialMetrics: WindowMetrics?,
+    atomicHostLayout: Boolean = false,
     presenterFactory: (() -> Long) -> EglPresenter,
 ) {
-    @JvmOverloads constructor(context: Context, storageKey: String?, initialMetrics: WindowMetrics? = null, gpuRequired: Boolean? = null, devDiagnostics: Boolean = false) :
-        this(context, storageKey, initialMetrics.also { require(gpuRequired != false) { "Android native preview requires GPU" } }, { EglPresenter(handle = it) }) {
+    @JvmOverloads constructor(context: Context, storageKey: String?, initialMetrics: WindowMetrics? = null, gpuRequired: Boolean? = null, devDiagnostics: Boolean = false, atomicHostLayout: Boolean = false) :
+        this(context, storageKey, initialMetrics.also { require(gpuRequired != false) { "Android native preview requires GPU" } }, atomicHostLayout, { EglPresenter(handle = it) }) {
         requiredGpu = gpuRequired
         diagnosticsEnabled = devDiagnostics
     }
     private var requiredGpu: Boolean? = null
     private var diagnosticsEnabled = false
+    private val atomicHostLayout = atomicHostLayout
+    private var hostSurfaceIdentity: JSONObject? = null
     // Validation must precede allocating a thread or any native resources.
     private val app = context.applicationContext.also {
         require(storageKey == null || storageKey.isNotBlank()) { "storageKey must be stable and nonblank; null explicitly selects memory storage" }
@@ -68,14 +71,14 @@ class WeappContainerSession internal constructor(
     private var boundView: WeakReference<WeappContainerView>? = null // main thread only
     @Volatile var eventListener: ContainerEventListener? = null
 
-    private data class PendingLoad(val source: PackSource, val route: String?, val options: JSONObject, val initialHostChrome: JSONObject?, val result: CompletableFuture<Unit>)
+    private data class PendingLoad(val source: PackSource, val route: String?, val options: JSONObject, val initialHostChrome: JSONObject?, val initialHostLayout: JSONObject?, val result: CompletableFuture<Unit>)
 
     /** May be queued before View layout; no module executes until real metrics exist. */
     @JvmOverloads fun load(source: PackSource, options: LoadOptions = LoadOptions()): CompletableFuture<Unit> {
         val result = CompletableFuture<Unit>(); val copied = JSONObject(options.options.toString())
         enqueue(result) {
             ensureOpen()
-            pendingLoads.add(PendingLoad(source, options.route, copied, options.initialHostChrome?.let { JSONObject(it.toString()) }, result))
+            pendingLoads.add(PendingLoad(source, options.route, copied, options.initialHostChrome?.let { JSONObject(it.toString()) }, options.initialHostLayout?.let { JSONObject(it.toString()) }, result))
             drainLoads()
         }
         return result
@@ -89,6 +92,7 @@ class WeappContainerSession internal constructor(
             source.withDirectory(app) { directory ->
                 val payload = JSONObject().put("packPath", directory.absolutePath).put("options", copied)
                 options.initialHostChrome?.let { payload.put("initialHostChrome", JSONObject(it.toString())) }
+                options.initialHostLayout?.let { payload.put("initialHostLayout", JSONObject(it.toString())) }
                 options.route?.let { payload.put("route", it) }
                 val classification = command("classifyDevPack", payload) as JSONObject
                 val kind = classification.getString("reloadKind")
@@ -102,18 +106,64 @@ class WeappContainerSession internal constructor(
                 try {
                     val result = command("applyDevPack", payload) as JSONObject
                     if(restart) retainAcceptedChrome()
-                    if (restart) foreground = true
                     presentedRevision = -1
                     result
                 } finally {
                     try {
-                        if (restart && loaded) { ensurePresenter(); applyForeground() }
+                        if (restart && loaded) { applyForeground(); ensurePresenter() }
                     } finally { drainEvents() }
                     present()
                 }
             }
         }
     }
+    /** Versioned SDK transport. IDs stay decimal strings; SDK journal receipts,
+     * not frame changes, decide whether a throwing GPU wrapper committed. */
+    @JvmOverloads fun executeCommand(operation: String, payload: JSONObject = JSONObject()): CompletableFuture<Any?> {
+        val copied = JSONObject(payload.toString())
+        return task {
+            ensureOpen()
+            if (handle == 0L) createNative(metrics ?: throw ContainerException("ERR_NOT_READY", "A measured native view is required"))
+            if (operation == "applyDevPackAttempt") {
+                val identity = JSONObject().put("ownerId", copied.getString("ownerId")).put("attemptId", copied.getString("attemptId"))
+                val receipt = command("queryDevPackAttempt", identity) as JSONObject
+                val restart = receipt.optString("status") == "prepared" && receipt.optString("reloadKind") == "restart"
+                if (restart) {
+                    presenterAttachmentFailed = false
+                    presenter.detachRuntime(); presentedRevision = -1
+                }
+                try {
+                    val result = command(operation, copied) as JSONObject
+                    if (result.optString("status") == "accepted") { loaded = true; presenterAttachmentFailed = false; presentedRevision = -1 }
+                    result
+                } catch (error: Throwable) {
+                    val retained = try { command("queryDevPackAttempt", identity) as? JSONObject } catch (_: Throwable) { null }
+                    if (retained?.optString("status") == "accepted") { loaded = true; presenterAttachmentFailed = false; presentedRevision = -1 }
+                    throw error
+                } finally {
+                    try { if (loaded) { applyForeground(); ensurePresenter() } } finally { drainEvents() }
+                    present()
+                }
+            } else {
+                try {
+                    val result = command(operation, copied)
+                    if (operation == "queryDevPackAttempt" && (result as? JSONObject)?.optString("status") == "accepted") {
+                        // The durable outcome query must survive GPU failure.
+                        loaded = true
+                    }
+                    result
+                } finally { drainEvents(); presentedRevision = -1; present() }
+            }
+        }
+    }
+    /** Same-size native observations also require a complete shell response. */
+    fun requestHostLayoutObservation(): CompletableFuture<JSONObject> = task {
+        ensureOpen()
+        if (handle == 0L) createNative(metrics ?: throw ContainerException("ERR_NOT_READY", "A measured native view is required"))
+        observeAtomicLayout()
+        (command("state") as JSONObject).getJSONObject("pendingHostLayout")
+    }
+
     fun devState(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("devState") as JSONObject }
     fun clearDevStorage(): CompletableFuture<Unit> = task { ensureLoaded(); command("clearDevStorage"); Unit }.thenCompose { flushStorage() }
 
@@ -146,6 +196,7 @@ class WeappContainerSession internal constructor(
         val copied = JSONObject(value.toString())
         return task {
             ensureOpen()
+            if (atomicHostLayout) throw ContainerException("ERR_UNSUPPORTED_CAPABILITY", "Atomic host layout requires a complete hostLayout")
             if (handle != 0L) command("hostChrome", copied)
             else {
                 val temporary = NativeBridge.create(JSONObject().put("engine", "quickjs").toString())
@@ -160,13 +211,15 @@ class WeappContainerSession internal constructor(
     fun setPreviewOccluded(value: Boolean): CompletableFuture<Unit> = task {
         ensureOpen()
         if (handle != 0L) command("setPreviewOccluded", JSONObject().put("occluded", value))
+        val wasOccluded = previewOccluded
         previewOccluded = value
+        if (!value && wasOccluded && loaded) { presenterAttachmentFailed = false; ensurePresenter() }
         presentedRevision = -1
         drainEvents(); present()
     }
     fun sendMessage(message: Any?): CompletableFuture<Unit> = operation("sendMessage", JSONObject().put("message", jsonCopy(message)))
-    fun state(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("state") as JSONObject }
-    fun capabilities(): CompletableFuture<JSONObject> = task { ensureLoaded(); command("capabilities") as JSONObject }
+    fun state(): CompletableFuture<JSONObject> = task { ensureOpen(); command("state") as JSONObject }
+    fun capabilities(): CompletableFuture<JSONObject> = task { ensureOpen(); command("capabilities") as JSONObject }
     /** Measured-view preflight creates an empty native runtime, never App/Page JS. */
     fun prepareView(): CompletableFuture<JSONObject> {
         val result = CompletableFuture<JSONObject>()
@@ -209,6 +262,8 @@ class WeappContainerSession internal constructor(
         synchronized(this) {
             closeFuture?.let { return it }
             val result = CompletableFuture<Unit>(); closeFuture = result
+            // Resolve UI-side metric waiters before waiting on worker shutdown.
+            main.post { boundView?.get()?.cancelObservationWaits() }
             enqueue(result) {
                 if (closed) { finish(result, Unit); return@enqueue }
                 closing = true; cleanupNeedsRetry = false
@@ -247,7 +302,7 @@ class WeappContainerSession internal constructor(
                 retireSurface()
                 surface = ownedSurface; surfaceToken = token; physicalWidth = width; physicalHeight = height; viewVisible = visible
                 acceptMetrics(observation); drainLoads()
-                ensurePresenter(); applyForeground(); present()
+                applyForeground(); ensurePresenter(); present()
             } catch (error: Throwable) { if (surface !== ownedSurface) ownedSurface.release(); emitError(error) }
         }) ownedSurface.release()
     }
@@ -257,7 +312,7 @@ class WeappContainerSession internal constructor(
             if (surfaceToken !== token || closing) return@post
             try {
                 physicalWidth = width; physicalHeight = height; viewVisible = visible
-                acceptMetrics(observation); drainLoads(); ensurePresenter(); applyForeground(); present()
+                acceptMetrics(observation); drainLoads(); applyForeground(); ensurePresenter(); present()
             } catch (error: Throwable) { emitError(error) }
         }
     }
@@ -277,6 +332,10 @@ class WeappContainerSession internal constructor(
             if (presenter.isRetired) {
                 presenterAttachmentFailed = false
                 val retired = surfaceToken
+                if (hostSurfaceIdentity != null && handle != 0L && !closing) {
+                    command("hostSurface", JSONObject(hostSurfaceIdentity.toString()).put("action", "detach"))
+                }
+                hostSurfaceIdentity = null
                 surface?.release(); surface = null; surfaceToken = null; presentedRevision = -1
                 retiringToken = null
                 retired?.let { retirementCallbacks.remove(it)?.forEach { callback -> callback() } }
@@ -303,9 +362,12 @@ class WeappContainerSession internal constructor(
     }
 
     private fun acceptMetrics(observation: WindowMetrics) {
-        if (metrics == observation) return
+        if (!atomicHostLayout && metrics == observation) return
         metrics = observation
-        if (loaded) {
+        if (atomicHostLayout) {
+            if (handle == 0L) createNative(observation) else observeAtomicLayout()
+            drainEvents(); presentedRevision = -1
+        } else if (loaded) {
             // Native metrics commit precedes resize hooks; keep the observation
             // even if a user resize hook throws after that commit.
             try { command("windowMetrics", observation.json()) } finally { drainEvents(); presentedRevision = -1 }
@@ -313,17 +375,27 @@ class WeappContainerSession internal constructor(
     }
     private fun createNative(observation: WindowMetrics) {
         val host = JSONObject().put("kind", "android").put("platform", "android").put("version", Build.VERSION.RELEASE)
-            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.4").put("windowWidth", observation.windowWidth)
+            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.5").put("windowWidth", observation.windowWidth)
             .put("windowHeight", observation.windowHeight).put("displayMetrics", observation.displayJson())
         val config = JSONObject().put("engine", "quickjs").put("host", host)
         requiredGpu?.let { config.put("gpuRequired", it) }
         if (diagnosticsEnabled) config.put("devDiagnostics", true)
+        if (atomicHostLayout) config.put("hostLayout", JSONObject().put("protocolVersion", "1.0").put("atomic", true))
         if (storageKey != null) config.put("storageKey", storageKey).put("storageRoot", File(app.filesDir, "weapp-container/storage").absolutePath)
         handle = NativeBridge.create(config.toString())
-        hostChrome?.let { command("hostChrome", it) }
+        if (atomicHostLayout) observeAtomicLayout() else hostChrome?.let { command("hostChrome", it) }
         if (previewOccluded) command("setPreviewOccluded", JSONObject().put("occluded", true))
         for (name in methods.keys) command("registerHostMethod", JSONObject().put("name", name))
         schedulePump()
+    }
+    private fun observeAtomicLayout() {
+        if (!atomicHostLayout || handle == 0L) return
+        val observation = metrics ?: return
+        if (hostSurfaceIdentity == null) {
+            hostSurfaceIdentity = command("hostSurface", JSONObject().put("action", "attach")) as JSONObject
+        }
+        val identity = checkNotNull(hostSurfaceIdentity)
+        command("observeHostLayout", JSONObject(identity.toString()).put("schemaVersion", 1).put("windowMetrics", observation.json()))
     }
     private fun drainLoads() {
         val observation = metrics ?: return
@@ -338,7 +410,7 @@ class WeappContainerSession internal constructor(
                 // A staged view may have resized since capability preflight.
                 // Initialize guest JS with the latest measured metrics, never
                 // with the empty preflight runtime's earlier configuration.
-                if (!loaded && handle != 0L) { unwrap(NativeBridge.destroy(handle)); handle = 0L }
+                if (!loaded && handle != 0L && !atomicHostLayout) { unwrap(NativeBridge.destroy(handle)); handle = 0L }
                 if (handle == 0L) createNative(observation)
                 presenterAttachmentFailed = false // Explicit load begins a new attachment attempt.
                 presenter.detachRuntime()
@@ -347,16 +419,17 @@ class WeappContainerSession internal constructor(
                     pending.source.withDirectory(app) { directory ->
                         val payload = JSONObject().put("packPath", directory.absolutePath).put("options", pending.options)
                         pending.initialHostChrome?.let { payload.put("initialHostChrome", it) }
+                        pending.initialHostLayout?.let { payload.put("initialHostLayout", it) }
                         pending.route?.let { payload.put("route", it) }
                         command("load", payload)
                         retainAcceptedChrome()
                     }
-                    loaded = true; foreground = true; presentedRevision = -1
+                    loaded = true; presentedRevision = -1
                 } finally {
                     // Failed candidates preserve the old active session and
                     // must regain its GPU target just like successful reloads.
                     try {
-                        if (loaded) { ensurePresenter(); applyForeground() }
+                        if (loaded) { applyForeground(); ensurePresenter() }
                     } finally {
                         // A committed runtime may emit load/frame/storage events
                         // even when GPU attachment fails. Keep its revision and
@@ -367,7 +440,7 @@ class WeappContainerSession internal constructor(
                 }
                 finish(pending.result, Unit)
             } catch (error: Throwable) {
-                if (!loaded && handle != 0L) {
+                if (!loaded && handle != 0L && !atomicHostLayout) {
                     try { unwrap(NativeBridge.destroy(handle)); handle = 0L } catch (cleanup: Throwable) { error.addSuppressed(cleanup) }
                 }
                 fail(pending.result, error)
@@ -375,6 +448,10 @@ class WeappContainerSession internal constructor(
         }
     }
     private fun ensurePresenter() {
+        // Atomic preflight owns a logical hostSurface for measured observations;
+        // real GLES attach is valid only after the SDK accepted a pack. Treating
+        // an empty owner as loaded causes ERR_NOT_LOADED and poisons the retry
+        // latch before the first App/Page module has even executed.
         if (!loaded || presenterAttachmentFailed || retiringToken != null || surface?.isValid != true) return
         try {
             if (!presenter.isOpen) presenter.open(checkNotNull(surface))
@@ -395,11 +472,16 @@ class WeappContainerSession internal constructor(
     private fun applyForeground() {
         if (!loaded || closing) return
         val next = desiredForeground && viewVisible
-        if (next != foreground) {
-            foreground = next
+        val changed = next != foreground
+        foreground = next
+        // A newly accepted SDK session starts foreground even if its host was
+        // suspended during an asynchronous GPU drain. Compare authoritative
+        // state instead of resetting the host's actual visibility latch.
+        val nativeForeground = (command("state") as JSONObject).optBoolean("foreground", !next)
+        if (nativeForeground != next) {
             try { command("lifecycle", JSONObject().put("event", if (next) "show" else "hide")) } finally { drainEvents() }
-            if (next) presentedRevision = -1
         }
+        if (next && (changed || nativeForeground != next)) presentedRevision = -1
     }
     private fun present() {
         if (!loaded || closing || retiringToken != null || !foreground || previewOccluded || !presenter.isOpen || frameRevision == presentedRevision) return
@@ -417,7 +499,12 @@ class WeappContainerSession internal constructor(
         }
         if (!swapped) return
         try {
-            command("presented", JSONObject().put("generation", generation).put("revision", revision))
+            val receipt = JSONObject().put("generation", generation).put("revision", revision)
+            if (atomicHostLayout) {
+                val layout = state.getJSONObject("acceptedLayout")
+                for (field in listOf("ownerId", "surfaceGeneration", "observationId", "layoutRevision")) receipt.put(field, layout.getString(field))
+            }
+            command("presented", receipt)
             presentedRevision = revision
             emit(JSONObject().put("type", "presented").put("generation", generation).put("revision", revision).put("width", physicalWidth).put("height", physicalHeight).put("backend", "skia-gpu-gles"))
         } catch (error: Throwable) {

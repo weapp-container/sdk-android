@@ -10,6 +10,7 @@ import android.os.SystemClock
 import android.widget.FrameLayout
 import org.json.JSONArray
 import org.json.JSONObject
+import java.io.File
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.CopyOnWriteArrayList
 import java.util.concurrent.TimeUnit
@@ -33,6 +34,35 @@ class GlesRecoveryInstrumentation : Instrumentation() {
         val cleanup = JSONArray()
         try {
             activity = startActivitySync(Intent(targetContext, GlesRecoveryActivity::class.java).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)) as GlesRecoveryActivity
+            // Exercise the real empty SDK owner. Its logical hostSurface is
+            // valid before guest startup, while native GLES attach would return
+            // ERR_NOT_LOADED. A permissive mock cannot detect that boundary.
+            val atomicAttaches = AtomicInteger()
+            val atomic = create("atomic-empty", object : GlesRuntime {
+                override fun attach(handle: Long) { atomicAttaches.incrementAndGet(); NativeGlesRuntime.attach(handle) }
+                override fun detach(handle: Long, abandon: Boolean) = NativeGlesRuntime.detach(handle, abandon)
+                override fun present(handle: Long, width: Int, height: Int) = NativeGlesRuntime.present(handle, width, height)
+            }, atomicHostLayout = true)
+            atomic.session.prepareView().await()
+            val firstObservation = atomic.session.requestHostLayoutObservation().await()
+            val freshObservation = atomic.session.requestHostLayoutObservation().await()
+            check(firstObservation.getString("observationId") != freshObservation.getString("observationId"))
+            check(firstObservation.getJSONObject("windowMetrics").toString() == freshObservation.getJSONObject("windowMetrics").toString())
+            check(atomicAttaches.get() == 0 && !atomic.presenter.isOpen)
+            check(!atomic.session.capabilities().await().getJSONObject("runtime").getBoolean("gpuSurface"))
+            rejected(atomic.session.load(PackSource.Directory(File(targetContext.cacheDir, "missing-atomic-pack"))))
+            check(atomicAttaches.get() == 0 && !atomic.presenter.isOpen)
+            check(atomic.events.none { it.optJSONObject("error")?.optString("code") == "ERR_NOT_LOADED" })
+            val startupObservation = atomic.session.requestHostLayoutObservation().await()
+            atomic.session.load(PackSource.Asset("portable-pack"), LoadOptions(initialHostLayout = hostLayout(startupObservation))).await()
+            presented(atomic)
+            check(atomicAttaches.get() == 1)
+            val accepted = atomic.session.state().await().getJSONObject("acceptedLayout")
+            check(accepted.getString("ownerId") == startupObservation.getString("ownerId"))
+            check(accepted.getString("observationId") == startupObservation.getString("observationId"))
+            cases.put(JSONObject().put("case", "atomic-empty-owner-observes-without-physical-attach-and-first-pack-presents")
+                .put("nativeAttaches", atomicAttaches.get()).put("acceptedLayout", accepted))
+            close(atomic)
             val healthy = create("healthy")
             healthy.session.load(PackSource.Asset("portable-pack")).await(); presented(healthy)
             val healthyGeneration = healthy.session.state().await().getLong("generation")
@@ -164,11 +194,12 @@ class GlesRecoveryInstrumentation : Instrumentation() {
     }
     private fun create(key: String, runtime: GlesRuntime = NativeGlesRuntime,
         beforeObservation: ((WeappContainerSession) -> Unit)? = null,
+        atomicHostLayout: Boolean = false,
         version: () -> String? = { GLES20.glGetString(GLES20.GL_VERSION) }): Owned {
         lateinit var session: WeappContainerSession; lateinit var view: WeappContainerView; lateinit var presenter: EglPresenter
         val events = CopyOnWriteArrayList<JSONObject>()
         runOnMainSync {
-            session = WeappContainerSession(activity, "gles-recovery-$key", null) { handle -> EglPresenter(handle, runtime, version).also { presenter = it } }
+            session = WeappContainerSession(activity, "gles-recovery-$key", null, atomicHostLayout) { handle -> EglPresenter(handle, runtime, version).also { presenter = it } }
             session.eventListener = ContainerEventListener { events.add(JSONObject(it.toString())) }
             view = WeappContainerView(activity)
             activity.root.addView(view, FrameLayout.LayoutParams(400, 360).apply { topMargin = if (key == "healthy") 30 else 420; leftMargin = 20 })
@@ -179,6 +210,17 @@ class GlesRecoveryInstrumentation : Instrumentation() {
         until { view.isAvailable && view.width > 0 }
         session.setForeground(true).await() // Wait for stable real View metrics before beginning the load fault.
         return result
+    }
+    private fun hostLayout(observation: JSONObject): JSONObject {
+        val metrics = observation.getJSONObject("windowMetrics")
+        val chrome = JSONObject().put("schemaVersion", 1).put("revision", 1)
+            .put("contentRect", JSONObject().put("left", 0).put("top", metrics.getDouble("screenTop"))
+                .put("width", metrics.getInt("windowWidth")).put("height", metrics.getInt("windowHeight")))
+            .put("menuButtonRect", JSONObject().put("left", 1).put("top", 1).put("right", 2).put("bottom", 2).put("width", 1).put("height", 1))
+        for (key in listOf("sessionId", "pageId")) if (observation.has(key)) chrome.put(key, observation.get(key))
+        return JSONObject().put("schemaVersion", 1).put("ownerId", observation.getString("ownerId"))
+            .put("surfaceGeneration", observation.getString("surfaceGeneration")).put("observationId", observation.getString("observationId"))
+            .put("layoutRevision", "1").put("windowMetrics", JSONObject(metrics.toString())).put("chrome", chrome)
     }
     private fun close(item: Owned) {
         item.session.closeAsync().await()

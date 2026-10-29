@@ -71,6 +71,7 @@ class WeappContainerView @JvmOverloads constructor(context: Context, attrs: Attr
         awaitingObservation.add(callback)
         postInvalidateOnAnimation()
     }
+    internal fun cancelObservationWaits() { checkMain(); resolveObservations(null) }
     private fun resolveObservations(value: WindowMetrics?) {
         val callbacks = awaitingObservation.toList(); awaitingObservation.clear()
         callbacks.forEach { it(value) }
