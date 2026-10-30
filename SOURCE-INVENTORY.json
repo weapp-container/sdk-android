@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
-  "sdkVersion": "0.1.0-preview.5.3",
-  "sourceBaseCommit": "e4fa84e784edc1a80d972655eea347537ca40774",
-  "review": "Lock-only update to the reviewed preview.5.3 manifest SHA-256 ee393000b5726172755b24a31812f9b55051e710c2714edadb9b3ac287b95388 and matching installation-documentation corrections; no wrapper implementation or native byte changes. Original Android archive producer e4fa84e784edc1a80d972655eea347537ca40774 and native producer 012400d43cb20b4d91a73fbbde7e1cf11bd0bb6a remain unchanged.",
+  "sdkVersion": "0.1.0-preview.5.4",
+  "sourceBaseCommit": "6a4e33d14945b8fd6433a7d5bafea5f8f58757ae",
+  "review": "Reviewed preview.5.4 wrapper version and exact native diagnostic provenance; Flutter also isolates retired View lease diagnostics. Historical ORIGIN and preview.5.3 artifact lock preserved.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -53,7 +53,7 @@
     },
     {
       "path": "consumer/build.gradle.kts",
-      "sha256": "16ec55e62b09e3537730ae57d2c7eff883ee0c35e9f049777cd60031a9536f86",
+      "sha256": "c27873bd734c3fa6e6c9a0788d694ddbb3dd67805b7f9c93a12bb66e4b051479",
       "size": 1071,
       "mode": "100644"
     },
@@ -119,7 +119,7 @@
     },
     {
       "path": "library/build.gradle.kts",
-      "sha256": "91a9491459cd74332463637244abda38a780fdd52eeb5662e89fc06efa4286c9",
+      "sha256": "bae70355632a8dde8a4910819b840e0a7dc5a216753cd438c86550c02cf936fb",
       "size": 3897,
       "mode": "100644"
     },
@@ -179,7 +179,7 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
-      "sha256": "ef4b8c5a764299600f9597bd7b79780aec180795b5fe26f8f99a61c73f1656c4",
+      "sha256": "5db1d523c574a742aa58adbe1b09592c7923339aefb8f00abf763fc66d09a6b3",
       "size": 36556,
       "mode": "100644"
     },
@@ -191,7 +191,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "45327e03a4d9751417b6542966e4a648ba3798418e025250fbdfdd474bc62c7a",
+      "sha256": "efe1fccffa3b313dd5081d766b6c785b2a9558538cf62dc0ae120d04c42d887e",
       "size": 500,
       "mode": "100644"
     },
@@ -209,8 +209,8 @@
     },
     {
       "path": "test/native-input.test.mjs",
-      "sha256": "19428de6437bd8abef9a9586b23c9a01339679506f2027bbfc228e337898b291",
-      "size": 14306,
+      "sha256": "b83842252d0b784d08c6ad9c452c95396289f0d6fcb45ecc6b085e428de135c3",
+      "size": 14332,
       "mode": "100644"
     },
     {
@@ -257,8 +257,8 @@
     },
     {
       "path": "tools/native-input.mjs",
-      "sha256": "8a9952472bcce34df1602f110159ffd189900d6016e8dfc079913390ead2d1d3",
-      "size": 11443,
+      "sha256": "9429c0f9cc531cbc37ce938527c834a87b309b907356a6254e946d62b9b42ac5",
+      "size": 11462,
       "mode": "100644"
     },
     {
@@ -269,7 +269,7 @@
     },
     {
       "path": "tools/runtime-artifacts.mjs",
-      "sha256": "d8cb43007799c4434efa2b06cdc13eaf233d5f0fd8e602d66a89410b1714dd55",
+      "sha256": "b9370a356f8e140d1c057920b78ad7067a7ec1299d2db18a185da0bebfeb7c75",
       "size": 19113,
       "mode": "100644"
     },

@@ -3,9 +3,9 @@ import { spawnSync } from 'node:child_process';
 import { cpSync, existsSync, lstatSync, mkdirSync, readFileSync, readdirSync } from 'node:fs';
 import { basename, isAbsolute, relative, resolve, sep } from 'node:path';
 
-export const SDK_VERSION = '0.1.0-preview.5.3';
+export const SDK_VERSION = '0.1.0-preview.5.4';
 // This source requires a new native producer; older preview bytes cannot satisfy it.
-export const NATIVE_RUNTIME_VERSION = '0.1.0-preview.5.3';
+export const NATIVE_RUNTIME_VERSION = '0.1.0-preview.5.4';
 export const HEADER_SHA256 = '2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b';
 export const sha256 = path => createHash('sha256').update(readFileSync(path)).digest('hex');
 
@@ -25,7 +25,7 @@ export function sourceProvenance(root) {
 
 /** Distribution receipts retain identities; command paths stay in external validation. */
 export function nativeIdentity(receipt) {
-  const keys = ['schemaVersion', 'sdkVersion', 'abiVersion', 'status', 'target', 'platform', 'profile', 'features', 'sourceCommit', 'sourceDirty'];
+  const keys = ['schemaVersion', 'sdkVersion', 'abiVersion', 'status', 'target', 'platform', 'profile', 'features', 'viewDiagnostics', 'sourceCommit', 'sourceDirty'];
   const identity = Object.fromEntries(keys.filter(key => Object.hasOwn(receipt, key)).map(key => [key, receipt[key]]));
   identity.artifacts = receipt.artifacts.map(artifact => Object.fromEntries(['file', 'bytes', 'sha256'].filter(key => Object.hasOwn(artifact, key)).map(key => [key, artifact[key]])));
   return identity;
