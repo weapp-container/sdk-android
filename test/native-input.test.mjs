@@ -182,10 +182,10 @@ test('distribution selection cannot relax native path and symlink rules', t => {
 // Native changes require a new producer; the retained old lock cannot relabel it.
 test('current preview requires its exact native version and rejects every earlier preview producer', t => {
   const f = fixture(t);
-  assert.equal(SDK_VERSION, '0.1.0-preview.5.6');
-  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.5.6');
+  assert.equal(SDK_VERSION, '0.1.0-preview.5.7');
+  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.5.7');
   assert.equal(readNative(f.native, f.target, ['libfixture.a']).receipt.sdkVersion, NATIVE_RUNTIME_VERSION);
-  for (const oldVersion of ['0.1.0-preview.5', '0.1.0-preview.5.1', '0.1.0-preview.5.2', '0.1.0-preview.5.3', '0.1.0-preview.5.4', '0.1.0-preview.5.5']) {
+  for (const oldVersion of ['0.1.0-preview.5', '0.1.0-preview.5.1', '0.1.0-preview.5.2', '0.1.0-preview.5.3', '0.1.0-preview.5.4', '0.1.0-preview.5.5', '0.1.0-preview.5.6']) {
     f.receipt.sdkVersion = oldVersion; f.save();
     assert.throws(() => readNative(f.native, f.target, ['libfixture.a']), /runtime receipt/, oldVersion);
   }
