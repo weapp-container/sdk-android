@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "c02f6bfb3581018b65c4569faab0880cf7ee0a1d",
-  "review": "Prepare explicitly signed-out native owners without revoked host credentials; preserve exact account epoch boundaries",
+  "sourceBaseCommit": "8e48f64f9e45584b2550cb925faa546f76216c42",
+  "review": "Align signed-out identity snapshots with core canonical u64 epochs including the default epoch zero",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "dc132bc10f7a34e13082849120da57b827960c220dc52df6c7f27452cca4c674",
-      "size": 15890,
+      "sha256": "8138f5741942cf56db84a4606208d70aec3cef9c765a2880020247901ef31c77",
+      "size": 15913,
       "mode": "100644"
     },
     {
@@ -317,8 +317,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostIdentitySnapshot.kt",
-      "sha256": "20162e58b5f7ccf87f683c632e2a6a9d2a72f1327b7989f9fd466bc8e61cec14",
-      "size": 992,
+      "sha256": "7a1aca7d2a9ebc79337844d1d4f1afe3ef5dd80549e68ef249fc374a2bc7ca01",
+      "size": 962,
       "mode": "100644"
     },
     {
@@ -407,8 +407,8 @@
     },
     {
       "path": "test/HostIdentitySnapshotTests.kt",
-      "sha256": "bd3b855adf7eef9f5512fbe36b3e2a92ba524f2afabc957e4fa107cce12fb5e9",
-      "size": 1207,
+      "sha256": "de7374e1fc88e900519b6bf88287c1c574ffebbdb3d5d2a203f0b1f0e79f25f6",
+      "size": 1362,
       "mode": "100644"
     },
     {
