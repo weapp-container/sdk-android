@@ -7,6 +7,11 @@
 加载 pack。`registerApiHandler` 接入微信 API；业务扩展继续使用
 `registerHostMethod`。未安装的 API 明确不支持。
 
+`HostServicesClient.identityState` 在可信账号明确为 `principalId: null` 且 epoch
+为精确正十进制 u64 时准备未登录快照，不再读取已撤销的宿主 bearer。初始准备、
+换号清理准备与前台刷新都使用同一入口；已登录 principal 仍必须查询真实后端，
+网络、权限或凭据失败继续传递，不会回退为成功。快照不包含旧用户资料或手机号授权。
+
 `readHostApiResource(context, offset, length)` 透传资源 setter 的原始可信 context，
 返回 `{bytes,totalBytes}`；单块最多 1 MiB。先检查 runtime 的
 `hostServices.apiResourceChunks == "1.0"`，保留 context 中的十进制 epoch、deadline

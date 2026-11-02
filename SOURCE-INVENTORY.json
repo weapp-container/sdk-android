@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "8bb6431e5ad0f3de2281a8c247592fd0ca17354e",
-  "review": "Restrict Android runtime notices to the two packaged ABI targets and synchronize generated asset and JNI outputs to remove stale files.",
+  "sourceBaseCommit": "c02f6bfb3581018b65c4569faab0880cf7ee0a1d",
+  "review": "Prepare explicitly signed-out native owners without revoked host credentials; preserve exact account epoch boundaries",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "17494dae3e5a943799f41703978b19babc8c52b2b60a6d6d08ff139ac737c15f",
-      "size": 15461,
+      "sha256": "dc132bc10f7a34e13082849120da57b827960c220dc52df6c7f27452cca4c674",
+      "size": 15890,
       "mode": "100644"
     },
     {
@@ -316,9 +316,15 @@
       "mode": "100644"
     },
     {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostIdentitySnapshot.kt",
+      "sha256": "20162e58b5f7ccf87f683c632e2a6a9d2a72f1327b7989f9fd466bc8e61cec14",
+      "size": 992,
+      "mode": "100644"
+    },
+    {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
-      "sha256": "842d3cf6515c2779df45fc79b3b64714a2c0041c10ee6f02baae191cdaef759d",
-      "size": 16799,
+      "sha256": "e280ed0e9d870ecfb865d01b0f93fde709a566ddb5a4dd40e649dde91467819a",
+      "size": 17175,
       "mode": "100644"
     },
     {
@@ -365,8 +371,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "2fd79810d4bed0ef3c8adad636fd762ddfac7351d16d348d37f60d3b904ba950",
-      "size": 567,
+      "sha256": "8a3af698e34aa7ce3a8ed92583b186467a8cd1c2d7f5dacf57b611ee17951364",
+      "size": 638,
       "mode": "100644"
     },
     {
@@ -397,6 +403,12 @@
       "path": "test/AndroidNfcTerminalTest.kt",
       "sha256": "660dcd0e634ea4406898d2742697820c864d3f1b9a1e6c817e58c2ac98c126db",
       "size": 830,
+      "mode": "100644"
+    },
+    {
+      "path": "test/HostIdentitySnapshotTests.kt",
+      "sha256": "bd3b855adf7eef9f5512fbe36b3e2a92ba524f2afabc957e4fa107cce12fb5e9",
+      "size": 1207,
       "mode": "100644"
     },
     {
@@ -553,6 +565,12 @@
       "path": "tools/test-account-cleanup.mjs",
       "sha256": "430cc62b80e8e251200b0d48d2730ccf0e3aea8789e9178846573e809f5b04ef",
       "size": 1528,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/test-identity-snapshot.mjs",
+      "sha256": "4b7c5a12ec421433b4ed82676d1845dd6c8252cdfeea8abcd4e54c816ad53f2f",
+      "size": 1796,
       "mode": "100644"
     },
     {

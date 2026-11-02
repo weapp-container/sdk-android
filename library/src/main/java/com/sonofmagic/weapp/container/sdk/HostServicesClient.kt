@@ -65,6 +65,13 @@ class HostServicesClient(
         require(orderId.matches(Regex("[A-Za-z0-9-]{1,128}")))
         request(call, "/v1/payments/orders/$orderId/launch", selection(call), complete)
     }
+    /** Logged-out owners have no host bearer. Signed-in backend failures still propagate. */
+    fun identityState(call: HostCall, complete: (Result<JSONObject>) -> Unit) {
+        check(!closed && !call.isCancelled) { "Call cancelled" }
+        val state = HostIdentitySnapshot.signedOut(requireNotNull(call.context))
+        if (state != null) main.post { if (!closed && !call.isCancelled) complete(Result.success(state)) }
+        else request(call, "/v1/host/identity-state", selection(call), complete)
+    }
     override fun close() { closed = true; for (connection in active.toList()) connection.disconnect(); active.clear(); executor.shutdownNow() }
 }
 
@@ -78,7 +85,7 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
         val context = JSONObject().put("application", copied.getJSONObject("application")).put("account", copied.getJSONObject("account")).put("sessionId", "native-preflight")
         val call = HostCall("native-preflight-${java.util.UUID.randomUUID()}", "weappContainer.identity.getState", JSONObject(), null, null, context)
         val future = java.util.concurrent.CompletableFuture<JSONObject>()
-        try { backend.request(call, "/v1/host/identity-state", backend.selection(call)) { result -> result.fold({ state ->
+        try { backend.identityState(call) { result -> result.fold({ state ->
             try {
             copied.put("syncValues", (copied.optJSONObject("syncValues") ?: JSONObject()).put("weappContainer.identity.getState", state))
             val apis = copied.optJSONArray("apis") ?: org.json.JSONArray()
@@ -99,12 +106,12 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
     fun prepareAccountState(session: WeappContainerSession, operationId: String, trustedContext: JSONObject): java.util.concurrent.CompletableFuture<JSONObject> {
         val call = HostCall("native-account-${java.util.UUID.randomUUID()}", "weappContainer.identity.getState", JSONObject(), null, null, JSONObject(trustedContext.toString()))
         val future = java.util.concurrent.CompletableFuture<JSONObject>()
-        try { backend.request(call, "/v1/host/identity-state", backend.selection(call)) { result -> result.fold({ state ->
+        try { backend.identityState(call) { result -> result.fold({ state ->
             try { session.hostServicesCommand("prepareAccountHostServiceSnapshots", JSONObject().put("operationId", operationId).put("values", JSONObject().put("weappContainer.identity.getState", state))).whenComplete { _, error -> if (error == null) future.complete(state) else future.completeExceptionally(error) } } catch (error: Throwable) { future.completeExceptionally(error) }
         }, future::completeExceptionally) } } catch (error: Throwable) { future.completeExceptionally(error) }; return future
     }
     private fun refresh(session: WeappContainerSession, call: HostCall, complete: (Result<JSONObject>) -> Unit) {
-        backend.request(call, "/v1/host/identity-state", backend.selection(call)) { result -> result.fold({ state ->
+        backend.identityState(call) { result -> result.fold({ state ->
             try { session.hostServicesCommand("updateHostServiceSnapshots", JSONObject().put("context", call.context).put("values", JSONObject().put("weappContainer.identity.getState", state))).whenComplete { _, error ->
                 if (error != null) complete(Result.failure(error))
                 else try {

@@ -14,6 +14,7 @@
     "build": "node tools/build.mjs",
     "test": "node --test test/*.test.mjs",
     "test:account-cleanup": "node tools/test-account-cleanup.mjs",
+    "test:identity-snapshot": "node tools/test-identity-snapshot.mjs",
     "check:origin": "node tools/check-origin.mjs"
   }
 }
