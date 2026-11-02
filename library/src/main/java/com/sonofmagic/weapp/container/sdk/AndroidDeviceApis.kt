@@ -2,6 +2,7 @@ package com.sonofmagic.weapp.container.sdk
 
 import android.Manifest
 import android.app.Activity
+import android.app.Application
 import android.app.AlertDialog
 import android.app.ProgressDialog
 import android.content.ClipData
@@ -48,10 +49,34 @@ class AndroidDeviceApis(
     private val activity: Activity get() = checkNotNull(binding) { "Native Activity is detached" }
     private val scopes = AndroidManagedFileScopes()
     private val consent = AndroidAppPermissionConsent({ this.activity }, { scopes.auxiliaryRoot(it) })
+    private val application = activity.application
+    private var locationVisible = true
+    private var activityVisible = true
+    private var locationGeneration = 0L
+    private data class LocationStart(val call: HostCall, val reply: HostReply, val generation: Long)
+    private var locationStart: LocationStart? = null
+    private var locationOwner: HostCall? = null
+    private var locationListener: LocationListener? = null
+    private var locationManager: LocationManager? = null
+    private val locationSubscriptions = mutableMapOf<String, HostCall>()
+    private data class LocationEmission(val owner: HostCall, val generation: Long, val method: String, val value: JSONObject)
+    private val pendingLocationEvents = linkedMapOf<String, LocationEmission>()
+    private var locationDelivering = false
+    private data class SingleLocation(val call: HostCall, val reply: HostReply, val manager: LocationManager, val listener: LocationListener)
+    private val singleLocations = mutableMapOf<String, SingleLocation>()
+    private val lifecycle = object : Application.ActivityLifecycleCallbacks {
+        override fun onActivityResumed(a: Activity) { if (a === binding) { activityVisible = true; resumeLocationStream() } }
+        override fun onActivityStopped(a: Activity) { if (a === binding) { activityVisible = false; runCatching { pauseLocations() }.onFailure { android.util.Log.e("WeappContainer", "Location cleanup needs retry", it) } } }
+        override fun onActivityDestroyed(a: Activity) { if (a === binding) runCatching { pauseLocations() }.onFailure { android.util.Log.e("WeappContainer", "Location cleanup needs retry", it) } }
+        override fun onActivityCreated(a: Activity, state: Bundle?) {}
+        override fun onActivityStarted(a: Activity) {}
+        override fun onActivityPaused(a: Activity) {}
+        override fun onActivitySaveInstanceState(a: Activity, state: Bundle) {}
+    }
     fun rebindActivity(activity: Activity?) {
         check(Looper.myLooper() == Looper.getMainLooper())
         if (binding === activity) return
-        try { resetResources() } finally { binding = activity }
+        try { resetResources() } finally { binding = activity; activityVisible = activity != null }
     }
     private val main = Handler(Looper.getMainLooper())
     private var session: WeappContainerSession? = null
@@ -66,13 +91,14 @@ class AndroidDeviceApis(
         "wx.getBatteryInfo", "wx.getScreenBrightness", "wx.setScreenBrightness", "wx.setKeepScreenOn", "wx.vibrateLong", "wx.vibrateShort",
         "wx.showToast", "wx.hideToast", "wx.showLoading", "wx.hideLoading", "wx.showModal", "wx.showActionSheet", "wx.makePhoneCall",
         "wx.openAppAuthorizeSetting", "wx.getSetting", "wx.authorize", "wx.getLocation", "wx.getFuzzyLocation",
+        "wx.startLocationUpdate", "wx.stopLocationUpdate", "wx.onLocationChange", "wx.offLocationChange", "wx.onLocationChangeError", "wx.offLocationChangeError",
         "wx.startAccelerometer", "wx.stopAccelerometer", "wx.onAccelerometerChange", "wx.offAccelerometerChange",
         "wx.startGyroscope", "wx.stopGyroscope", "wx.onGyroscopeChange", "wx.offGyroscopeChange",
         "wx.startCompass", "wx.stopCompass", "wx.onCompassChange", "wx.offCompassChange",
     )
     fun install(target: WeappContainerSession): CompletableFuture<Void> {
-        check(session == null) { "Device adapter belongs to one controller" }; session = target; scopes.bind(target)
-        return CompletableFuture.allOf(target.registerHostResourceCleanup("device-${java.util.UUID.randomUUID()}") { resetResources() }, *supportedApis.map { api -> target.registerApiHandler(api) { call, reply ->
+        check(session == null) { "Device adapter belongs to one controller" }; session = target; scopes.bind(target); application.registerActivityLifecycleCallbacks(lifecycle)
+        return CompletableFuture.allOf(target.registerHostResourceCleanup("device-${java.util.UUID.randomUUID()}") { resetResources() }, target.registerHostVisibilityHandler("location-${java.util.UUID.randomUUID()}") { visible -> locationVisible = visible; if (visible) resumeLocationStream() else pauseLocations() }, *supportedApis.map { api -> target.registerApiHandler(api) { call, reply ->
             val context = call.context
             if (context == null) reply.reject(HostErrorCode.PERMISSION_DENIED, "Trusted native context required")
             else scopes.prepare(context).whenComplete { _, error ->
@@ -173,6 +199,7 @@ class AndroidDeviceApis(
                     else permission(requested, call) { granted -> if (granted) ok(api, reply) else fail(api, reply, "auth deny", HostErrorCode.PERMISSION_DENIED, 2001) }
                 }
                 "wx.getLocation", "wx.getFuzzyLocation" -> locate(api, call, reply, value)
+                "wx.startLocationUpdate", "wx.stopLocationUpdate", "wx.onLocationChange", "wx.offLocationChange", "wx.onLocationChangeError", "wx.offLocationChangeError" -> locationStream(api, call, reply, value)
                 "wx.openLocation" -> {
                     require(value.optString("type", "wgs84") == "wgs84") { "GCJ-02 coordinates require a licensed coordinate adapter" }
                     val latitude = value.getDouble("latitude"); val longitude = value.getDouble("longitude"); require(latitude in -90.0..90.0 && longitude in -180.0..180.0)
@@ -205,28 +232,102 @@ class AndroidDeviceApis(
     }
     private fun locate(api: String, call: HostCall, reply: HostReply, value: JSONObject) {
         if (value.optString("type", "wgs84") != "wgs84") { fail(api, reply, "GCJ-02 requires a coordinate adapter", HostErrorCode.UNSUPPORTED); return }
+        val accepted = locationGeneration
         val precise = api != "wx.getFuzzyLocation"; val requested = arrayOf(if (precise) Manifest.permission.ACCESS_FINE_LOCATION else Manifest.permission.ACCESS_COARSE_LOCATION)
         permission(requested, call) { granted ->
+            if (accepted != locationGeneration || !locationVisible || !activityVisible || binding == null || call.isCancelled) { reply.reject(HostErrorCode.CANCELLED, "Location owner left the foreground"); return@permission }
             if (!granted) { fail(api, reply, "auth deny", HostErrorCode.PERMISSION_DENIED, 2001); return@permission }
             val manager = activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
             val provider = if (precise && manager.isProviderEnabled(LocationManager.GPS_PROVIDER)) LocationManager.GPS_PROVIDER else LocationManager.NETWORK_PROVIDER
             if (!manager.isProviderEnabled(provider)) { fail(api, reply, "location service disabled"); return@permission }
             val listener = object : LocationListener {
                 override fun onLocationChanged(location: Location) {
-                    manager.removeUpdates(this)
-                    if (!call.isCancelled) {
+                    try { removeSingleLocation(call.id) } catch (error: Throwable) { fail(api, reply, error.message ?: "Native location cleanup failed"); return }
+                    if (!call.isCancelled && accepted == locationGeneration) {
                         val result = if (!precise) JSONObject().put("latitude", kotlin.math.round(location.latitude * 100) / 100).put("longitude", kotlin.math.round(location.longitude * 100) / 100)
                         else JSONObject().put("latitude", location.latitude).put("longitude", location.longitude).put("accuracy", location.accuracy.toDouble())
                             .put("speed", location.speed.toDouble()).put("altitude", location.altitude).put("horizontalAccuracy", location.accuracy.toDouble()).put("verticalAccuracy", location.verticalAccuracyMeters.toDouble())
                         ok(api, reply, result)
                     }
                 }
-                override fun onProviderDisabled(provider: String) { manager.removeUpdates(this); fail(api, reply, "location service disabled") }
+                override fun onProviderDisabled(provider: String) { runCatching { removeSingleLocation(call.id) }; fail(api, reply, "location service disabled") }
                 override fun onProviderEnabled(provider: String) {}
                 override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
             }
-            manager.requestLocationUpdates(provider, 0, 0f, listener, Looper.getMainLooper()); call.onCancel = { manager.removeUpdates(listener) }
+            singleLocations[call.id] = SingleLocation(call, reply, manager, listener)
+            try { manager.requestLocationUpdates(provider, 0, 0f, listener, Looper.getMainLooper()) } catch (error: Throwable) { removeSingleLocation(call.id); throw error }
+            call.addCancellationHandler { removeSingleLocation(call.id) }
         }
+    }
+    private fun removeSingleLocation(id: String) { val pending = singleLocations[id] ?: return; pending.manager.removeUpdates(pending.listener); if (singleLocations[id] === pending) singleLocations.remove(id) }
+    private fun locationStream(api: String, call: HostCall, reply: HostReply, value: JSONObject) {
+        if (api.startsWith("wx.off")) { remove(value.getString("subscriptionId")); ok(api, reply); return }
+        if (api.startsWith("wx.on")) {
+            val id = value.getString("subscriptionId"); require(locationSubscriptions.size < 32)
+            locationSubscriptions[id] = call; retain(call, reply) { locationSubscriptions.remove(id) }; ok(api, reply); return
+        }
+        if (api == "wx.stopLocationUpdate") { stopLocationStream(true); ok(api, reply); return }
+        if (value.optString("type", "wgs84") != "wgs84") { fail(api, reply, "GCJ-02 requires a coordinate adapter", HostErrorCode.UNSUPPORTED); return }
+        check(locationStart == null && locationVisible && activityVisible) { "Location start is pending or outside the foreground" }
+        val pending = LocationStart(call, reply, locationGeneration); locationStart = pending
+        call.addCancellationHandler { if (locationStart === pending) locationStart = null }
+        permission(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), call) { granted ->
+            if (locationStart !== pending || pending.generation != locationGeneration || !locationVisible || !activityVisible || call.isCancelled || binding == null) { reply.reject(HostErrorCode.CANCELLED, "Location start owner retired"); return@permission }
+            locationStart = null
+            if (!granted) { fail(api, reply, "auth deny", HostErrorCode.PERMISSION_DENIED, 2001); return@permission }
+            try {
+                if (locationOwner == null) {
+                    check(locationListener == null) { "Previous native location cleanup requires retry" }
+                    // This API returns no resource object. The registered native
+                    // cleanup owns the continuing producer until stop/account reset.
+                    locationOwner = call
+                }
+                startNativeLocation(); ok(api, reply)
+            } catch (error: Throwable) { if (locationOwner === call) locationOwner = null; fail(api, reply, error.message ?: "Native location start failed") }
+        }
+    }
+    private fun startNativeLocation() {
+        val owner = locationOwner ?: return
+        if (locationListener != null || !locationVisible || !activityVisible || binding == null || owner.isCancelled) return
+        val manager = activity.getSystemService(Context.LOCATION_SERVICE) as LocationManager
+        val provider = listOf(LocationManager.GPS_PROVIDER, LocationManager.NETWORK_PROVIDER).firstOrNull { manager.isProviderEnabled(it) } ?: error("Location service disabled")
+        val accepted = locationGeneration
+        val listener = object : LocationListener {
+            override fun onLocationChanged(value: Location) {
+                if (locationListener !== this || locationOwner !== owner || accepted != locationGeneration || !locationVisible || !activityVisible || owner.isCancelled) return
+                queueLocationEvent(owner, "wx.onLocationChange", JSONObject().put("latitude", value.latitude).put("longitude", value.longitude).put("accuracy", value.accuracy.toDouble()).put("horizontalAccuracy", value.accuracy.toDouble()).put("verticalAccuracy", value.verticalAccuracyMeters.toDouble()).put("altitude", value.altitude).put("speed", value.speed.toDouble()))
+            }
+            override fun onProviderDisabled(provider: String) { if (locationListener === this && locationOwner === owner) queueLocationEvent(owner, "wx.onLocationChangeError", JSONObject().put("errMsg", "startLocationUpdate:fail location service disabled").put("errCode", 2)) }
+            override fun onProviderEnabled(provider: String) {}
+            override fun onStatusChanged(provider: String?, status: Int, extras: Bundle?) {}
+        }
+        locationManager = manager; locationListener = listener
+        try { manager.requestLocationUpdates(provider, 1000, 0f, listener, Looper.getMainLooper()) }
+        catch (error: Throwable) { try { stopNativeLocation() } catch (cleanup: Throwable) { error.addSuppressed(cleanup) }; throw error }
+    }
+    private fun stopNativeLocation() { locationListener?.let { locationManager?.removeUpdates(it) }; locationListener = null; locationManager = null }
+    private fun stopLocationStream(clearOwner: Boolean) {
+        val pending = locationStart; locationStart = null; pending?.call?.cancel(); pending?.reply?.reject(HostErrorCode.CANCELLED, "Location update stopped")
+        stopNativeLocation(); pendingLocationEvents.clear(); if (clearOwner) locationOwner = null
+    }
+    private fun pauseLocations() {
+        locationGeneration++; stopLocationStream(false)
+        for ((id, pending) in singleLocations.toMap()) { removeSingleLocation(id); pending.reply.reject(HostErrorCode.CANCELLED, "Location owner left the foreground") }
+    }
+    private fun resumeLocationStream() { runCatching { startNativeLocation() }.onFailure { error -> locationOwner?.let { queueLocationEvent(it, "wx.onLocationChangeError", JSONObject().put("errMsg", "startLocationUpdate:fail ${error.message}").put("errCode", if (error is SecurityException) 2001 else 2)) } } }
+    private fun queueLocationEvent(owner: HostCall, method: String, value: JSONObject) { pendingLocationEvents[method] = LocationEmission(owner, locationGeneration, method, value); drainLocationEvents() }
+    private fun drainLocationEvents() {
+        if (locationDelivering || pendingLocationEvents.isEmpty()) return
+        val event = pendingLocationEvents.entries.first().also { pendingLocationEvents.remove(it.key) }.value
+        if (event.owner !== locationOwner || event.generation != locationGeneration || event.owner.isCancelled) { drainLocationEvents(); return }
+        locationDelivering = true
+        val recipients = locationSubscriptions.values.filter { it.method == event.method && !it.isCancelled && it.context?.getString("sessionId") == event.owner.context?.getString("sessionId") && it.context?.getJSONObject("account")?.toString() == event.owner.context?.getJSONObject("account")?.toString() && it.context?.getJSONObject("application")?.toString() == event.owner.context?.getJSONObject("application")?.toString() }.toList()
+        var delivery = CompletableFuture.completedFuture<Any?>(null)
+        for (subscription in recipients) delivery = delivery.thenCompose {
+            if (event.owner !== locationOwner || event.generation != locationGeneration || subscription.isCancelled) CompletableFuture.completedFuture(null)
+            else emitAsync(subscription, event.value)
+        }
+        delivery.whenComplete { _, error -> main.post { locationDelivering = false; if (error != null && event.owner === locationOwner) runCatching { stopLocationStream(true) }; drainLocationEvents() } }
     }
     private fun sensor(api: String, call: HostCall, reply: HostReply, value: JSONObject) {
         val family = when { api.contains("Accelerometer") -> "Accelerometer"; api.contains("Gyroscope") -> "Gyroscope"; api.contains("Compass") -> "Compass"; else -> { fail(api, reply, "not installed", HostErrorCode.UNSUPPORTED); return } }
@@ -263,12 +364,13 @@ class AndroidDeviceApis(
         }
     }
     private val sequences = mutableMapOf<String, Long>()
-    private fun emit(call: HostCall, value: JSONObject) {
-        if (call.isCancelled) return
-        val context = call.context ?: return; val id = options(call).optString("subscriptionId"); if (id.isEmpty()) return
+    private fun emit(call: HostCall, value: JSONObject) { emitAsync(call, value) }
+    private fun emitAsync(call: HostCall, value: JSONObject): CompletableFuture<Any?> {
+        if (call.isCancelled) return CompletableFuture.completedFuture(null)
+        val context = call.context ?: return CompletableFuture.completedFuture(null); val id = options(call).optString("subscriptionId"); if (id.isEmpty()) return CompletableFuture.completedFuture(null)
         val sequence = (sequences[id] ?: 0) + 1; sequences[id] = sequence
-        session?.emitHostApiEvent(JSONObject().put("sessionId", context.getString("sessionId")).put("accountEpoch", context.getJSONObject("account").get("epoch"))
-            .put("subscriptionId", id).put("sequence", sequence).put("value", value))
+        return session?.emitHostApiEvent(JSONObject().put("sessionId", context.getString("sessionId")).put("accountEpoch", context.getJSONObject("account").get("epoch"))
+            .put("subscriptionId", id).put("sequence", sequence).put("value", value)) ?: CompletableFuture.completedFuture(null)
     }
     private fun retain(call: HostCall, reply: HostReply, dispose: () -> Unit) {
         val id = options(call).getString("subscriptionId"); cleanup[id] = dispose
@@ -283,10 +385,11 @@ class AndroidDeviceApis(
         var failure: Throwable? = null
         fun attempt(action: () -> Unit) { try { action() } catch (error: Throwable) { if (failure == null) failure = error else if (failure !== error) failure!!.addSuppressed(error) } }
         for (id in cleanup.keys.toList()) attempt { remove(id) }
+        attempt { pauseLocations(); stopLocationStream(true) }
         attempt { consent.reset() }; scopes.clear()
         attempt { toast?.cancel(); toast = null }; attempt { loading?.dismiss(); loading = null }
         attempt { restoreDisplay() }; sensorEnabled.clear()
         if (failure != null) throw failure!!
     }
-    override fun close() { check(Looper.myLooper() == Looper.getMainLooper()); resetResources(); session = null }
+    override fun close() { check(Looper.myLooper() == Looper.getMainLooper()); resetResources(); application.unregisterActivityLifecycleCallbacks(lifecycle); session = null }
 }

@@ -74,7 +74,7 @@ class HostServicesProbeActivity : Activity() {
         main.postDelayed({ if (!finishing) fail(IllegalStateException("Native host-services probe timed out")) }, 120000)
     }
     private fun account(principal: String, epoch: String) = JSONObject().put("principalId", principal).put("epoch", epoch)
-    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()).put("networkOrigin", intent.getStringExtra("networkOrigin")).put("systemMarker", systemMarker))
+    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()).put("networkOrigin", intent.getStringExtra("networkOrigin")).put("systemMarker", systemMarker).put("probeLocation", intent.getBooleanExtra("probeLocation", false).toString()))
     private fun onMessage(message: JSONObject) {
         android.util.Log.i("WeappHostProbe", "guest: $message")
         when (message.optString("kind")) {
@@ -87,6 +87,8 @@ class HostServicesProbeActivity : Activity() {
             }
             "phone-ready" -> preparePhoneTap()
             "system-commits" -> try { verifySystemCommits() } catch (error: Throwable) { fail(error) }
+            "location-ready" -> File(filesDir, "location-ready.json").writeText("{\"ready\":true}")
+            "location-verified" -> checks.put("real-emulator-gps-location-subscription-and-stop-barrier")
             "transport-recording" -> {
                 session.state().thenCompose { state ->
                     val context = JSONObject(state.getJSONObject("hostServicesState").toString()).put("sessionId", state.getString("sessionId"))

@@ -69,6 +69,10 @@ challenge；SDK 校验结果的 raw challenge 与非空 base64 签名，普通�
 
 设备适配器包括真实剪贴板、网络状态、电量、窗口亮度与常亮、震动、原生系统 UI、
 WGS84 定位及传感器。传感器当前支持 normal 采样；GCJ-02 需要独立坐标服务。
+前台持续定位使用 LocationManager，支持 start/stopLocationUpdate、
+on/offLocationChange 及 on/offLocationChangeError。单次与持续定位共享权限边界，
+小程序隐藏或 Activity 进入后台暂停采样，回到前台才按原 owner 恢复；停止、换号
+和关闭移除原 listener。事件只保留最新位置/错误，串行送达；不注册后台定位。
 BLE 适配器拥有自己的扫描器和 GATT，按设备串行提交操作；关闭不会关闭宿主全局
 蓝牙。取消在途 GATT 操作会关闭该连接，以隔离迟到回调。
 
@@ -104,6 +108,11 @@ token closure 始终留在 native；小程序只收到短时、单次、绑定�
 `wx.checkSession` 查询服务端已兑换的有效会话。兑换完成、撤权、宿主凭据刷新及
 回到前台后，宿主调用 `identity.refreshState(session, trustedContext)`；同步
 `weappContainer.identity.getState` 和 onChange 来自这一真实服务端状态。
+
+资料与手机号提示先向可信后端查询授权政策，原生 UI 展示服务端 purpose，
+授权记录和后续 code 同时绑定 purpose 与 permissionVersion。小程序传入的 desc
+不决定用途；拒绝同步服务端并刷新快照，取消保留取消语义。服务端政策变化后，
+旧授权不能继续使用。
 
 换号先替换宿主安全凭据，在 `accountCleanupHandler` 内等待
 `identity.prepareAccountState(session, operationId, newTrustedContext)`，再完成清理
@@ -157,3 +166,9 @@ WebSocket echo/close、实际 AAC ADTS 帧、换号关闭旧请求/socket，以�
 写为 10 分钟、没有 signer 时 SOTER 不可用。探针只删除自身随机 marker 的
 联系人与临时 calendar account；扫码识别、实体 NFC 与真实 SOTER 签名仍为
 独立设备验收范围。
+
+[前台定位与授权政策开发记录](test/evidence/host-services-location-policy-development.json)
+保留独立 18 项探针。显式 `--probe-foreground-location` 使用模拟器 console 注入 GPS，
+小程序收到真实 LocationManager 坐标，停止后继续注入仍不再收到事件；原生资料与
+手机号 UI 实际显示后端登记用途，授权并完成兑换。工具、原生包装、fixture 与完整
+参考后端源码在执行前后逐文件核对哈希；这仍是开发 snapshot 的模拟器证据。

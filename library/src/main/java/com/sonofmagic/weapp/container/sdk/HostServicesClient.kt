@@ -157,16 +157,32 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
                     "weappContainer.identity.logout" -> request("/v1/host/app-logout", backend.selection(call)) { it }
                     else -> {
                         val phone = api == "weappContainer.identity.authorizePhone"
-                        val dialog = AlertDialog.Builder(activity).setTitle(if (phone) "授权手机号" else "授权昵称和头像")
-                            .setMessage(if (phone) "允许此小程序获取宿主账号已验证的手机号？" else "允许此小程序获取宿主账号的昵称和头像？")
-                            .setPositiveButton("允许") { _, _ ->
-                                val consent = backend.selection(call).put("kind", if (phone) "phone" else "profile").put("granted", true)
-                                try { backend.request(call, "/v1/host/consents", consent) { result -> result.fold({
-                                    if (phone) request("/v1/host/phone-codes", backend.selection(call)) { it } else fetchProfile()
-                                }, ::fail) } } catch (error: Throwable) { fail(error) }
-                            }.setNegativeButton("拒绝") { _, _ -> reply.reject(HostErrorCode.PERMISSION_DENIED, "User denied consent", false, JSONObject().put("errMsg", "$api:fail auth deny").put("errCode", 2001)) }
-                            .setOnCancelListener { reply.reject(HostErrorCode.CANCELLED, "Consent cancelled", false, JSONObject().put("errMsg", "$api:fail cancel")) }.show()
-                        call.onCancel = { dialog.dismiss() }
+                        val kind = if (phone) "phone" else "profile"
+                        try { backend.request(call, "/v1/host/authorization-policy", backend.selection(call).put("kind", kind)) { policyResult ->
+                            policyResult.fold({ policy -> try {
+                                if (call.isCancelled) return@fold
+                                check(!activity.isFinishing && !activity.isDestroyed) { "Visible activity required for consent" }
+                                val purpose = policy.getString("purpose"); val version = policy.getString("permissionVersion")
+                                require(policy.getString("kind") == kind && purpose.isNotBlank() && purpose.length <= 512 && version.isNotBlank() && version.length <= 64) { "Invalid registered authorization policy" }
+                                fun record(granted: Boolean) {
+                                    val consent = backend.selection(call).put("kind", kind).put("granted", granted).put("purpose", purpose).put("permissionVersion", version)
+                                    try { backend.request(call, "/v1/host/consents", consent) { result -> result.fold({
+                                        if (granted) { if (phone) request("/v1/host/phone-codes", backend.selection(call)) { it } else fetchProfile() }
+                                        else try { refresh(session, call) { refreshed -> refreshed.fold({
+                                            reply.reject(HostErrorCode.PERMISSION_DENIED, "User denied consent", false, JSONObject().put("errMsg", "$api:fail auth deny").put("errCode", 2001))
+                                        }, ::fail) } } catch (error: Throwable) { fail(error) }
+                                    }, ::fail) } } catch (error: Throwable) { fail(error) }
+                                }
+                                val dialog = AlertDialog.Builder(activity).setTitle(if (phone) "授权手机号" else "授权昵称和头像")
+                                    .setMessage((if (phone) "允许此小程序获取宿主账号已验证的手机号？" else "允许此小程序获取宿主账号的昵称和头像？") + "\n\n用途：$purpose")
+                                    .setPositiveButton("允许") { _, _ -> record(true) }
+                                    .setNegativeButton("拒绝") { _, _ -> record(false) }
+                                    .setOnCancelListener { reply.reject(HostErrorCode.CANCELLED, "Consent cancelled", false, JSONObject().put("errMsg", "$api:fail cancel")) }.show()
+                                val previousCancellation = call.onCancel
+                                call.onCancel = { try { previousCancellation?.invoke() } finally { dialog.dismiss() } }
+                                if (call.isCancelled) dialog.dismiss()
+                            } catch (error: Throwable) { fail(error) } }, ::fail)
+                        } } catch (error: Throwable) { fail(error) }
                     }
                 }
             }
