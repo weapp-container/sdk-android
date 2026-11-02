@@ -8,7 +8,7 @@
 `registerHostMethod`。未安装的 API 明确不支持。
 
 `HostServicesClient.identityState` 在可信账号明确为 `principalId: null` 且 epoch
-为精确十进制 u64（包含默认值 `"0"`）时准备未登录快照，不再读取已撤销的宿主 bearer。初始准备、
+为精确十进制 u64（快照辅助层接受 `"0"`，公开 owner 配置仍要求正数）时准备未登录快照，不再读取已撤销的宿主 bearer。初始准备、
 换号清理准备与前台刷新都使用同一入口；已登录 principal 仍必须查询真实后端，
 网络、权限或凭据失败继续传递，不会回退为成功。快照不包含旧用户资料或手机号授权。
 
@@ -138,6 +138,10 @@ token closure 始终留在 native；小程序只收到短时、单次、绑定�
 `wx.checkSession` 查询服务端已兑换的有效会话。兑换完成、撤权、宿主凭据刷新及
 回到前台后，宿主调用 `identity.refreshState(session, trustedContext)`；同步
 `weappContainer.identity.getState` 和 onChange 来自这一真实服务端状态。
+刷新在发起请求之前读取 native state，验证传入的 application/account 并冻结实际
+内部 sessionId；旧请求完成时仍携带该身份，不会重新绑定到新 owner。回调携带的
+原始 ApiCallContext 同样原样透传。运行时按完整应用/包、账号 epoch 和内部会话
+拒绝过时快照；这项校验不要求人工 native refresh 对应一个 pending API call。
 
 资料与手机号提示先向可信后端查询授权政策，原生 UI 展示服务端 purpose，
 授权记录和后续 code 同时绑定 purpose 与 permissionVersion。小程序传入的 desc

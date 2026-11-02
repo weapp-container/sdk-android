@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "8e48f64f9e45584b2550cb925faa546f76216c42",
-  "review": "Align signed-out identity snapshots with core canonical u64 epochs including the default epoch zero",
+  "sourceBaseCommit": "115e5716227db4303f8f1ce4abb0b7aa31664a36",
+  "review": "Freeze actual native snapshot incarnation before asynchronous identity refresh and reject mismatched trusted application/account before I/O",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "8138f5741942cf56db84a4606208d70aec3cef9c765a2880020247901ef31c77",
-      "size": 15913,
+      "sha256": "df0e6e19dda7b6177d4a4e7171dcf11e346a33f3102de390a2a7d016df3a89df",
+      "size": 16364,
       "mode": "100644"
     },
     {
@@ -317,14 +317,14 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostIdentitySnapshot.kt",
-      "sha256": "7a1aca7d2a9ebc79337844d1d4f1afe3ef5dd80549e68ef249fc374a2bc7ca01",
-      "size": 962,
+      "sha256": "43626140cef41e5873a9ff94664bb56dd57908fa1a38e60fa29b2bd89b456179",
+      "size": 1899,
       "mode": "100644"
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
-      "sha256": "e280ed0e9d870ecfb865d01b0f93fde709a566ddb5a4dd40e649dde91467819a",
-      "size": 17175,
+      "sha256": "095d7ea803c98764faea39a1dd3fbf52759daf791fc340def19fdb1e7eef3dca",
+      "size": 17358,
       "mode": "100644"
     },
     {
@@ -407,8 +407,8 @@
     },
     {
       "path": "test/HostIdentitySnapshotTests.kt",
-      "sha256": "de7374e1fc88e900519b6bf88287c1c574ffebbdb3d5d2a203f0b1f0e79f25f6",
-      "size": 1362,
+      "sha256": "38e3240290c0377f797a70f4566f0d3f7128147fbcda555b566c1c651f3a33ad",
+      "size": 3214,
       "mode": "100644"
     },
     {

@@ -97,10 +97,14 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
     }
     /** Call after backend code redemption, consent revocation, token refresh, or foreground resume. */
     fun refreshState(session: WeappContainerSession, trustedContext: JSONObject): java.util.concurrent.CompletableFuture<JSONObject> {
-        val call = HostCall("native-refresh-${java.util.UUID.randomUUID()}", "weappContainer.identity.getState", JSONObject(), null, null, JSONObject(trustedContext.toString()))
-        val future = java.util.concurrent.CompletableFuture<JSONObject>()
-        try { refresh(session, call) { it.fold(future::complete, future::completeExceptionally) } } catch (error: Throwable) { future.completeExceptionally(error) }
-        return future
+        val expected = JSONObject(trustedContext.toString())
+        return session.state().thenCompose { state ->
+            val context = HostIdentitySnapshot.refreshContext(expected, state)
+            val call = HostCall("native-refresh-${java.util.UUID.randomUUID()}", "weappContainer.identity.getState", JSONObject(), null, null, context)
+            val future = java.util.concurrent.CompletableFuture<JSONObject>()
+            try { refresh(session, call) { it.fold(future::complete, future::completeExceptionally) } } catch (error: Throwable) { future.completeExceptionally(error) }
+            future
+        }
     }
     /** Called by accountCleanupHandler after new host credentials are installed, before cleanup ACK. */
     fun prepareAccountState(session: WeappContainerSession, operationId: String, trustedContext: JSONObject): java.util.concurrent.CompletableFuture<JSONObject> {

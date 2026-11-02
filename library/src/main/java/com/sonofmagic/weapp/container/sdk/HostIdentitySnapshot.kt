@@ -4,6 +4,21 @@ import org.json.JSONObject
 
 /** Native account projection only; never substitute this for a failed HTTP request. */
 internal object HostIdentitySnapshot {
+    /** Capture before starting asynchronous work; never bind a late result to a new owner. */
+    fun refreshContext(trusted: JSONObject, nativeState: JSONObject): JSONObject {
+        val current = nativeState.getJSONObject("hostServicesState")
+        for (group in listOf("application", "account")) {
+            val expected = trusted.getJSONObject(group)
+            val observed = current.getJSONObject(group)
+            require(observed.length() > 0 && expected.length() == observed.length() && observed.keys().asSequence().all { name ->
+                expected.has(name) && expected.get(name) == observed.get(name)
+            }) { "Stale native snapshot owner" }
+        }
+        val incarnation = nativeState.get("sessionId")
+        require(incarnation is String && incarnation.isNotEmpty()) { "A live native snapshot owner is required" }
+        return JSONObject(current.toString()).put("sessionId", incarnation)
+    }
+
     fun signedOut(context: JSONObject): JSONObject? {
         val account = context.getJSONObject("account")
         require(account.has("principalId")) { "Trusted account principal required" }
