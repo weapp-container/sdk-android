@@ -4,8 +4,12 @@ import org.json.JSONObject
 
 /** Native account projection only; never substitute this for a failed HTTP request. */
 internal object HostIdentitySnapshot {
+    fun supportsOwnerContext(capabilities: JSONObject): Boolean =
+        capabilities.optJSONObject("hostServices")?.opt("snapshotOwnerContext") == "1.0"
+
     /** Capture before starting asynchronous work; never bind a late result to a new owner. */
     fun refreshContext(trusted: JSONObject, nativeState: JSONObject): JSONObject {
+        require(nativeState.opt("status") == "ready") { "A ready native snapshot owner is required" }
         val current = nativeState.getJSONObject("hostServicesState")
         for (group in listOf("application", "account")) {
             val expected = trusted.getJSONObject(group)

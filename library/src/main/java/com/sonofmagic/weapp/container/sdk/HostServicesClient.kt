@@ -98,7 +98,11 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
     /** Call after backend code redemption, consent revocation, token refresh, or foreground resume. */
     fun refreshState(session: WeappContainerSession, trustedContext: JSONObject): java.util.concurrent.CompletableFuture<JSONObject> {
         val expected = JSONObject(trustedContext.toString())
-        return session.state().thenCompose { state ->
+        return session.capabilities().thenCompose { capabilities ->
+            if (!HostIdentitySnapshot.supportsOwnerContext(capabilities))
+                throw ContainerException("ERR_UNSUPPORTED_CAPABILITY", "Runtime does not validate native snapshot owner contexts")
+            session.state()
+        }.thenCompose { state ->
             val context = HostIdentitySnapshot.refreshContext(expected, state)
             val call = HostCall("native-refresh-${java.util.UUID.randomUUID()}", "weappContainer.identity.getState", JSONObject(), null, null, context)
             val future = java.util.concurrent.CompletableFuture<JSONObject>()
@@ -115,6 +119,16 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
         }, future::completeExceptionally) } } catch (error: Throwable) { future.completeExceptionally(error) }; return future
     }
     private fun refresh(session: WeappContainerSession, call: HostCall, complete: (Result<JSONObject>) -> Unit) {
+        session.capabilities().whenComplete { capabilities, error ->
+            if (error != null) complete(Result.failure(error))
+            else try {
+                if (!HostIdentitySnapshot.supportsOwnerContext(capabilities))
+                    throw ContainerException("ERR_UNSUPPORTED_CAPABILITY", "Runtime does not validate native snapshot owner contexts")
+                fetchAndPublishState(session, call, complete)
+            } catch (failure: Throwable) { complete(Result.failure(failure)) }
+        }
+    }
+    private fun fetchAndPublishState(session: WeappContainerSession, call: HostCall, complete: (Result<JSONObject>) -> Unit) {
         backend.identityState(call) { result -> result.fold({ state ->
             try { session.hostServicesCommand("updateHostServiceSnapshots", JSONObject().put("context", call.context).put("values", JSONObject().put("weappContainer.identity.getState", state))).whenComplete { _, error ->
                 if (error != null) complete(Result.failure(error))
@@ -131,6 +145,7 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
     }
     private fun sameOwner(left: HostCall, right: HostCall): Boolean {
         val a = left.context ?: return false; val b = right.context ?: return false
+        if (a.optString("sessionId").isEmpty() || a.opt("sessionId") != b.opt("sessionId")) return false
         return listOf("application" to listOf("hostAppId", "tenantId", "publisherId", "appId", "environment", "version", "packRoot"), "account" to listOf("principalId", "epoch")).all { (group, fields) -> fields.all { a.getJSONObject(group).get(it).toString() == b.getJSONObject(group).get(it).toString() } }
     }
     fun install(session: WeappContainerSession) = java.util.concurrent.CompletableFuture.allOf(

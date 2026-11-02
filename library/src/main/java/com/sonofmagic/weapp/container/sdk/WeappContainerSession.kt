@@ -252,6 +252,8 @@ class WeappContainerSession internal constructor(
             }
             if (operation == "retryAccountSwitch") accountDetachAttempts = 0
             if (operation == "updateHostServiceSnapshots" && copied.has("context")) {
+                if (!HostIdentitySnapshot.supportsOwnerContext(command("capabilities") as JSONObject))
+                    throw ContainerException("ERR_UNSUPPORTED_CAPABILITY", "Runtime does not validate native snapshot owner contexts")
                 val expected = copied.getJSONObject("context"); val configured = checkNotNull(hostServicesConfig)
                 for ((group, fields) in listOf("application" to listOf("hostAppId", "tenantId", "publisherId", "appId", "environment", "packRoot"), "account" to listOf("principalId", "epoch"))) {
                     check(fields.all { name -> expected.getJSONObject(group).get(name).toString() == configured.getJSONObject(group).get(name).toString() }) { "Stale native snapshot owner" }

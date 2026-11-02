@@ -139,9 +139,13 @@ token closure 始终留在 native；小程序只收到短时、单次、绑定�
 回到前台后，宿主调用 `identity.refreshState(session, trustedContext)`；同步
 `weappContainer.identity.getState` 和 onChange 来自这一真实服务端状态。
 刷新在发起请求之前读取 native state，验证传入的 application/account 并冻结实际
-内部 sessionId；旧请求完成时仍携带该身份，不会重新绑定到新 owner。回调携带的
+内部 sessionId；只有 ready owner 能发起该刷新，切换中或空 owner 直接拒绝。
+旧请求完成时仍携带该身份，不会重新绑定到新 owner。回调携带的
 原始 ApiCallContext 同样原样透传。运行时按完整应用/包、账号 epoch 和内部会话
 拒绝过时快照；这项校验不要求人工 native refresh 对应一个 pending API call。
+发起异步身份刷新前及提交带 context 的快照时，SDK 都要求 runtime 声明
+`hostServices.snapshotOwnerContext == "1.0"`；缺少该标记时明确报
+`ERR_UNSUPPORTED_CAPABILITY`，防止旧 runtime 静默忽略新的 owner 校验字段。
 
 资料与手机号提示先向可信后端查询授权政策，原生 UI 展示服务端 purpose，
 授权记录和后续 code 同时绑定 purpose 与 permissionVersion。小程序传入的 desc
