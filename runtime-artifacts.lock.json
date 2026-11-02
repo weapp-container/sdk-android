@@ -12,16 +12,16 @@
       "platform": "android",
       "arch": "arm64-v8a",
       "fileName": "runtime-0.1.0-preview.6.0-android-arm64-v8a.tar.gz",
-      "size": 9914217,
-      "sha256": "011ade2ac9557bbaa8472c00bd2adb06cd2180d9ff41b95e4b3a9fc21189ff6f"
+      "size": 9914214,
+      "sha256": "4a083bb1aa087cade0e67fab0ae98500c31f151a7b2e3efd53674128cfcf8aa8"
     },
     {
       "component": "runtime",
       "platform": "android",
       "arch": "x86_64",
       "fileName": "runtime-0.1.0-preview.6.0-android-x86_64.tar.gz",
-      "size": 10104356,
-      "sha256": "5905b253d106ab3b34ec11a5c87c6b2e552cbb8c362190372c1d54445b533320"
+      "size": 10104365,
+      "sha256": "b850555c7d3e8ba67263a7dc7936796457f486c3082836303e0042c494002553"
     }
   ]
 }
