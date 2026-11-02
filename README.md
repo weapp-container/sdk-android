@@ -111,3 +111,9 @@ npm test
 ```
 
 Commit source and inventory together before building distributable packages. `sourceBaseCommit` identifies the checkout used to prepare the source review; it does not bind subsequent build evidence to that earlier commit. Never rewrite historical receipts or fabricate runtime archive lock hashes to make this check pass.
+
+## Native dependency lock
+
+`runtime-artifacts.lock.json` pins only this SDK's native runtime slices. Wrapper archives are build outputs and are kept in the delivery manifest, so the SDK never depends on the hash of its own archive. Other platforms use their own SDK locks. Historical `ORIGIN.json` records remain unchanged.
+
+The `0.1.0-preview.6.0` generation is an unpublished local preview. Prepare it with the exact reviewed offline archive directory (`npm run runtime:prepare -- --artifact-dir <archives>`); a version pin does not imply that a release has been published.

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "de48141f610fca59a51294e3f2240a65c6205c55",
-  "review": "Negotiate snapshot ownership before asynchronous refresh; require a ready owner, freeze actual incarnation, and isolate identity subscriptions by session",
+  "sourceBaseCommit": "a9cdb45d1fcbdd1c5e8264f5ba16d2ccea62016d",
+  "review": "Review platform-only runtime dependency pins from clean core 06bf6ae0e4f91abde2a6270835071da454e07bc7; break wrapper archive self-dependency without rewriting ORIGIN",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -47,8 +47,8 @@
     },
     {
       "path": "README.md",
-      "sha256": "31a9dd8eb147d6fe1e51343849dec9d8d8e8a7a230c62abe79f9ce663d1909fc",
-      "size": 10512,
+      "sha256": "03bf7b4fefbb55eb9b17cb12ec2a240c5934c34198388144cd558c33c937012c",
+      "size": 11089,
       "mode": "100644"
     },
     {
@@ -377,8 +377,8 @@
     },
     {
       "path": "runtime-artifacts.lock.json",
-      "sha256": "ee393000b5726172755b24a31812f9b55051e710c2714edadb9b3ac287b95388",
-      "size": 3241,
+      "sha256": "b375d224514fff2d4f1d29982a7d1f59597ff90fdf3c696af8c81981d36dce14",
+      "size": 776,
       "mode": "100644"
     },
     {
@@ -479,8 +479,8 @@
     },
     {
       "path": "test/native-input.test.mjs",
-      "sha256": "0a46419312366cbd18a8c13590d55bceb089077b1708c8cb7befd83eb4dc4fb7",
-      "size": 14395,
+      "sha256": "787bbc57d16060f383a4379b9890c95619cec870e3ed1535c28bc9a89ef74c35",
+      "size": 15309,
       "mode": "100644"
     },
     {
