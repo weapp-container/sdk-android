@@ -65,6 +65,22 @@ class WeappContainerSession internal constructor(
     private var closeFuture: CompletableFuture<Unit>? = null
     private val flushes = mutableMapOf<Long, CompletableFuture<Unit>>()
     private val methods = linkedMapOf<String, HostMethod>()
+    private val apiHandlers = linkedMapOf<String, HostMethod>()
+    private var hostServicesConfig: JSONObject? = null
+    private val authorizedApplications = linkedMapOf<String, JSONObject>()
+    private val resourceCleanups = linkedMapOf<String, () -> Unit>()
+    private var accountSwitchBlocked = false
+    private var accountDetachPending = false
+    private var accountDetachAttempts = 0
+    private var accountUiResetDone = true
+    private var accountUiResetAwaiting = false
+    private var accountUiResetActions = listOf<() -> Unit>()
+    private var accountSwitchOperationId: String? = null
+    private var accountNativeDetached = false
+    private var accountCustomCleanupDone = false
+    private var accountCustomCleanupAwaiting = false
+    private var accountCustomCleanupFailed = false
+    @Volatile var accountCleanupHandler: ((String) -> CompletableFuture<Unit>)? = null
     private val calls = mutableMapOf<String, HostCall>()
     private val pendingLoads = ArrayDeque<PendingLoad>()
     private val pendingPrepares = ArrayDeque<CompletableFuture<JSONObject>>()
@@ -190,6 +206,68 @@ class WeappContainerSession internal constructor(
         if (handle != 0L) command("registerHostMethod", JSONObject().put("name", name))
         methods[name] = method
     }
+    /** Verified installation/account configuration; retained across empty preflight recreation. */
+    fun configureHostServices(configuration: JSONObject): CompletableFuture<JSONObject> = hostServicesCommand("configureHostServices", configuration).thenApply { it as? JSONObject ?: JSONObject() }
+    /** Native adapter lifecycle; reset OS resources before the replacement account becomes visible. */
+    fun registerHostResourceCleanup(key: String, cleanup: () -> Unit): CompletableFuture<Unit> = task {
+        ensureOpen(); check(!resourceCleanups.containsKey(key)); resourceCleanups[key] = cleanup
+    }
+    fun registerApiHandler(name: String, handler: HostMethod): CompletableFuture<Unit> = task {
+        ensureOpen(); check(!loaded && pendingLoads.isEmpty()) { "Register native APIs before load" }
+        check(hostServicesConfig != null) { "Configure trusted host services before registering native APIs" }
+        check(!apiHandlers.containsKey(name)) { "Native API already registered: $name" }; require(name.isNotBlank())
+        if (handle != 0L) command("registerApiHandler", JSONObject().put("name", name))
+        apiHandlers[name] = handler
+    }
+    /** Allowlisted host-services transport for native embeddings, Flutter and React Native. */
+    @JvmOverloads fun hostServicesCommand(operation: String, payload: JSONObject = JSONObject()): CompletableFuture<Any?> {
+        val copied = JSONObject(payload.toString())
+        val allowed = setOf("configureHostServices", "registerApiHandler", "updateHostServiceSnapshots", "authorizeInstalledPack", "migrateLegacyStorage", "deleteAccountData", "hostApiEvent", "hostComponents", "managedFileScope", "hostComponentEvent", "authorizePhoneButton", "acknowledgeAccountCleanup", "retryAccountCleanup", "switchAccount", "queryAccountSwitch", "updateAccountSwitchLaunch", "retryAccountSwitch", "cancelAccountSwitch", "createHostBinary", "readHostBinary", "retainHostBinary", "releaseHostBinary")
+        return task {
+            ensureOpen(); require(operation in allowed || operation in setOf("hostComponentFrame", "prepareAccountHostServiceSnapshots")) { "Not a host-services command: $operation" }
+            if (operation == "configureHostServices") {
+                check(!loaded && pendingLoads.isEmpty()) { "Configure host services before load" }
+                val result = if (handle != 0L) command(operation, copied) as? JSONObject else null
+                hostServicesConfig = copied
+                return@task result ?: JSONObject()
+            }
+            if (handle == 0L) createNative(metrics ?: throw ContainerException("ERR_NOT_READY", "A measured native view is required"))
+            if (operation == "retryAccountCleanup") {
+                accountCustomCleanupFailed = false; accountDetachAttempts = 0
+                if (!accountUiResetDone) scheduleAccountUiReset() else progressAccountSwitch()
+                return@task command("queryAccountSwitch")
+            }
+            if (operation == "retryAccountSwitch") accountDetachAttempts = 0
+            if (operation == "updateHostServiceSnapshots" && copied.has("context")) {
+                val expected = copied.getJSONObject("context"); val configured = checkNotNull(hostServicesConfig)
+                for ((group, fields) in listOf("application" to listOf("hostAppId", "tenantId", "publisherId", "appId", "environment", "packRoot"), "account" to listOf("principalId", "epoch"))) {
+                    check(fields.all { name -> expected.getJSONObject(group).get(name).toString() == configured.getJSONObject(group).get(name).toString() }) { "Stale native snapshot owner" }
+                }
+                check(!accountSwitchBlocked) { "Account replacement is in progress" }
+            }
+            try {
+                val result = command(operation, copied)
+                if (operation == "authorizeInstalledPack") {
+                    val root = copied.getString("packRoot")
+                    check(authorizedApplications.containsKey(root) || authorizedApplications.size < 64) { "Authorized pack limit reached" }
+                    authorizedApplications[root] = JSONObject(copied.toString())
+                }
+                if (operation == "updateHostServiceSnapshots" || operation == "prepareAccountHostServiceSnapshots") {
+                    val values = copied.optJSONObject("values") ?: JSONObject()
+                    val snapshots = hostServicesConfig?.optJSONObject("syncValues") ?: JSONObject()
+                    for (name in values.keys()) snapshots.put(name, values.get(name))
+                    hostServicesConfig?.put("syncValues", snapshots)
+                }
+                if (operation == "switchAccount" && (result as? JSONObject)?.optString("phase") != "complete") accountSwitchBlocked = true
+                result
+            } finally { drainEvents(); progressAccountSwitch(); present() }
+        }
+    }
+    fun emitHostApiEvent(event: JSONObject): CompletableFuture<Any?> = hostServicesCommand("hostApiEvent", event)
+    fun createHostBinary(bytes: ByteArray): CompletableFuture<Any?> {
+        require(bytes.size <= 1024 * 1024) { "Host binary chunks are bounded to 1 MiB" }
+        return hostServicesCommand("createHostBinary", JSONObject().put("bytes", JSONArray().apply { bytes.forEach { put(it.toInt() and 255) } }))
+    }
     @JvmOverloads fun navigate(route: String, query: JSONObject = JSONObject(), replace: Boolean = false): CompletableFuture<Unit> {
         val payload = JSONObject().put("route", route).put("query", JSONObject(query.toString())).put("replace", replace)
         return operation("navigate", payload)
@@ -283,6 +361,8 @@ class WeappContainerSession internal constructor(
             enqueue(result) {
                 if (closed) { finish(result, Unit); return@enqueue }
                 closing = true; cleanupNeedsRetry = false
+                val cleanups = resourceCleanups.values.toList(); resourceCleanups.clear()
+                main.post { cleanups.forEach { dispose -> try { dispose() } catch (error: Throwable) { emitError(error) } } }
                 while (pendingPrepares.isNotEmpty()) fail(pendingPrepares.removeFirst(), ContainerException("ERR_CLOSED", "Session closed before measured-view preparation"))
                 while (pendingLoads.isNotEmpty()) fail(pendingLoads.removeFirst().result, ContainerException("ERR_CLOSED", "Session closed before layout/load"))
                 try {
@@ -372,7 +452,7 @@ class WeappContainerSession internal constructor(
     internal fun input(events: JSONArray) {
         if (closed) return
         worker.post {
-            if (!loaded || closing || !foreground || previewOccluded) return@post
+            if (!loaded || closing || accountSwitchBlocked || !foreground || previewOccluded) return@post
             try { command("input", JSONObject().put("events", events)); drainEvents(); present() } catch (error: Throwable) { emitError(error) }
         }
     }
@@ -391,17 +471,21 @@ class WeappContainerSession internal constructor(
     }
     private fun createNative(observation: WindowMetrics) {
         val host = JSONObject().put("kind", "android").put("platform", "android").put("version", Build.VERSION.RELEASE)
-            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.5.7").put("windowWidth", observation.windowWidth)
+            .put("user_agent", "WeappContainerAndroid/0.1.0-preview.6.0").put("windowWidth", observation.windowWidth)
             .put("windowHeight", observation.windowHeight).put("displayMetrics", observation.displayJson())
         val config = JSONObject().put("engine", "quickjs").put("host", host)
+            .put("managedFilesRoot", File(app.filesDir, "weapp-container/managed-files").absolutePath)
         requiredGpu?.let { config.put("gpuRequired", it) }
         if (diagnosticsEnabled) config.put("devDiagnostics", true)
         if (atomicHostLayout) config.put("hostLayout", JSONObject().put("protocolVersion", "1.0").put("atomic", true))
+        hostServicesConfig?.let { config.put("hostServices", JSONObject(it.toString())) }
         if (storageKey != null) config.put("storageKey", storageKey).put("storageRoot", File(app.filesDir, "weapp-container/storage").absolutePath)
         handle = NativeBridge.create(config.toString())
         if (atomicHostLayout) observeAtomicLayout() else hostChrome?.let { command("hostChrome", it) }
         if (previewOccluded) command("setPreviewOccluded", JSONObject().put("occluded", true))
         for (name in methods.keys) command("registerHostMethod", JSONObject().put("name", name))
+        for (name in apiHandlers.keys) command("registerApiHandler", JSONObject().put("name", name))
+        for (application in authorizedApplications.values) command("authorizeInstalledPack", application)
         schedulePump()
     }
     private fun observeAtomicLayout() {
@@ -486,7 +570,7 @@ class WeappContainerSession internal constructor(
         hostChrome=JSONObject(geometry.toString()).apply { remove("sessionId"); remove("pageId") }
     }
     private fun applyForeground() {
-        if (!loaded || closing) return
+        if (!loaded || closing || accountSwitchBlocked) return
         val next = desiredForeground && viewVisible
         val changed = next != foreground
         foreground = next
@@ -532,7 +616,7 @@ class WeappContainerSession internal constructor(
     private val pump = object : Runnable {
         override fun run() {
             if (closed || cleanupNeedsRetry || handle == 0L) return
-            try { command("pump"); drainEvents(); present() } catch (error: Throwable) { emitError(error) }
+            try { command("pump"); drainEvents(); progressAccountSwitch(); present() } catch (error: Throwable) { emitError(error) }
             schedulePump()
         }
     }
@@ -547,6 +631,15 @@ class WeappContainerSession internal constructor(
                 "frame" -> frameRevision = event.getLong("revision")
                 "hostCall" -> dispatchHostCall(event)
                 "hostCallCancelled" -> calls.remove(event.getString("callId"))?.let { call -> main.post { cancelCall(call) } }
+                "accountSwitch" -> { handleAccountSwitch(event); emit(event) }
+                "ready", "devReload" -> {
+                    val state = event.optJSONObject("state") ?: command("state") as? JSONObject
+                    state?.optJSONObject("hostServicesState")?.let { trusted ->
+                        trusted.optJSONObject("application")?.let { hostServicesConfig?.put("application", JSONObject(it.toString())) }
+                        trusted.optJSONObject("account")?.let { hostServicesConfig?.put("account", JSONObject(it.toString())) }
+                    }
+                    emit(event)
+                }
                 "storageFlushed" -> flushes.remove(event.getLong("ticket"))?.let { future -> if (event.optBoolean("ok")) finish(future, Unit) else fail(future, eventError(event)) }
                 "closed" -> { emit(event); completeClose(if (event.optBoolean("ok", true)) null else eventError(event)) }
                 else -> emit(event)
@@ -555,13 +648,17 @@ class WeappContainerSession internal constructor(
     }
     private fun dispatchHostCall(event: JSONObject) {
         val id = event.getString("callId"); val name = event.getString("method")
+        val deadline = event.opt("deadlineNs").takeUnless { it == null || it == JSONObject.NULL }?.toString()
         val call = HostCall(id, name, event.opt("payload").takeUnless { it == JSONObject.NULL },
-            if (event.isNull("deadlineNs")) null else event.getLong("deadlineNs"), event.optString("cancelToken").takeIf { !event.isNull("cancelToken") })
+            deadline?.toLongOrNull(), event.optString("cancelToken").takeIf { !event.isNull("cancelToken") },
+            event.optJSONObject("context")?.let { JSONObject(it.toString()) }, deadline, event.optBoolean("retainUntilCancelled", false))
         calls[id] = call
-        val method = methods[name]
-        val reply = HostReply { payload ->
+        val method = if (call.context != null) apiHandlers[name] else methods[name]
+        val retained = java.util.concurrent.atomic.AtomicBoolean(event.optBoolean("retainUntilCancelled", false))
+        val reply = HostReply(retain = { retained.set(true) }) { payload ->
             worker.post {
-                if (calls.remove(id) == null || closing || closed) return@post
+                if (calls[id] !== call || closing || closed || accountSwitchBlocked) return@post
+                if (!retained.get() || payload.has("error")) calls.remove(id)
                 try { command("completeHostCall", payload.put("callId", id)); drainEvents(); present() } catch (error: Throwable) { emitError(error) }
             }
         }
@@ -571,6 +668,82 @@ class WeappContainerSession internal constructor(
             } catch (error: Throwable) { reply.reject(HostErrorCode.INVALID_REQUEST, error.message ?: "Host method failed") }
         }
     }
+    private fun handleAccountSwitch(event: JSONObject) {
+        val receipt = event.getJSONObject("receipt")
+        event.optJSONObject("account")?.let { hostServicesConfig?.put("account", JSONObject(it.toString())) }
+        event.optJSONObject("syncValues")?.let { hostServicesConfig?.put("syncValues", JSONObject(it.toString())) }
+        when (receipt.optString("phase")) {
+            "revoking" -> {
+                accountSwitchBlocked = true; loaded = false; presentedRevision = -1; hostChrome = null
+                accountSwitchOperationId = receipt.getString("operationId"); accountUiResetDone = false; accountUiResetAwaiting = false
+                val cancelled = calls.values.toList(); calls.clear()
+                accountUiResetActions = cancelled.map { call -> { call.cancel() } } + resourceCleanups.values.toList()
+                accountDetachPending = true; accountDetachAttempts = 0
+                accountNativeDetached = false; accountCustomCleanupDone = false; accountCustomCleanupAwaiting = false; accountCustomCleanupFailed = false
+                scheduleAccountUiReset()
+            }
+            "awaitingPresentation" -> {
+                loaded = !receipt.isNull("sessionId"); presenterAttachmentFailed = false; presentedRevision = -1
+                if (loaded) ensurePresenter()
+            }
+            "complete" -> {
+                accountSwitchBlocked = false; loaded = !receipt.isNull("sessionId")
+                if (loaded) { applyForeground(); ensurePresenter(); presentedRevision = -1 }
+            }
+            "failed", "superseded" -> { accountSwitchBlocked = true; loaded = false }
+        }
+    }
+    private fun scheduleAccountUiReset() {
+        if (accountUiResetAwaiting || accountUiResetDone) return
+        val operationId = accountSwitchOperationId ?: return
+        val actions = accountUiResetActions
+        accountUiResetAwaiting = true
+        main.post {
+            val retry = mutableListOf<() -> Unit>()
+            var failure: Throwable? = null
+            for (action in actions) try { action() } catch (error: Throwable) {
+                retry.add(action)
+                if (failure == null) failure = error else if (failure !== error) failure!!.addSuppressed(error)
+            }
+            worker.post uiReset@{
+                if (accountSwitchOperationId != operationId) return@uiReset
+                accountUiResetAwaiting = false; accountUiResetActions = retry; accountUiResetDone = retry.isEmpty()
+                if (failure != null) emitError(failure!!) else progressAccountSwitch()
+            }
+        }
+    }
+    private fun progressAccountSwitch() {
+        if (!accountDetachPending || !accountUiResetDone || accountCustomCleanupAwaiting || accountCustomCleanupFailed) return
+        try {
+            if (!accountNativeDetached) {
+                if (accountDetachAttempts >= 3) return
+                accountDetachAttempts++
+                presenter.detachRuntime(); presenter.clear()
+                // Rust already invalidated the old logical surface owner.
+                hostSurfaceIdentity = null
+                if (atomicHostLayout) observeAtomicLayout()
+                accountNativeDetached = true
+            }
+            val operationId = checkNotNull(accountSwitchOperationId)
+            val hook = accountCleanupHandler
+            if (!accountCustomCleanupDone && hook != null) {
+                accountCustomCleanupAwaiting = true
+                main.post {
+                    try {
+                        hook(operationId).whenComplete { _, error -> worker.post {
+                            if (accountSwitchOperationId != operationId) return@post
+                            accountCustomCleanupAwaiting = false
+                            if (error != null) { accountCustomCleanupFailed = true; emitError(error) }
+                            else { accountCustomCleanupDone = true; progressAccountSwitch() }
+                        } }
+                    } catch (error: Throwable) { worker.post { if (accountSwitchOperationId == operationId) { accountCustomCleanupAwaiting = false; accountCustomCleanupFailed = true; emitError(error) } } }
+                }
+                return
+            }
+            command("acknowledgeAccountCleanup", JSONObject().put("operationId", checkNotNull(accountSwitchOperationId)))
+            accountDetachPending = false
+        } catch (error: Throwable) { emitError(error) }
+    }
     private fun completeClose(error: Throwable?) {
         if (closed) return
         var failure = error
@@ -579,6 +752,7 @@ class WeappContainerSession internal constructor(
         try { if (handle != 0L) { unwrap(NativeBridge.destroy(handle)); handle = 0L } } catch (cleanup: Throwable) { if (failure == null) failure = cleanup else failure.addSuppressed(cleanup) }
         if (handle != 0L) { failCloseAttempt(checkNotNull(failure)); return }
         closed = true; loaded = false; worker.removeCallbacks(pump)
+        apiHandlers.clear(); methods.clear()
         for (call in calls.values) main.post { cancelCall(call) }; calls.clear()
         for (future in flushes.values) fail(future, failure ?: ContainerException("ERR_CLOSED", "Session closed before storage flush completed")); flushes.clear()
         closeFuture?.let { if (failure == null) finish(it, Unit) else fail(it, failure) }
@@ -604,7 +778,7 @@ class WeappContainerSession internal constructor(
     private fun emit(event: JSONObject) { main.post { try { eventListener?.onEvent(event) } catch (error: Throwable) { android.util.Log.e("WeappContainer", "Event listener failed", error) } } }
     private fun emitError(error: Throwable) { val e = error.asContainerException(); emit(JSONObject().put("type", "error").put("error", JSONObject().put("code", e.code).put("message", e.message))) }
     private fun ensureOpen() { if (closed || closing) throw ContainerException("ERR_CLOSED", "Session is closing or closed") }
-    private fun ensureLoaded() { ensureOpen(); if (!loaded) throw ContainerException("ERR_NOT_LOADED", "Load a pack after supplying View/window metrics") }
+    private fun ensureLoaded() { ensureOpen(); if (accountSwitchBlocked) throw ContainerException("ERR_IDENTITY_SWITCHING", "Account replacement is not presented"); if (!loaded) throw ContainerException("ERR_NOT_LOADED", "Load a pack after supplying View/window metrics") }
     private fun operation(name: String, payload: JSONObject = JSONObject()): CompletableFuture<Unit> = task { ensureLoaded(); try { command(name, payload) } finally { drainEvents(); present() }; Unit }
     private fun <T> task(action: () -> T): CompletableFuture<T> { val future = CompletableFuture<T>(); enqueue(future) { finish(future, action()) }; return future }
     private fun <T> enqueue(future: CompletableFuture<T>, action: () -> Unit) {

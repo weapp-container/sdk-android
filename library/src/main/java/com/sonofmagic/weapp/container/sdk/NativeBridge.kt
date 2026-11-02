@@ -9,4 +9,7 @@ internal object NativeBridge {
     external fun glesPresent(handle: Long, width: Int, height: Int): String
     external fun glesDetach(handle: Long, abandon: Boolean): String
     external fun snapshot(handle: Long): ByteArray
+    /** Same flock protocol as the Rust synchronous FileSystemManager provider. */
+    external fun filesLock(path: String): Long
+    external fun filesUnlock(token: Long)
 }

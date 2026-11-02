@@ -2,6 +2,10 @@
 #include <cstdint>
 #include <limits>
 #include <string>
+#include <cerrno>
+#include <fcntl.h>
+#include <sys/file.h>
+#include <unistd.h>
 #include "weapp_container_sdk.h"
 
 namespace {
@@ -37,6 +41,21 @@ jstring javaString(JNIEnv* env, const std::string& value) {
 void fail(JNIEnv* env, const Result& result) { env->ThrowNew(env->FindClass("java/lang/IllegalStateException"), result.text().c_str()); }
 }
 #define JNI_METHOD(NAME) Java_com_sonofmagic_weapp_container_sdk_NativeBridge_##NAME
+extern "C" JNIEXPORT jlong JNICALL JNI_METHOD(filesLock)(JNIEnv* env, jobject, jstring path) {
+  const auto name = utf8(env, path); if (env->ExceptionCheck()) return 0;
+  const int fd = open(name.c_str(), O_RDWR | O_CREAT | O_CLOEXEC | O_NOFOLLOW, 0600);
+  if (fd < 0) { env->ThrowNew(env->FindClass("java/lang/IllegalStateException"), "Cannot open managed filesystem operation lock"); return 0; }
+  int status; do { status = flock(fd, LOCK_EX); } while (status != 0 && errno == EINTR);
+  if (status != 0) { close(fd); env->ThrowNew(env->FindClass("java/lang/IllegalStateException"), "Cannot lock managed filesystem operation"); return 0; }
+  return static_cast<jlong>(fd) + 1;
+}
+extern "C" JNIEXPORT void JNICALL JNI_METHOD(filesUnlock)(JNIEnv* env, jobject, jlong token) {
+  if (token <= 0 || token - 1 > std::numeric_limits<int>::max()) { env->ThrowNew(env->FindClass("java/lang/IllegalArgumentException"), "Invalid managed filesystem lock"); return; }
+  const int fd = static_cast<int>(token - 1); int status;
+  do { status = flock(fd, LOCK_UN); } while (status != 0 && errno == EINTR);
+  const int closed = close(fd);
+  if (status != 0 || closed != 0) env->ThrowNew(env->FindClass("java/lang/IllegalStateException"), "Cannot release managed filesystem operation lock");
+}
 extern "C" JNIEXPORT jlong JNICALL JNI_METHOD(create)(JNIEnv* env, jobject, jstring config) {
   auto input = utf8(env, config); if (env->ExceptionCheck()) return 0;
   Session* handle = nullptr; Result result;

@@ -64,6 +64,11 @@ fun interface HostMethod { fun invoke(call: HostCall, reply: HostReply) }
 
 class HostCall internal constructor(
     val id: String, val method: String, val payload: Any?, val deadlineNs: Long?, val cancelToken: String?,
+    /** Frozen native identity; never reconstructed from payload or app options. */
+    val context: JSONObject? = null,
+    /** Full u64 value, including values outside Java's signed Long range. */
+    val deadlineNsDecimal: String? = deadlineNs?.toString(),
+    val keepsResourceAlive: Boolean = false,
 ) {
     private val cancelled = AtomicBoolean(false)
     private val cancellationDelivered = AtomicBoolean(false)
@@ -71,7 +76,12 @@ class HostCall internal constructor(
         set(value) { field = value; deliverCancellation() }
     val isCancelled: Boolean get() = cancelled.get()
     internal fun cancel() { cancelled.set(true); deliverCancellation() }
-    private fun deliverCancellation() { val callback = onCancel; if (cancelled.get() && callback != null && cancellationDelivered.compareAndSet(false, true)) callback() }
+    private fun deliverCancellation() {
+        val callback = onCancel
+        if (cancelled.get() && callback != null && cancellationDelivered.compareAndSet(false, true)) {
+            try { callback() } catch (error: Throwable) { cancellationDelivered.set(false); throw error }
+        }
+    }
 }
 
 enum class HostErrorCode(internal val wire: String) {
@@ -79,14 +89,16 @@ enum class HostErrorCode(internal val wire: String) {
     CANCELLED("cancelled"), UNSUPPORTED("unsupported"),
 }
 
-class HostReply internal constructor(private val complete: (JSONObject) -> Unit) {
+class HostReply internal constructor(private val retain: () -> Unit = {}, private val complete: (JSONObject) -> Unit) {
     private val settled = AtomicBoolean(false)
+    /** Keep the creator's cancellation hook alive after a subscription/object is created. */
+    fun retainUntilCancelled() { retain() }
     fun resolve(value: Any? = null) {
         val payload = JSONObject().put("result", jsonCopy(value))
         if (settled.compareAndSet(false, true)) complete(payload)
     }
-    fun reject(code: HostErrorCode, message: String, retryable: Boolean = false) {
-        val payload = JSONObject().put("error", JSONObject().put("code", code.wire).put("message", message).put("retryable", retryable))
+    @JvmOverloads fun reject(code: HostErrorCode, message: String, retryable: Boolean = false, details: JSONObject = JSONObject()) {
+        val payload = JSONObject().put("error", JSONObject().put("code", code.wire).put("message", message).put("retryable", retryable).put("details", jsonCopy(details)))
         if (settled.compareAndSet(false, true)) complete(payload)
     }
 }

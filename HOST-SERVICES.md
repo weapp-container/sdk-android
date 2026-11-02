@@ -1,0 +1,112 @@
+# Android 宿主能力
+
+这些适配器需要匹配当前 host-services 协议的 native runtime；旧 preview runtime
+不能通过只替换 Kotlin 源码获得新能力。源码编译通过不代表设备、渠道或商户验收。
+
+先由宿主验证发行者和安装包，配置 `application`、`account`，再注册适配器，最后
+加载 pack。`registerApiHandler` 接入微信 API；业务扩展继续使用
+`registerHostMethod`。未安装的 API 明确不支持。
+
+```kotlin
+val device = AndroidDeviceApis(activity, permissionBroker)
+val bluetooth = AndroidBluetoothApis(activity, permissionBroker)
+val files = AndroidManagedFiles(activity.applicationContext)
+val media = AndroidNativeMedia(activity, files, permissionBroker)
+
+session.configureHostServices(trustedConfiguration).thenCompose {
+    CompletableFuture.allOf(device.install(session), bluetooth.install(session),
+        files.install(session), media.install(session))
+}.thenCompose { session.load(pack, options) }
+```
+
+宿主必须持有这些对象直到 session 关闭。Activity 重建时，在主线程分别调用
+`device.rebindActivity(activityOrNull)`、`bluetooth.rebindActivity(activityOrNull)`、
+`media.rebindActivity(activityOrNull)`；空值停止旧资源，新的 Activity 不重复注册
+handler。宿主通过 `AndroidPermissionBroker` 接入真实 Activity Result 权限流程，
+不能把点击“允许”直接当成系统授权成功。
+
+定位、相机、麦克风和蓝牙使用独立的小程序授权提示。授权记录按可信宿主、租户、
+发行者、应用、环境、账号及 epoch 隔离；系统授权已存在也需要小程序授权。
+`wx.getSetting` 只返回已询问过的作用域。宿主仍须按实际使用声明 CAMERA、
+RECORD_AUDIO、定位、Android 12+ BLUETOOTH_SCAN / BLUETOOTH_CONNECT，以及旧系统
+所需的蓝牙/定位权限；SDK 不替应用默认申请所有危险权限。
+
+设备适配器包括真实剪贴板、网络状态、电量、窗口亮度与常亮、震动、原生系统 UI、
+WGS84 定位及传感器。传感器当前支持 normal 采样；GCJ-02 需要独立坐标服务。
+BLE 适配器拥有自己的扫描器和 GATT，按设备串行提交操作；关闭不会关闭宿主全局
+蓝牙。取消在途 GATT 操作会关闭该连接，以隔离迟到回调。
+
+文件适配器公开受管 `wxfile://user/` 虚拟路径和基础异步文件 API。同步
+FileSystemManager 方法由核心直接执行，使用同一个受管目录与真实 flock 操作锁。每块读写最多 1 MiB、单文件 8 MiB、单账号应用 32 MiB；写入等待
+同步和原子替换。guest 拒绝并隐藏 `.weapp-*` 内部锁文件。原生相机照片写入同一 namespace。宿主路径不传入小程序。
+SDK 创建 native session 时总是设置 app-private `managedFilesRoot`，独立于键值存储
+配置。文件与授权记录只使用 core `managedFileScope` 返回并经应用/账号身份核验的
+`root` 和 `auxiliaryRoot`；资源清理完成前保留共享 lease。账号删除统一调用 core
+`deleteAccountData`，在清理 ACK 与 surface detach 后同时移除文件和授权记录。
+
+媒体驱动从 `hostComponents` 的已接受节点建立资源，通过 `hostComponentFrame`
+传输真实 Camera2 / 视频解码 RGBA 帧，交给原 Skia PaintPlan 完成变换、裁剪和
+层级合成。当前预览上限 320×240、5 fps，队列只保留最新待提交帧。Android 视频
+目前读取受管本地文件，使用 MediaPlayer 播放音频并从同一文件按播放位置解码
+视频帧；不支持直播、DRM、录制、全屏和弹幕。CameraContext 拍照来自捕获的当前
+帧；不提供高分辨率独立静态拍摄。上下文只接受 runtime 签发的 componentTarget，
+不能用 guest 的节点 ID 或 ownerScopeId 替代。后台、节点卸载和换号停止设备；
+相机关闭等待 CameraDevice.onClosed，清理失败会阻止新账号展示。
+
+身份与支付是单独的宿主接入：
+
+```kotlin
+val backend = HostServicesClient(URI("https://accounts.example.com"),
+    hostToken = { call -> secureHostSession.tokenFor(call.context!!) })
+val identity = AndroidHostIdentity(activity, backend)
+val prepared = identity.prepareConfiguration(trustedConfiguration)
+// 等待 prepared，configureHostServices 后安装 identity，之后才 load。
+```
+
+token closure 始终留在 native；小程序只收到短时、单次、绑定应用的 code。应用后端
+用自己的 confidential client 兑换 code。签发 code 尚未等于应用已登录；
+`wx.checkSession` 查询服务端已兑换的有效会话。兑换完成、撤权、宿主凭据刷新及
+回到前台后，宿主调用 `identity.refreshState(session, trustedContext)`；同步
+`weappContainer.identity.getState` 和 onChange 来自这一真实服务端状态。
+
+换号先替换宿主安全凭据，在 `accountCleanupHandler` 内等待
+`identity.prepareAccountState(session, operationId, newTrustedContext)`，再完成清理
+future。新的快照必须在清理 ACK 之前准备；旧账号任意快照不能复用。
+
+`AndroidAppPayments(activity, backend, wechatAppId)` 同时注册 `wx.requestPayment` 与 `weappContainer.payment.request`，只接收服务端 `orderId`，拒绝
+JSAPI 签名冒充 APP Pay。宿主显式引入官方微信/支付宝 Android SDK，并配置 Manifest、
+应用 ID、回调 Activity 和混淆规则。微信回调从官方 WXApi.handleIntent 的
+IWXAPIEventHandler 传给 `onWechatPayResponse`。官方回调之后仍须后端验签确认 paid
+才向小程序报告成功。取消等待不会关闭订单或退款；旧支付回调不会分派给新账号。
+
+实际设备权限、蓝牙外设、相机画面、媒体帧、账号切换和真实商户交易仍须以当前
+native 产物分别验收，不能由模拟响应、目录清单或源码存在性替代。
+
+## 开发闭环验证
+
+`test/HostServicesProbeActivity.kt` 和 `tools/host-services-probe.mjs` 使用完整公开 SDK、
+真实 JNI 和 JS 引擎运行 authored pack。探针自动启动独立 loopback reference 业务服务，
+只向 native Activity 注入临时 control token；guest 使用公开业务地址兑换登录 code、
+获取 businessSession、创建固定测试商品订单。测试通过实际 Android input 点击 Skia
+手机号按钮，并分别处理资料、手机号、相机和 reference 支付的原生同意 UI。
+
+在私有核心 checkout 已生成 arm64 Android dev slice 后，选择一个已经运行的模拟器：
+
+```sh
+node sdk/android/tools/host-services-probe.mjs \
+  --serial emulator-5580 \
+  --native-dir /absolute/development/aarch64-linux-android \
+  --out /absolute/new-probe-output \
+  --accept-app-consent
+```
+
+独立 SDK checkout 还需通过 `--reference-root` 指定参考服务目录。探针拒绝覆盖已有
+输出、同名测试应用和 adb reverse 端口，并在结束时卸载自己的应用、删除自己的 UI
+临时文件、撤销自己的 reverse 映射、关闭自己的业务服务；模拟器由调用方管理。
+
+当前 [开发记录](test/evidence/host-services-development.json) 绑定未发布的 dev 库、
+SDK/fixture/JNI 源码和真实 GPU 截图哈希，并记录构建前后一致的核心源码清单。
+已通过登录兑换和快照刷新、独立授权、server-paid reference 订单、同步/异步同目录
+文件、A/B 换号隔离、Camera2 JPEG 和 Skia 合成、账号数据删除及资源清理。这里的
+相机来自模拟器虚拟场景，支付来自显式 reference 渠道，不代表物理设备、蓝牙外设、
+官方钱包、商户交易、编译器兼容性或正式发行验收。
