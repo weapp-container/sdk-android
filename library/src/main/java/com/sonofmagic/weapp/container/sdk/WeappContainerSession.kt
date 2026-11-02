@@ -254,11 +254,9 @@ class WeappContainerSession internal constructor(
             if (operation == "updateHostServiceSnapshots" && copied.has("context")) {
                 if (!HostIdentitySnapshot.supportsOwnerContext(command("capabilities") as JSONObject))
                     throw ContainerException("ERR_UNSUPPORTED_CAPABILITY", "Runtime does not validate native snapshot owner contexts")
-                val expected = copied.getJSONObject("context"); val configured = checkNotNull(hostServicesConfig)
-                for ((group, fields) in listOf("application" to listOf("hostAppId", "tenantId", "publisherId", "appId", "environment", "packRoot"), "account" to listOf("principalId", "epoch"))) {
-                    check(fields.all { name -> expected.getJSONObject(group).get(name).toString() == configured.getJSONObject(group).get(name).toString() }) { "Stale native snapshot owner" }
-                }
-                check(!accountSwitchBlocked) { "Account replacement is in progress" }
+                // The negotiated runtime owns the complete application, accepted pack,
+                // account epoch and session comparison, including ERR_CANCELLED.
+                // Cache changes below happen only after that command succeeds.
             }
             try {
                 val result = command(operation, copied)

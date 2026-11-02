@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "a9cdb45d1fcbdd1c5e8264f5ba16d2ccea62016d",
-  "review": "Review platform-only runtime dependency pins from clean core 06bf6ae0e4f91abde2a6270835071da454e07bc7; break wrapper archive self-dependency without rewriting ORIGIN",
+  "sourceBaseCommit": "d498388fd59c04056487da0abdcf9c0b24d1521f",
+  "review": "Delegate complete snapshot owner comparison and stale cancellation classification to the negotiated runtime",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "038ff702ba6801b88d43e08e75cf3a7ea63e49c023cba004c9c298701da6fec2",
-      "size": 16699,
+      "sha256": "598767096fdee54af509149dcd23bf8eec6f7a9a82164ae08d210eeabf43c5a8",
+      "size": 17020,
       "mode": "100644"
     },
     {
@@ -341,8 +341,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
-      "sha256": "adcbb3bea933b9bcc12e6029987804cf60ffe1d4c5da1c082aae158478126593",
-      "size": 52629,
+      "sha256": "09870669d65e3ec244e8abe8c6dc6390502988fc5103ddb8f725081d722897f7",
+      "size": 52274,
       "mode": "100644"
     },
     {

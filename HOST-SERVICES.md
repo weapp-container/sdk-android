@@ -224,3 +224,5 @@ WebSocket echo/close、实际 AAC ADTS 帧、换号关闭旧请求/socket，以�
 待验收。Beacon
 新源码完整编译，JVM 执行 authored 广播字节的 UUID、无符号 major/minor、距离估计
 及畸形长度/前缀边界测试；这不构成真实 Beacon 发射器、权限变更或射频验收。
+
+Native snapshot owner validation belongs to the negotiated runtime. The SDK passes the complete captured context unchanged and preserves the runtime error, including `ERR_CANCELLED` for a retired owner; it updates its rebuild cache only after successful validation. A credential refresh cannot replace this owner check.
