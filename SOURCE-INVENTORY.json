@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "89b81cc4be24752f92c45139e487b98a5a0313a0",
-  "review": "Foreground native iBeacon scanner and decoder; official recorder defaults and actual output format guard, source-stable 20-check Android development probe",
+  "sourceBaseCommit": "fd1ddc0ef6c0da694d775a5d73db511a85f1c45e",
+  "review": "Explicit native Wi-Fi opt-in using public Android OS APIs, native confirmation and bounded owner resources; exact source-stable 21-check development probe",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "365d8b554d134a78884587a05cf9f28efe0ee978965b98ffb5aed56169579119",
-      "size": 14102,
+      "sha256": "391937817caea2aae4aa40dce0adb1730bcd0dd24c547358529c415d2a64972e",
+      "size": 14331,
       "mode": "100644"
     },
     {
@@ -127,6 +127,12 @@
       "path": "examples/host-services/ReferenceHostServices.kt",
       "sha256": "4a28bd34f2da9e7913ba68cba312c51a6a629375633c50cc79a6fa85c26d1dd8",
       "size": 8005,
+      "mode": "100644"
+    },
+    {
+      "path": "examples/host-services/WIFI-APIS.md",
+      "sha256": "ef89cdeab39e29ffae6bcd9bb8aa1b43abb93b413de74fb3d1d7eda1b625a231",
+      "size": 3702,
       "mode": "100644"
     },
     {
@@ -239,8 +245,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeDeviceServices.kt",
-      "sha256": "5b455acfa40ad0a2ac583e2cc648317531b74bfdd3fc3a46a7c5741796c717a1",
-      "size": 2517,
+      "sha256": "87ae073429a9d76f48cd72f42bbf3af5f897d144066fe1321187da6548a2a7d8",
+      "size": 2743,
       "mode": "100644"
     },
     {
@@ -271,6 +277,12 @@
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidSystemApis.kt",
       "sha256": "fa1be4e3c4c5e936b1184132feac77d4ef4dde81ed8e3e1fb78c1f910265a423",
       "size": 23806,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidWifiApis.kt",
+      "sha256": "0c7511502d12bff3ce26b78b9b05e31c8969620f3e7de5bf738d6a301bbfec2f",
+      "size": 24712,
       "mode": "100644"
     },
     {
@@ -353,8 +365,8 @@
     },
     {
       "path": "test/HostServicesProbeActivity.kt",
-      "sha256": "4b5d2da943eb816e8268671e7643c9f5b94802c72c7d9232e7cddbebf6ba1056",
-      "size": 19328,
+      "sha256": "eac088a15b3f0f33fa83dbdd6e992d7d0c5de8dfc2bcb105ab0e9fef506af88a",
+      "size": 20698,
       "mode": "100644"
     },
     {
@@ -394,9 +406,15 @@
       "mode": "100644"
     },
     {
+      "path": "test/evidence/host-services-wifi-development.json",
+      "sha256": "fb45acb466db05a3f86e2e8efe21c930cac8576728d30d9b110f534e52d80ffb",
+      "size": 14239,
+      "mode": "100644"
+    },
+    {
       "path": "test/host-services-fixture.mjs",
-      "sha256": "c1f4679f33da714f64a63ad9a94569ab137eae6bfb9e4613fe1b058f97e873ed",
-      "size": 14553,
+      "sha256": "b3517164e6c0b8a57c55db8605c27cf7bc06a6ec95078160bd1710cd7c9ad9d7",
+      "size": 16482,
       "mode": "100644"
     },
     {
@@ -455,8 +473,8 @@
     },
     {
       "path": "tools/host-services-probe.mjs",
-      "sha256": "2190fb65464bd99795d8d71da3dbbb5520aeae8241bc92ab6e592a9831056d1b",
-      "size": 16752,
+      "sha256": "92d1658634dcedb9ecb3bd0127d0b2fefb2bc11c9252cee72e05e225661e3752",
+      "size": 17240,
       "mode": "100644"
     },
     {

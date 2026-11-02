@@ -23,6 +23,7 @@ class HostServicesProbeActivity : Activity() {
     private lateinit var media: AndroidNativeMedia
     private lateinit var network: AndroidNetworkApis
     private lateinit var recorder: AndroidRecorderApis
+    private lateinit var wifi: AndroidWifiApis
     private lateinit var system: AndroidSystemApis
     private lateinit var containerView: WeappContainerView
     private lateinit var application: JSONObject
@@ -56,6 +57,7 @@ class HostServicesProbeActivity : Activity() {
         network = AndroidNetworkApis(files, setOf(origin, networkOrigin, networkOrigin.replace("http://", "ws://")), true)
         recorder = AndroidRecorderApis(this, files)
         system = AndroidSystemApis(this, files)
+        wifi = AndroidWifiApis(this)
         domain = DemoHostDomain(DemoEnvironment(URI(origin), requireNotNull(intent.getStringExtra("demoControl"))))
         reference = ReferenceHostServices(this, domain)
         try { createProbeCalendar() } catch (error: Throwable) { fail(error); return }
@@ -68,13 +70,13 @@ class HostServicesProbeActivity : Activity() {
             application = configuration.getJSONObject("application"); check(application.getString("packRoot") == root)
             reference.install(session)
         }.thenCompose {
-            files.install(session).thenCompose { CompletableFuture.allOf(device.install(session), media.install(session), network.install(session), recorder.install(session), system.install(session)) }
+            files.install(session).thenCompose { CompletableFuture.allOf(device.install(session), media.install(session), network.install(session), recorder.install(session), system.install(session), wifi.install(session)) }
         }.thenCompose { session.load(PackSource.Directory(pack), LoadOptions(options = launchOptions("A"))) }
             .exceptionally { fail(it); null }
         main.postDelayed({ if (!finishing) fail(IllegalStateException("Native host-services probe timed out")) }, 120000)
     }
     private fun account(principal: String, epoch: String) = JSONObject().put("principalId", principal).put("epoch", epoch)
-    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()).put("networkOrigin", intent.getStringExtra("networkOrigin")).put("systemMarker", systemMarker).put("probeLocation", intent.getBooleanExtra("probeLocation", false).toString()))
+    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()).put("networkOrigin", intent.getStringExtra("networkOrigin")).put("systemMarker", systemMarker).put("probeLocation", intent.getBooleanExtra("probeLocation", false).toString()).put("probeWifi", intent.getBooleanExtra("probeWifi", false).toString()))
     private fun onMessage(message: JSONObject) {
         android.util.Log.i("WeappHostProbe", "guest: $message")
         when (message.optString("kind")) {
@@ -89,6 +91,15 @@ class HostServicesProbeActivity : Activity() {
             "system-commits" -> try { verifySystemCommits() } catch (error: Throwable) { fail(error) }
             "location-ready" -> File(filesDir, "location-ready.json").writeText("{\"ready\":true}")
             "location-verified" -> checks.put("real-emulator-gps-location-subscription-and-stop-barrier")
+            "wifi-verified" -> {
+                @Suppress("DEPRECATION") val native = (applicationContext.getSystemService(WIFI_SERVICE) as android.net.wifi.WifiManager).connectionInfo
+                val observed = message.getJSONObject("wifi")
+                check(native.ssid.removeSurrounding("\"") == observed.getString("SSID") && native.bssid.equals(observed.getString("BSSID"), true) && native.frequency == observed.getInt("frequency"))
+                check((applicationContext.getSystemService(CONNECTIVITY_SERVICE) as android.net.ConnectivityManager).boundNetworkForProcess == null) { "Adapter rebound the process network" }
+                check((applicationContext.getSystemService(WIFI_SERVICE) as android.net.wifi.WifiManager).isWifiEnabled) { "Adapter disabled the radio" }
+                File(filesDir, "wifi-verification.json").writeText(message.put("nativeSsidMatched", true).put("nativeBssidMatched", true).put("processNetworkUnbound", true).put("radioStillEnabled", true).toString())
+                checks.put("real-emulator-wifi-query-fresh-scan-partial-events-stop-and-no-global-radio-or-network-mutation")
+            }
             "recorder-default-result" -> {
                 File(filesDir, "recorder-default-outcome.json").writeText(message.toString())
                 if (!message.getBoolean("success")) check(message.getString("errMsg").contains("requested 8000 Hz / 2 channels") && !message.has("tempFilePath"))
@@ -185,7 +196,7 @@ class HostServicesProbeActivity : Activity() {
             }.whenComplete { _, closeError ->
                 if (closeError != null) { finishReport(closeError); return@whenComplete }
                 try {
-                    system.close(); recorder.close(); network.close(); media.close(); files.close(); device.close(); reference.close(); domain.close()
+                    wifi.close(); system.close(); recorder.close(); network.close(); media.close(); files.close(); device.close(); reference.close(); domain.close()
                     check(window.attributes.screenBrightness == brightness)
                     check(window.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON == 0)
                     checks.put("close-drains-camera-and-restores-window-resources")
@@ -199,7 +210,7 @@ class HostServicesProbeActivity : Activity() {
         finishing = true
         session.closeAsync().whenComplete { _, cleanupError ->
             if (cleanupError != null) error.addSuppressed(cleanupError)
-            runCatching { system.close() }; runCatching { recorder.close() }; runCatching { network.close() }; runCatching { media.close() }; runCatching { device.close() }; runCatching { files.close() }; runCatching { reference.close() }; runCatching { domain.close() }
+            runCatching { wifi.close() }; runCatching { system.close() }; runCatching { recorder.close() }; runCatching { network.close() }; runCatching { media.close() }; runCatching { device.close() }; runCatching { files.close() }; runCatching { reference.close() }; runCatching { domain.close() }
             finishReport(error)
         }
     }

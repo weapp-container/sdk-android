@@ -90,6 +90,10 @@ iBeacon scan 声明 neverForLocation，否则系统可能过滤这些位置广�
 accuracy 是基于真实 RSSI 与广播 measured power 的路径损耗估计，无法估计时为 -1。
 不需要先打开 BLE adapter API，不修改或关闭宿主 radio。
 
+Wi-Fi 需要宿主显式 `enableWifi = true`。公共 OS 实现、系统确认、应用 local-only
+网络 lease、maunal 系统设置、扫描节流和实际权限范围见
+[Wi-Fi 接入](examples/host-services/WIFI-APIS.md)。
+
 文件适配器公开受管 `wxfile://user/` 虚拟路径和基础异步文件 API。同步
 FileSystemManager 方法由核心直接执行，使用同一个受管目录与真实 flock 操作锁。每块读写最多 1 MiB、单文件 8 MiB、单账号应用 32 MiB；写入等待
 同步和原子替换。guest 拒绝并隐藏 `.weapp-*` 内部锁文件。原生相机照片写入同一 namespace。宿主路径不传入小程序。
