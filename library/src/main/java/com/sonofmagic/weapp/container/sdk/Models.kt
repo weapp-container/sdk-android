@@ -75,6 +75,17 @@ class HostCall internal constructor(
     @Volatile var onCancel: (() -> Unit)? = null
         set(value) { field = value; deliverCancellation() }
     val isCancelled: Boolean get() = cancelled.get()
+    /** Compose adapter cleanup with an existing permission or OS-operation cancellation hook. */
+    fun addCancellationHandler(handler: () -> Unit) {
+        if (isCancelled) { handler(); return }
+        val previous = onCancel
+        onCancel = {
+            var failure: Throwable? = null
+            try { previous?.invoke() } catch (error: Throwable) { failure = error }
+            try { handler() } catch (error: Throwable) { if (failure == null) failure = error else failure.addSuppressed(error) }
+            if (failure != null) throw failure
+        }
+    }
     internal fun cancel() { cancelled.set(true); deliverCancellation() }
     private fun deliverCancellation() {
         val callback = onCancel

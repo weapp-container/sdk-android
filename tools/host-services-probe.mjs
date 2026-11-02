@@ -7,6 +7,7 @@ import { fileURLToPath } from 'node:url';
 import { pathToFileURL } from 'node:url';
 import os from 'node:os';
 import { makeHostServicesFixture } from '../test/host-services-fixture.mjs';
+import { networkDependencies } from './network-dependencies.mjs';
 
 const root=resolve(dirname(fileURLToPath(import.meta.url)),'..'),args=process.argv.slice(2);
 const option=name=>{const i=args.indexOf(name);return i<0?undefined:args[i+1];};
@@ -27,7 +28,7 @@ const device=(argv,options)=>execute(adb,['-s',serial,...argv],options);
 const hash=path=>createHash('sha256').update(readFileSync(path)).digest('hex');
 const collect=(directory,suffix)=>readdirSync(directory,{withFileTypes:true}).flatMap(entry=>entry.isDirectory()?collect(join(directory,entry.name),suffix):entry.name.endsWith(suffix)?[join(directory,entry.name)]:[]);
 const report={schemaVersion:1,status:'failed',scope:'Unpublished development native/wrapper/guest Android emulator probe; no physical-device, BLE peripheral, merchant, parity or release claim',serial,checks:[],cleanupErrors};
-let installed=false,uiCreated=false,serverProcess,reversePort,phoneTapped=false;
+let installed=false,uiCreated=false,serverProcess,reversePorts=[],phoneTapped=false;
 try {
  if(device(['get-state']).trim()!=='device'||device(['shell','getprop','ro.kernel.qemu']).trim()!=='1')throw Error('Select an already-running emulator');
  if(device(['shell','pm','path',pkg],{optional:true}).trim())throw Error(`Refusing to overwrite an existing ${pkg}`);
@@ -38,26 +39,27 @@ try {
  const assets=join(out,'assets'),packRoot=makeHostServicesFixture(join(assets,'probe-pack'));
  const serverSource=resolve(option('--reference-root')??join(root,'../../tools/host-services-reference'),'scripts/demo-business-server.mjs');
  if(!existsSync(serverSource))throw Error('Use --reference-root <tools/host-services-reference> when running outside the monorepo');
- const serverCode=`import {createDemoBusinessServer} from ${JSON.stringify(pathToFileURL(serverSource).href)};const {server}=createDemoBusinessServer({controlToken:process.env.HOST_DEMO_CONTROL_TOKEN,packRoot:process.env.HOST_DEMO_PACK_ROOT});server.listen(0,'127.0.0.1',()=>console.log(JSON.stringify({port:server.address().port})));process.once('SIGTERM',()=>server.close());`;
+ const serverCode=`import {createDemoBusinessServer} from ${JSON.stringify(pathToFileURL(serverSource).href)};import {makeNetworkFixtureServer} from ${JSON.stringify(pathToFileURL(join(root,'test/host-services-network-fixture.mjs')).href)};const {server}=createDemoBusinessServer({controlToken:process.env.HOST_DEMO_CONTROL_TOKEN,packRoot:process.env.HOST_DEMO_PACK_ROOT});const network=makeNetworkFixtureServer();await Promise.all([new Promise(done=>server.listen(0,'127.0.0.1',done)),new Promise(done=>network.listen(0,'127.0.0.1',done))]);console.log(JSON.stringify({port:server.address().port,networkPort:network.address().port}));process.once('SIGTERM',()=>{server.close();server.closeIdleConnections();network.close();network.closeAllConnections();});`;
  serverProcess=spawn(process.execPath,['--input-type=module','-e',serverCode],{env:{...process.env,HOST_DEMO_CONTROL_TOKEN:control,HOST_DEMO_PACK_ROOT:packRoot},stdio:['ignore','pipe','pipe']});
  let serverError='';serverProcess.stderr.on('data',data=>{serverError+=data;});
- const port=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Demo server startup timed out')),10000);let text='';serverProcess.once('error',reject);serverProcess.once('exit',code=>reject(Error(`Demo server exited ${code}: ${serverError}`)));serverProcess.stdout.on('data',data=>{text+=data;if(text.includes('\n')){clearTimeout(timer);resolve(JSON.parse(text.split('\n')[0]).port);}});});
- if(device(['reverse','--list']).split('\n').some(line=>line.split(/\s+/).includes(`tcp:${port}`)))throw Error('Refusing to replace an existing adb reverse port');
- device(['reverse',`tcp:${port}`,`tcp:${port}`]);reversePort=port;
+ const {port,networkPort}=await new Promise((resolve,reject)=>{const timer=setTimeout(()=>reject(Error('Demo server startup timed out')),10000);let text='';serverProcess.once('error',reject);serverProcess.once('exit',code=>reject(Error(`Demo server exited ${code}: ${serverError}`)));serverProcess.stdout.on('data',data=>{text+=data;if(text.includes('\n')){clearTimeout(timer);resolve(JSON.parse(text.split('\n')[0]));}});});
+ for(const mapping of [port,networkPort]){if(device(['reverse','--list']).split('\n').some(line=>line.split(/\s+/).includes(`tcp:${mapping}`)))throw Error('Refusing to replace an existing adb reverse port');device(['reverse',`tcp:${mapping}`,`tcp:${mapping}`]);reversePorts.push(mapping);}
  report.referenceBackend={kind:'ephemeral-loopback-reference-only',packRoot,sourceSha256:hash(serverSource)};
  const classes=join(out,'classes');mkdirSync(classes);
+ const dependencies=await networkDependencies(option('--dependency-cache')??join(out,'dependencies'));
+ report.networkDependencies=dependencies.map(({path,...input})=>input);
  const gradle=join(os.homedir(),'.gradle/wrapper/dists/gradle-8.9-bin/90cnw93cvbtalezasaz0blq0a/gradle-8.9/lib'),stdlib=join(gradle,'kotlin-stdlib-1.9.23.jar');
  const source=collect(join(root,'library/src/main/java'),'.kt').concat(join(root,'test/HostServicesProbeActivity.kt'),join(root,'examples/host-services/ReferenceHostServices.kt'));
  report.wrapperSources=source.map(path=>({path:path.slice(root.length+1),sha256:hash(path)}));
  report.fixtureSource={sha256:hash(join(root,'test/host-services-fixture.mjs'))};report.jniSource={sha256:hash(join(root,'library/src/main/cpp/weapp_jni.cpp'))};
- execute('java',['-cp',join(gradle,'*'),'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler','-no-stdlib','-no-reflect','-classpath',`${android}:${stdlib}`,'-jvm-target','17','-d',classes,...source]);
+ execute('java',['-cp',join(gradle,'*'),'org.jetbrains.kotlin.cli.jvm.K2JVMCompiler','-no-stdlib','-no-reflect','-classpath',[android,stdlib,...dependencies.map(input=>input.path)].join(':'),'-jvm-target','17','-d',classes,...source]);
  execute('jar',['cf',join(out,'probe.jar'),'-C',classes,'.']);
- const dex=join(out,'dex');mkdirSync(dex);execute(join(build,'d8'),['--min-api','26','--lib',android,'--output',dex,join(out,'probe.jar'),stdlib]);
+ const dex=join(out,'dex');mkdirSync(dex);execute(join(build,'d8'),['--min-api','26','--lib',android,'--output',dex,join(out,'probe.jar'),stdlib,...dependencies.map(input=>input.path)]);
  const ndk=process.env.ANDROID_NDK_HOME||join(sdk,'ndk/27.1.12297006'),clang=join(ndk,'toolchains/llvm/prebuilt/darwin-x86_64/bin/aarch64-linux-android26-clang++');
  const libs=join(out,'lib/arm64-v8a');mkdirSync(libs,{recursive:true});
  execute(clang,['-shared','-fPIC','-std=c++17','-Wl,-z,max-page-size=16384','-Wl,-soname,libweapp_container_android.so','-I',native,join(root,'library/src/main/cpp/weapp_jni.cpp'),'-L',native,'-lweapp_container_sdk','-o',join(libs,'libweapp_container_android.so')]);
  for(const name of ['libweapp_container_sdk.so','libc++_shared.so'])writeFileSync(join(libs,name),readFileSync(join(native,name)));
- const manifest=join(out,'AndroidManifest.xml');writeFileSync(manifest,`<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="${pkg}"><uses-permission android:name="android.permission.CAMERA"/><uses-permission android:name="android.permission.INTERNET"/><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/><uses-permission android:name="android.permission.VIBRATE"/><uses-feature android:name="android.hardware.camera" android:required="false"/><application android:label="Host Services Development Probe" android:debuggable="true" android:usesCleartextTraffic="true" android:extractNativeLibs="true"><activity android:name="com.sonofmagic.weapp.container.sdk.HostServicesProbeActivity" android:exported="true" android:theme="@android:style/Theme.Material.Light.NoActionBar"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>`);
+ const manifest=join(out,'AndroidManifest.xml');writeFileSync(manifest,`<manifest xmlns:android="http://schemas.android.com/apk/res/android" package="${pkg}"><uses-permission android:name="android.permission.CAMERA"/><uses-permission android:name="android.permission.RECORD_AUDIO"/><uses-permission android:name="android.permission.INTERNET"/><uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/><uses-permission android:name="android.permission.VIBRATE"/><uses-feature android:name="android.hardware.camera" android:required="false"/><application android:label="Host Services Development Probe" android:debuggable="true" android:usesCleartextTraffic="true" android:extractNativeLibs="true"><activity android:name="com.sonofmagic.weapp.container.sdk.HostServicesProbeActivity" android:exported="true" android:theme="@android:style/Theme.Material.Light.NoActionBar"><intent-filter><action android:name="android.intent.action.MAIN"/><category android:name="android.intent.category.LAUNCHER"/></intent-filter></activity></application></manifest>`);
  const unsigned=join(out,'unsigned.apk');execute(join(build,'aapt2'),['link','-I',android,'--manifest',manifest,'--min-sdk-version','26','--target-sdk-version','36','--version-code','1','-A',assets,'-o',unsigned]);
  for(const file of collect(dex,'.dex'))execute('zip',['-j',unsigned,file]);
  // zip's cwd is explicit because only task-owned native files belong in the APK.
@@ -67,7 +69,7 @@ try {
  const apk=join(out,'probe.apk');execute(join(build,'apksigner'),['sign','--ks',key,'--ks-key-alias','probe','--ks-pass','pass:android','--key-pass','pass:android','--out',apk,aligned]);
  report.apk={sha256:hash(apk)};
  device(['install','-g','-t',apk]);installed=true;
- device(['shell','am','start','-W','-n',`${pkg}/com.sonofmagic.weapp.container.sdk.HostServicesProbeActivity`,'--es','demoOrigin',`http://127.0.0.1:${port}`,'--es','demoControl',control]);
+ device(['shell','am','start','-W','-n',`${pkg}/com.sonofmagic.weapp.container.sdk.HostServicesProbeActivity`,'--es','demoOrigin',`http://127.0.0.1:${port}`,'--es','networkOrigin',`http://127.0.0.1:${networkPort}`,'--es','demoControl',control]);
  const deadline=Date.now()+130000,ui='/sdcard/weapp-host-services-probe-ui.xml';
  while(Date.now()<deadline){
   const value=device(['shell','run-as',pkg,'cat','files/host-services-probe.json'],{optional:true,timeout:10000});
@@ -96,7 +98,7 @@ try {
 finally{
  if(installed){try{device(['uninstall',pkg]);if(device(['shell','pm','path',pkg],{optional:true}).trim())throw Error('Probe package still installed');}catch(error){cleanupErrors.push(error.message);}}
  if(uiCreated)try{device(['shell','rm','-f','/sdcard/weapp-host-services-probe-ui.xml']);}catch(error){cleanupErrors.push(error.message);}
- if(reversePort)try{device(['reverse','--remove',`tcp:${reversePort}`]);if(device(['reverse','--list']).split('\n').some(line=>line.split(/\s+/).includes(`tcp:${reversePort}`)))throw Error('Task adb reverse remained');}catch(error){cleanupErrors.push(error.message);}
+ for(const mapping of reversePorts)try{device(['reverse','--remove',`tcp:${mapping}`]);if(device(['reverse','--list']).split('\n').some(line=>line.split(/\s+/).includes(`tcp:${mapping}`)))throw Error('Task adb reverse remained');}catch(error){cleanupErrors.push(error.message);}
  if(serverProcess){serverProcess.kill('SIGTERM');await new Promise(done=>{if(serverProcess.exitCode!==null||serverProcess.signalCode!==null)return done();const timer=setTimeout(()=>{cleanupErrors.push('Demo server did not close within 5 seconds');done();},5000);serverProcess.once('exit',()=>{clearTimeout(timer);done();});});}
  if(cleanupErrors.length)report.status='failed';
  writeFileSync(join(out,'commands.json'),JSON.stringify(commands,null,2));writeFileSync(join(out,'report.json'),JSON.stringify(report,null,2));

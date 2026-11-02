@@ -19,6 +19,14 @@ Page({
    await new Promise((resolve,reject) => wx.setScreenBrightness({value:0.4,success:resolve,fail:reject}));
    await new Promise((resolve,reject) => wx.setKeepScreenOn({keepScreenOn:true,success:resolve,fail:reject}));
    if (this.phase === 'A') {
+    const nativeRequest=(path,data)=>wx.request({url:options.networkOrigin+path,data});
+    let headers=false,chunks=false;const responseTask=wx.request({url:options.networkOrigin+'/json',data:{sample:'actual-query'},enableChunked:true});responseTask.onHeadersReceived(()=>{headers=true;});responseTask.onChunkReceived(()=>{chunks=true;});const nativeJson=await responseTask;
+    if(nativeJson.data.query!=='actual-query'||!headers||!chunks)throw new Error('native HTTP query/header/chunk mismatch '+JSON.stringify({response:nativeJson,headers,chunks}));
+    await operation(fs,'writeFile',{filePath:'wxfile://user/upload.txt',data:'native-upload-body'});
+    const upload=await wx.uploadFile({url:options.networkOrigin+'/upload',filePath:'wxfile://user/upload.txt',name:'file',formData:{probe:'real'}});const uploaded=JSON.parse(upload.data);if(!uploaded.multipart||!uploaded.containsFile)throw new Error('native multipart did not transport managed bytes');
+    const download=await wx.downloadFile({url:options.networkOrigin+'/download'});const downloaded=await operation(fs,'readFile',{filePath:download.tempFilePath,encoding:'utf8'});if(downloaded.data!=='native-network-download\\n')throw new Error('native download did not persist actual bytes');
+    const socket=wx.connectSocket({url:options.networkOrigin.replace('http://','ws://')+'/socket'});const opened=new Promise((resolve,reject)=>{socket.onOpen(resolve);socket.onError(reject);});const echoed=new Promise((resolve,reject)=>{socket.onMessage(resolve);socket.onError(reject);});const socketClosed=new Promise(resolve=>socket.onClose(resolve));await opened;await socket.send({data:'actual-websocket-echo'});if((await echoed).data!=='actual-websocket-echo')throw new Error('native WebSocket echo mismatch');await socket.close({code:1000,reason:'probe done'});await socketClosed;
+    const recorder=wx.getRecorderManager();const recorded=new Promise((resolve,reject)=>{recorder.onStop(resolve);recorder.onError(reject);});await recorder.start({format:'aac',duration:5000,sampleRate:44100,numberOfChannels:1,encodeBitRate:64000});await new Promise(resolve=>setTimeout(resolve,1200));await recorder.stop();const audio=await recorded;if(!audio.tempFilePath||audio.fileSize<=128)throw new Error('native recorder returned no audio file');send({kind:'transport-recording',path:audio.tempFilePath});
     const request=async(path,data,method='POST')=>{const response=await wx.request({url:options.businessOrigin+path,method,data,header:{'content-type':'application/json',...(method==='GET'?{Authorization:'Bearer '+this.businessSession}:{})}});if(response.statusCode<200||response.statusCode>=300)throw new Error('business '+path+' '+JSON.stringify(response.data));return response.data;};
     this.business=request;
     const login=await wx.login();
@@ -38,8 +46,11 @@ Page({
     if(value.data!=='account-A-sync')throw new Error('read did not retain actual native bytes');
     let rejected=false;try{await operation(fs,'writeFile',{filePath:'wxfile://user/../escape',data:'bad'});}catch(error){rejected=true;}
     if(!rejected)throw new Error('path traversal was accepted');
+    this.pendingSocket=wx.connectSocket({url:options.networkOrigin.replace('http://','ws://')+'/socket'});await new Promise((resolve,reject)=>{this.pendingSocket.onOpen(resolve);this.pendingSocket.onError(reject);});
+    this.pendingRequest=wx.request({url:options.networkOrigin+'/slow'});this.pendingRequest.catch(()=>{});await new Promise(resolve=>setTimeout(resolve,100));
     send({kind:'files-A'});
    } else {
+    let drained=false;for(let attempt=0;attempt<30;attempt++){const state=await wx.request({url:options.networkOrigin+'/stats'});if(state.data.sockets===0&&state.data.slowRequests===0){drained=true;break;}await new Promise(resolve=>setTimeout(resolve,50));}if(!drained)throw new Error('old native HTTP/socket peer survived account retirement');
     let missing=false;try{await operation(fs,'access',{path:'wxfile://user/alpha.txt'});}catch(error){missing=true;}
     if(!missing)throw new Error('account A file leaked into B');
     await operation(fs,'writeFile',{filePath:'wxfile://user/beta.txt',data:'account-B'});
@@ -82,7 +93,7 @@ Page({
     modules:[{id:'module:app.js',format:'commonjs',scope:'app',sha256:blob('App({});')},{id:'module:app.json',format:'json',scope:'app',sha256:blob({pages:['pages/probe/index']})},{id:'module:pages/probe/index.js',format:'commonjs',scope:'page',sha256:blob(page)},{id:'module:pages/probe/index.json',format:'json',scope:'page',sha256:blob({})}],
     templates:[{id:'template:pages/probe/index.wxml',wxmlAst:`sha256:${blob(template)}`,bindings:[]}],
     styles:[{id:'style:app.wxss',scope:'app',wxssIr:`sha256:${blob({version:1,imports:[],rules:[]})}`},{id:'style:pages/probe/index.wxss',scope:'page',wxssIr:`sha256:${blob(style)}`}],
-    components:[],assets:[],capabilities:Object.fromEntries(['wx.timer','wx.request','wx.login','wx.checkSession','wx.getUserProfile','component:button.open-type.getPhoneNumber','weappContainer.identity.authorizePhone','weappContainer.identity.getState','weappContainer.payment.request','wx.getFileSystemManager','object:FileSystemManager.writeFile','object:FileSystemManager.readFile','object:FileSystemManager.access','object:FileSystemManager.appendFileSync','wx.setScreenBrightness','wx.setKeepScreenOn','component:camera','wx.createCameraContext','object:CameraContext.takePhoto'].map(name=>[name,'partial'])),integrity:{algorithm:'sha256',root:''},
+    components:[],assets:[],capabilities:Object.fromEntries(['wx.timer','wx.request','wx.uploadFile','wx.downloadFile','object:RequestTask.onHeadersReceived','object:RequestTask.onChunkReceived','wx.connectSocket','object:SocketTask.onOpen','object:SocketTask.onClose','object:SocketTask.onMessage','object:SocketTask.onError','object:SocketTask.send','object:SocketTask.close','wx.getRecorderManager','object:RecorderManager.start','object:RecorderManager.stop','object:RecorderManager.onStop','object:RecorderManager.onError','wx.login','wx.checkSession','wx.getUserProfile','component:button.open-type.getPhoneNumber','weappContainer.identity.authorizePhone','weappContainer.identity.getState','weappContainer.payment.request','wx.getFileSystemManager','object:FileSystemManager.writeFile','object:FileSystemManager.readFile','object:FileSystemManager.access','object:FileSystemManager.appendFileSync','wx.setScreenBrightness','wx.setKeepScreenOn','component:camera','wx.createCameraContext','object:CameraContext.takePhoto'].map(name=>[name,'partial'])),integrity:{algorithm:'sha256',root:''},
   };
   manifest.integrity.root=sha(canonical(manifest));writeFileSync(join(destination,'manifest.json'),canonical(manifest));return manifest.integrity.root;
 }

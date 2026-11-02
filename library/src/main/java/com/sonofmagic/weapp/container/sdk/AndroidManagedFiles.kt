@@ -54,6 +54,12 @@ class AndroidManagedFiles(context: Context) : AutoCloseable {
         require(extension.matches(Regex("[a-z0-9]{1,8}")))
         withOperationLock(context) { val path = "wxfile://user/tmp/${UUID.randomUUID()}.$extension"; write(bytes, path, context); path }
     }
+    internal fun readForNative(path: String, context: JSONObject): ByteArray = synchronized(lock) {
+        withOperationLock(context) { val file = resolve(path, context); require(file.isFile && file.length() <= 8 * 1048576); file.readBytes() }
+    }
+    internal fun writeFromNative(bytes: ByteArray, path: String?, extension: String, context: JSONObject): String = synchronized(lock) {
+        withOperationLock(context) { val destination = path ?: "wxfile://user/tmp/${UUID.randomUUID()}.$extension"; write(bytes, destination, context); destination }
+    }
     private fun <T> withOperationLock(context: JSONObject, action: () -> T): T {
         val token = NativeBridge.filesLock(File(directory(context), ".weapp-operations.lock").absolutePath)
         try { return action() } finally { NativeBridge.filesUnlock(token) }

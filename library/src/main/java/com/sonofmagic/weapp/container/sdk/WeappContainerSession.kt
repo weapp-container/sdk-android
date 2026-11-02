@@ -69,6 +69,10 @@ class WeappContainerSession internal constructor(
     private var hostServicesConfig: JSONObject? = null
     private val authorizedApplications = linkedMapOf<String, JSONObject>()
     private val resourceCleanups = linkedMapOf<String, () -> Unit>()
+    private val visibilityHandlers = linkedMapOf<String, (Boolean) -> Unit>()
+    private var closeUiResetActions = listOf<() -> Unit>()
+    private var closeUiResetAwaiting = false
+    private var closeUiResetDone = false
     private var accountSwitchBlocked = false
     private var accountDetachPending = false
     private var accountDetachAttempts = 0
@@ -211,6 +215,9 @@ class WeappContainerSession internal constructor(
     /** Native adapter lifecycle; reset OS resources before the replacement account becomes visible. */
     fun registerHostResourceCleanup(key: String, cleanup: () -> Unit): CompletableFuture<Unit> = task {
         ensureOpen(); check(!resourceCleanups.containsKey(key)); resourceCleanups[key] = cleanup
+    }
+    fun registerHostVisibilityHandler(key: String, handler: (Boolean) -> Unit): CompletableFuture<Unit> = task {
+        ensureOpen(); check(!visibilityHandlers.containsKey(key)); visibilityHandlers[key] = handler
     }
     fun registerApiHandler(name: String, handler: HostMethod): CompletableFuture<Unit> = task {
         ensureOpen(); check(!loaded && pendingLoads.isEmpty()) { "Register native APIs before load" }
@@ -361,23 +368,40 @@ class WeappContainerSession internal constructor(
             enqueue(result) {
                 if (closed) { finish(result, Unit); return@enqueue }
                 closing = true; cleanupNeedsRetry = false
-                val cleanups = resourceCleanups.values.toList(); resourceCleanups.clear()
-                main.post { cleanups.forEach { dispose -> try { dispose() } catch (error: Throwable) { emitError(error) } } }
+                worker.removeCallbacks(pump)
                 while (pendingPrepares.isNotEmpty()) fail(pendingPrepares.removeFirst(), ContainerException("ERR_CLOSED", "Session closed before measured-view preparation"))
                 while (pendingLoads.isNotEmpty()) fail(pendingLoads.removeFirst().result, ContainerException("ERR_CLOSED", "Session closed before layout/load"))
-                try {
-                    retireSurface()
-                    if (handle == 0L) { completeClose(null); return@enqueue }
-                    val state = command("close") as JSONObject
-                    drainEvents()
-                    // Retried final cleanup may find an already-closed native
-                    // session; that response does not enqueue a second event.
-                    if (!closed && !state.optBoolean("pending") && state.optString("status") == "closed") completeClose(null)
-                    schedulePump()
-                } catch (error: Throwable) { completeClose(error) }
+                beginCloseResources()
             }
             return result
         }
+    }
+    private fun beginCloseResources() {
+        if (closeUiResetDone) { finishNativeClose(); return }
+        if (closeUiResetAwaiting) return
+        if (closeUiResetActions.isEmpty()) {
+            val activeCalls = calls.values.toList(); calls.clear()
+            closeUiResetActions = activeCalls.map { call -> { call.cancel() } } + resourceCleanups.values.toList()
+        }
+        closeUiResetAwaiting = true; val actions = closeUiResetActions
+        main.post {
+            val failed = mutableListOf<() -> Unit>(); var failure: Throwable? = null
+            for (action in actions) try { action() } catch (error: Throwable) { failed.add(action); if (failure == null) failure = error else failure.addSuppressed(error) }
+            worker.post {
+                closeUiResetAwaiting = false; closeUiResetActions = failed
+                if (failure != null) failCloseAttempt(checkNotNull(failure))
+                else { closeUiResetDone = true; resourceCleanups.clear(); visibilityHandlers.clear(); finishNativeClose() }
+            }
+        }
+    }
+    private fun finishNativeClose() {
+        try {
+            retireSurface()
+            if (handle == 0L) { completeClose(null); return }
+            val state = command("close") as JSONObject; drainEvents()
+            if (!closed && !state.optBoolean("pending") && state.optString("status") == "closed") completeClose(null)
+            schedulePump()
+        } catch (error: Throwable) { completeClose(error) }
     }
 
     internal fun claim(view: WeappContainerView) {
@@ -581,6 +605,7 @@ class WeappContainerSession internal constructor(
         if (nativeForeground != next) {
             try { command("lifecycle", JSONObject().put("event", if (next) "show" else "hide")) } finally { drainEvents() }
         }
+        if (changed || nativeForeground != next) { val callbacks = visibilityHandlers.values.toList(); main.post { callbacks.forEach { callback -> try { callback(next) } catch (error: Throwable) { emitError(error) } } } }
         if (next && (changed || nativeForeground != next)) presentedRevision = -1
     }
     private fun present() {
@@ -615,12 +640,12 @@ class WeappContainerSession internal constructor(
     }
     private val pump = object : Runnable {
         override fun run() {
-            if (closed || cleanupNeedsRetry || handle == 0L) return
+            if (closed || cleanupNeedsRetry || closing && !closeUiResetDone || handle == 0L) return
             try { command("pump"); drainEvents(); progressAccountSwitch(); present() } catch (error: Throwable) { emitError(error) }
             schedulePump()
         }
     }
-    private fun schedulePump() { worker.removeCallbacks(pump); if (!closed && !cleanupNeedsRetry && handle != 0L) worker.postDelayed(pump, if (foreground && !closing) 16L else 32L) }
+    private fun schedulePump() { worker.removeCallbacks(pump); if (!closed && !cleanupNeedsRetry && (!closing || closeUiResetDone) && handle != 0L) worker.postDelayed(pump, if (foreground && !closing) 16L else 32L) }
     private fun command(operation: String, payload: JSONObject = JSONObject()): Any? = unwrap(NativeBridge.command(handle, operation, payload.toString()))
     private fun drainEvents() {
         if (handle == 0L) return
@@ -746,6 +771,7 @@ class WeappContainerSession internal constructor(
     }
     private fun completeClose(error: Throwable?) {
         if (closed) return
+        if (!closeUiResetDone) { failCloseAttempt(error ?: ContainerException("ERR_NATIVE_RESOURCES", "Native resources have not drained")); return }
         var failure = error
         try { retireSurface() } catch (cleanup: Throwable) { if (failure == null) failure = cleanup else if (failure !== cleanup) failure.addSuppressed(cleanup) }
         if (!presenter.isRetired) { failCloseAttempt(failure ?: ContainerException("ERR_RENDER", "GPU resources are still owned")); return }

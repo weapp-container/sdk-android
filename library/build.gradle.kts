@@ -1,6 +1,7 @@
 plugins { id("com.android.library"); kotlin("android"); `maven-publish` }
 group = "com.sonofmagic.weapp"
 version = "0.1.0-preview.6.0"
+dependencies { implementation("com.squareup.okhttp3:okhttp:4.12.0") }
 val nativeRoot = providers.gradleProperty("weappSdkNativeDir").map { rootProject.file(it) }
 val licensesRoot = providers.gradleProperty("weappSdkLicensesDir").map { rootProject.file(it) }
 val generatedJni = layout.buildDirectory.dir("generated/jniLibs")

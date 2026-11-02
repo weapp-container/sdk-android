@@ -21,6 +21,8 @@ class HostServicesProbeActivity : Activity() {
     private lateinit var files: AndroidManagedFiles
     private lateinit var device: AndroidDeviceApis
     private lateinit var media: AndroidNativeMedia
+    private lateinit var network: AndroidNetworkApis
+    private lateinit var recorder: AndroidRecorderApis
     private lateinit var containerView: WeappContainerView
     private lateinit var application: JSONObject
     private lateinit var domain: DemoHostDomain
@@ -34,6 +36,7 @@ class HostServicesProbeActivity : Activity() {
     private var photo = false
     private var finishing = false
     private var brightness = -1f
+    private val nativeTransportVerification = CompletableFuture<Unit>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         brightness = window.attributes.screenBrightness
@@ -45,6 +48,9 @@ class HostServicesProbeActivity : Activity() {
         val pack = copyPack("probe-pack", File(filesDir, "probe-pack"))
         val root = JSONObject(File(pack, "manifest.json").readText()).getJSONObject("integrity").getString("root")
         val origin = requireNotNull(intent.getStringExtra("demoOrigin"))
+        val networkOrigin = requireNotNull(intent.getStringExtra("networkOrigin"))
+        network = AndroidNetworkApis(files, setOf(origin, networkOrigin, networkOrigin.replace("http://", "ws://")), true)
+        recorder = AndroidRecorderApis(this, files)
         domain = DemoHostDomain(DemoEnvironment(URI(origin), requireNotNull(intent.getStringExtra("demoControl"))))
         reference = ReferenceHostServices(this, domain)
         session.eventListener = ContainerEventListener { event ->
@@ -56,13 +62,13 @@ class HostServicesProbeActivity : Activity() {
             application = configuration.getJSONObject("application"); check(application.getString("packRoot") == root)
             reference.install(session)
         }.thenCompose {
-            CompletableFuture.allOf(files.install(session), device.install(session), media.install(session))
+            files.install(session).thenCompose { CompletableFuture.allOf(device.install(session), media.install(session), network.install(session), recorder.install(session)) }
         }.thenCompose { session.load(PackSource.Directory(pack), LoadOptions(options = launchOptions("A"))) }
             .exceptionally { fail(it); null }
         main.postDelayed({ if (!finishing) fail(IllegalStateException("Native host-services probe timed out")) }, 120000)
     }
     private fun account(principal: String, epoch: String) = JSONObject().put("principalId", principal).put("epoch", epoch)
-    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()))
+    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()).put("networkOrigin", intent.getStringExtra("networkOrigin")))
     private fun onMessage(message: JSONObject) {
         android.util.Log.i("WeappHostProbe", "guest: $message")
         when (message.optString("kind")) {
@@ -74,9 +80,22 @@ class HostServicesProbeActivity : Activity() {
                 checks.put("native-reference-payment-waits-for-server-paid-confirmation")
             }
             "phone-ready" -> preparePhoneTap()
+            "transport-recording" -> {
+                session.state().thenCompose { state ->
+                    val context = JSONObject(state.getJSONObject("hostServicesState").toString()).put("sessionId", state.getString("sessionId"))
+                    files.prepareScope(context).thenApply {
+                        val audio = files.readForNative(message.getString("path"), context)
+                        check(audio.size > 128 && audio[0].toInt() and 255 == 255 && audio[1].toInt() and 240 == 240) { "No actual ADTS AAC frame" }
+                        checks.put("real-http-managed-upload-download-and-stream-events")
+                        checks.put("real-native-websocket-peer-echo-and-close")
+                        checks.put("real-mediarecorder-aac-imported-into-managed-files")
+                        nativeTransportVerification.complete(Unit)
+                    }
+                }.exceptionally { nativeTransportVerification.completeExceptionally(it); fail(it); null }
+            }
             "files-A" -> if (!switched) {
                 switched = true; checks.put("guest-file-write-read-and-traversal-rejection")
-                session.hostServicesCommand("managedFileScope").thenCompose { value ->
+                nativeTransportVerification.thenCompose { session.hostServicesCommand("managedFileScope") }.thenCompose { value ->
                     val scope = value as JSONObject; oldRoot = File(scope.getString("root")); oldNative = File(scope.getString("auxiliaryRoot"))
                     check(File(oldRoot, "alpha.txt").readText() == "account-A-sync")
                     // Native metadata lives beside user files and must be deleted by the same account operation.
@@ -84,7 +103,7 @@ class HostServicesProbeActivity : Activity() {
                     domain.switchAccount(session, "demo-B", "2", JSONObject().put(application.getString("appId"), JSONObject().put("options", launchOptions("B"))))
                 }.exceptionally { fail(it); null }
             }
-            "files-B" -> { filesB = true; checks.put("new-guest-file-namespace-rejects-account-A"); maybeFinish() }
+            "files-B" -> { filesB = true; checks.put("new-guest-file-namespace-rejects-account-A"); checks.put("account-retirement-closes-real-http-and-websocket-peers"); maybeFinish() }
             "photo" -> {
                 val path = message.getString("path")
                 session.state().thenCompose { state ->
@@ -126,11 +145,22 @@ class HostServicesProbeActivity : Activity() {
             session.hostServicesCommand("deleteAccountData", JSONObject().put("principalId", "demo-A")).thenCompose {
                 check(oldRoot?.exists() == false && oldNative?.exists() == false)
                 checks.put("account-delete-removes-user-files-and-native-metadata")
-                session.closeAsync()
+                val attempts = java.util.concurrent.atomic.AtomicInteger()
+                session.registerHostResourceCleanup("probe-failed-cleanup-retry") {
+                    if (attempts.incrementAndGet() == 1) throw IllegalStateException("Authored one-time cleanup failure")
+                }.thenCompose { session.closeAsync() }.handle { _, error ->
+                    check(error != null && attempts.get() == 1) { "First native cleanup failure was not reported" }
+                    check((0 until events.length()).none { events.getJSONObject(it).optString("type") == "closed" }) { "Core closed before native cleanup succeeded" }
+                    Unit
+                }.thenCompose { session.closeAsync() }.thenApply {
+                    check(attempts.get() == 2)
+                    checks.put("failed-native-cleanup-retains-core-until-close-retry-succeeds")
+                    Unit
+                }
             }.whenComplete { _, closeError ->
                 if (closeError != null) { finishReport(closeError); return@whenComplete }
                 try {
-                    media.close(); files.close(); device.close(); reference.close(); domain.close()
+                    recorder.close(); network.close(); media.close(); files.close(); device.close(); reference.close(); domain.close()
                     check(window.attributes.screenBrightness == brightness)
                     check(window.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON == 0)
                     checks.put("close-drains-camera-and-restores-window-resources")
@@ -144,7 +174,7 @@ class HostServicesProbeActivity : Activity() {
         finishing = true
         session.closeAsync().whenComplete { _, cleanupError ->
             if (cleanupError != null) error.addSuppressed(cleanupError)
-            runCatching { media.close() }; runCatching { device.close() }; runCatching { files.close() }; runCatching { reference.close() }; runCatching { domain.close() }
+            runCatching { recorder.close() }; runCatching { network.close() }; runCatching { media.close() }; runCatching { device.close() }; runCatching { files.close() }; runCatching { reference.close() }; runCatching { domain.close() }
             finishReport(error)
         }
     }

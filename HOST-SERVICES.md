@@ -8,20 +8,17 @@
 `registerHostMethod`。未安装的 API 明确不支持。
 
 ```kotlin
-val device = AndroidDeviceApis(activity, permissionBroker)
-val bluetooth = AndroidBluetoothApis(activity, permissionBroker)
-val files = AndroidManagedFiles(activity.applicationContext)
-val media = AndroidNativeMedia(activity, files, permissionBroker)
+val toolkit = AndroidNativeDeviceServices(activity,
+    networkOrigins = setOf("https://api.example.com", "wss://api.example.com"),
+    permissions = permissionBroker)
 
 session.configureHostServices(trustedConfiguration).thenCompose {
-    CompletableFuture.allOf(device.install(session), bluetooth.install(session),
-        files.install(session), media.install(session))
+    toolkit.install(session)
 }.thenCompose { session.load(pack, options) }
 ```
 
-宿主必须持有这些对象直到 session 关闭。Activity 重建时，在主线程分别调用
-`device.rebindActivity(activityOrNull)`、`bluetooth.rebindActivity(activityOrNull)`、
-`media.rebindActivity(activityOrNull)`；空值停止旧资源，新的 Activity 不重复注册
+宿主必须持有 toolkit 直到 session 关闭。Activity 重建时，在主线程调用
+`toolkit.rebindActivity(activityOrNull)`；空值停止旧资源，新的 Activity 不重复注册
 handler。宿主通过 `AndroidPermissionBroker` 接入真实 Activity Result 权限流程，
 不能把点击“允许”直接当成系统授权成功。
 
@@ -30,6 +27,22 @@ handler。宿主通过 `AndroidPermissionBroker` 接入真实 Activity Result �
 `wx.getSetting` 只返回已询问过的作用域。宿主仍须按实际使用声明 CAMERA、
 RECORD_AUDIO、定位、Android 12+ BLUETOOTH_SCAN / BLUETOOTH_CONNECT，以及旧系统
 所需的蓝牙/定位权限；SDK 不替应用默认申请所有危险权限。
+
+toolkit 统一拥有文件、设备、蓝牙、媒体、网络和录音适配器，也可按需独立安装。
+`session.closeAsync()` 等待主线程原生资源完成清理后才关闭核心；清理失败保留
+原 owner 和文件 lease，再次调用 closeAsync 重试。完成后再关闭 toolkit。
+
+网络使用独立 OkHttp 4.12 客户端，支持 request、受管文件 multipart upload、
+download、进度/响应头/分块事件和 WebSocket。宿主明确列出 HTTPS/WSS origin，
+客户端不共享宿主 Cookie、不跟随重定向；开发时仅显式
+`allowLoopbackForDevelopment = true` 可允许 loopback HTTP/WS。请求/响应 1 MiB，
+受管下载/上传 8 MiB，socket 消息和待发送队列 1 MiB；事件入口受数量和字节上限
+限制，最终 HTTP 结果等待此前事件送达。换号与关闭实际取消并等待在途 I/O。
+
+RecorderManager 使用真实 MediaRecorder，独立检查 `scope.record` 和 RECORD_AUDIO。
+当前仅 AAC ADTS，100–60000ms、最多 4 MiB，支持 8000/16000/44100Hz、1/2 声道、
+16–128kbps；临时原生文件完成后导入同一受管目录。隐藏、后台、取消、换号和关闭
+停止麦克风；释放或删除失败时保留资源供清理重试。
 
 设备适配器包括真实剪贴板、网络状态、电量、窗口亮度与常亮、震动、原生系统 UI、
 WGS84 定位及传感器。传感器当前支持 normal 采样；GCJ-02 需要独立坐标服务。
@@ -110,3 +123,9 @@ SDK/fixture/JNI 源码和真实 GPU 截图哈希，并记录构建前后一致�
 文件、A/B 换号隔离、Camera2 JPEG 和 Skia 合成、账号数据删除及资源清理。这里的
 相机来自模拟器虚拟场景，支付来自显式 reference 渠道，不代表物理设备、蓝牙外设、
 官方钱包、商户交易、编译器兼容性或正式发行验收。
+
+[网络与录音开发记录](test/evidence/host-services-network-recording-development.json)
+另行记录 14 项通过的扩展探针：真实 HTTP 响应头/分块、multipart 文件、下载字节、
+WebSocket echo/close、实际 AAC ADTS 帧、换号关闭旧请求/socket，以及主动注入一次
+清理失败后，确认核心未提前 closed、第二次 close 成功。loopback 网络和模拟器
+麦克风不等于生产 TLS、物理录音或发行验收。
