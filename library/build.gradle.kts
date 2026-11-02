@@ -33,7 +33,7 @@ android {
     packaging { jniLibs.keepDebugSymbols += setOf("**/libweapp_container_sdk.so", "**/libc++_shared.so") }
     publishing { singleVariant("release") { withSourcesJar() } }
 }
-val copyNativeLibraries = tasks.register<Copy>("copyNativeLibraries") {
+val copyNativeLibraries = tasks.register<Sync>("copyNativeLibraries") {
     for ((abi, target) in mapOf("arm64-v8a" to "aarch64-linux-android", "x86_64" to "x86_64-linux-android")) {
         from(nativeRoot.map { it.resolve(target) }) { include("libweapp_container_sdk.so", "libc++_shared.so"); into(abi) }
     }
@@ -46,14 +46,20 @@ val copyNativeLibraries = tasks.register<Copy>("copyNativeLibraries") {
         }
     }
 }
-val copySdkNotices = tasks.register<Copy>("copySdkNotices") {
+val copySdkNotices = tasks.register<Sync>("copySdkNotices") {
     from(rootProject.file("LICENSE")) { into("weapp-container") }
     from(rootProject.file("THIRD-PARTY-NOTICES.md")) { into("weapp-container/sdk-dependencies") }
     from(rootProject.file("licenses")) { into("weapp-container/sdk-dependencies/licenses") }
-    from(licensesRoot) { into("weapp-container/licenses") }
+    for (target in listOf("aarch64-linux-android", "x86_64-linux-android")) {
+        from(licensesRoot.map { it.resolve(target) }) { into("weapp-container/licenses/$target") }
+    }
     from(nativeRoot.map { it.resolve("RUNTIME-LICENSE") }) { into("weapp-container") }
     into(generatedNotices)
-    doFirst { check(licensesRoot.get().resolve("aarch64-linux-android/licenses.json").isFile) { "Supply verified private runtime dependency notices before packaging" } }
+    doFirst {
+        for (target in listOf("aarch64-linux-android", "x86_64-linux-android")) {
+            check(licensesRoot.get().resolve("$target/licenses.json").isFile) { "Supply verified private runtime dependency notices for $target before packaging" }
+        }
+    }
 }
 tasks.named("preBuild") { dependsOn(copyNativeLibraries, copySdkNotices) }
 afterEvaluate {

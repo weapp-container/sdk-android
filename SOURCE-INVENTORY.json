@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "47cca3662e3aff95543b0d7dcc8db56c1c6f700b",
-  "review": "Expose gated read-only API resource chunks while preserving exact native call context and account revocation",
+  "sourceBaseCommit": "8bb6431e5ad0f3de2281a8c247592fd0ca17354e",
+  "review": "Restrict Android runtime notices to the two packaged ABI targets and synchronize generated asset and JNI outputs to remove stale files.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -161,8 +161,8 @@
     },
     {
       "path": "library/build.gradle.kts",
-      "sha256": "482e30aef1404b99be824f92967df666e1fa9f4a0097b7ae0c62ee51aba4d4e6",
-      "size": 4205,
+      "sha256": "66aa3fb52cc59e1e8d15b3e05b29a36cf156bce7084a09fd957d8b5ea1c8b056",
+      "size": 4434,
       "mode": "100644"
     },
     {
