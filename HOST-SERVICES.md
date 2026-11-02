@@ -40,9 +40,13 @@ download、进度/响应头/分块事件和 WebSocket。宿主明确列出 HTTPS
 限制，最终 HTTP 结果等待此前事件送达。换号与关闭实际取消并等待在途 I/O。
 
 RecorderManager 使用真实 MediaRecorder，独立检查 `scope.record` 和 RECORD_AUDIO。
-当前仅 AAC ADTS，100–60000ms、最多 4 MiB，支持 8000/16000/44100Hz、1/2 声道、
-16–128kbps；临时原生文件完成后导入同一受管目录。隐藏、后台、取消、换号和关闭
+当前仅 AAC ADTS，100–60000ms、最多 4 MiB，默认 8000Hz、双声道、48000bps、
+60000ms。支持官方列出的九档 8000–48000Hz，编码码率按每档采样率的官方范围
+分别核验；auto/mic audioSource 与 default audioMode 可用，其他输入源、模式和
+frameSize 明确拒绝。临时原生文件完成后导入同一受管目录。隐藏、后台、取消、换号和关闭
 停止麦克风；释放或删除失败时保留资源供清理重试。
+导入前由 MediaExtractor 核对真实输出采样率与声道；设备 encoder 静默降级时发出
+Error 并删除 staging，不把错误格式的文件作为成功结果交付。
 
 系统适配器按宿主 Manifest 声明安装通讯录、日历与扫码 API。通讯录需要
 WRITE_CONTACTS，日历需要 READ_CALENDAR / WRITE_CALENDAR；小程序授权和实际 OS
@@ -75,6 +79,16 @@ on/offLocationChange 及 on/offLocationChangeError。单次与持续定位共享
 和关闭移除原 listener。事件只保留最新位置/错误，串行送达；不注册后台定位。
 BLE 适配器拥有自己的扫描器和 GATT，按设备串行提交操作；关闭不会关闭宿主全局
 蓝牙。取消在途 GATT 操作会关闭该连接，以隔离迟到回调。
+
+iBeacon 通过独立 BluetoothLeScanner 解析真实 Apple manufacturer 0x004c / 0215
+广播，提供 start/stopBeaconDiscovery、getBeacons、on/offBeaconUpdate 和
+on/offBeaconServiceChange。需要独立位置与蓝牙小程序授权、精确位置 OS 权限、
+位置/蓝牙服务开启，以及对应 Android 版本的 scan/connect 权限；宿主不能为
+iBeacon scan 声明 neverForLocation，否则系统可能过滤这些位置广播。
+最多 20 个标准 UUID、64 个结果、32 个订阅；后台/隐藏暂停自己的 scanner，
+前台恢复，换号/关闭停止并丢弃旧代回调。Android proximity 按官方契约固定为 0，
+accuracy 是基于真实 RSSI 与广播 measured power 的路径损耗估计，无法估计时为 -1。
+不需要先打开 BLE adapter API，不修改或关闭宿主 radio。
 
 文件适配器公开受管 `wxfile://user/` 虚拟路径和基础异步文件 API。同步
 FileSystemManager 方法由核心直接执行，使用同一个受管目录与真实 flock 操作锁。每块读写最多 1 MiB、单文件 8 MiB、单账号应用 32 MiB；写入等待
@@ -172,3 +186,10 @@ WebSocket echo/close、实际 AAC ADTS 帧、换号关闭旧请求/socket，以�
 小程序收到真实 LocationManager 坐标，停止后继续注入仍不再收到事件；原生资料与
 手机号 UI 实际显示后端登记用途，授权并完成兑换。工具、原生包装、fixture 与完整
 参考后端源码在执行前后逐文件核对哈希；这仍是开发 snapshot 的模拟器证据。
+
+[Beacon 与录音开发记录](test/evidence/host-services-beacon-recorder-development.json)
+另行记录默认双声道在此模拟器被 native 降为 mono 后的明确拒绝，随后显式 mono
+实际 AAC 的 8000Hz/声道元数据，以及不兼容码率拒绝。默认双声道物理设备录音仍
+待验收。Beacon
+新源码完整编译，JVM 执行 authored 广播字节的 UUID、无符号 major/minor、距离估计
+及畸形长度/前缀边界测试；这不构成真实 Beacon 发射器、权限变更或射频验收。

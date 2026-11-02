@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "dd13488cb0eca5305aaf2ef22a4de6ee999b6703",
-  "review": "Native foreground location lifecycle and registered-purpose/version consent with source-stable Android development probe",
+  "sourceBaseCommit": "89b81cc4be24752f92c45139e487b98a5a0313a0",
+  "review": "Foreground native iBeacon scanner and decoder; official recorder defaults and actual output format guard, source-stable 20-check Android development probe",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "7335751613ca24d28b0c9b8940811aab65dbbd828233d3f7e814bc9a9ad6ac58",
-      "size": 12353,
+      "sha256": "365d8b554d134a78884587a05cf9f28efe0ee978965b98ffb5aed56169579119",
+      "size": 14102,
       "mode": "100644"
     },
     {
@@ -196,6 +196,18 @@
       "mode": "100644"
     },
     {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconApis.kt",
+      "sha256": "6ad1f27171e72057a7675447f00aca2d47a46ba6806a8cc3f093a8a7c5bacb6f",
+      "size": 14552,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconPayload.kt",
+      "sha256": "b0866b39cf94f154557c8c1bdfaf364a810058dc30705d8edb1c165e098dd8b0",
+      "size": 1174,
+      "mode": "100644"
+    },
+    {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBluetoothApis.kt",
       "sha256": "22336f203611f114447902709a81f9e2ee074bb9a47cfa0ad4a3b5c1733be38a",
       "size": 23824,
@@ -227,8 +239,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeDeviceServices.kt",
-      "sha256": "7e02ea87c68186b2486a5ba0b098daef370fb62cfdc918d546343ed480021ede",
-      "size": 2309,
+      "sha256": "5b455acfa40ad0a2ac583e2cc648317531b74bfdd3fc3a46a7c5741796c717a1",
+      "size": 2517,
       "mode": "100644"
     },
     {
@@ -251,8 +263,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidRecorderApis.kt",
-      "sha256": "765a171ba9dc773076d0ff308d55b9e295908e8fec865b138a63850acd07dd91",
-      "size": 13762,
+      "sha256": "a40b1ea1f5fc63f5868d920edd8c6a2db6770399c1050c10344f934b10086c41",
+      "size": 15797,
       "mode": "100644"
     },
     {
@@ -334,9 +346,21 @@
       "mode": "100644"
     },
     {
+      "path": "test/AndroidBeaconPayloadTests.kt",
+      "sha256": "e7179771a989eb387ebdb635653870cb18b568924baab3e189b85ea5a662d3a2",
+      "size": 1127,
+      "mode": "100644"
+    },
+    {
       "path": "test/HostServicesProbeActivity.kt",
-      "sha256": "f2f000d48a55b6fd2e3f5a2a552860b9ee15a3d03726ee9578aedca99552a08e",
-      "size": 17717,
+      "sha256": "4b5d2da943eb816e8268671e7643c9f5b94802c72c7d9232e7cddbebf6ba1056",
+      "size": 19328,
+      "mode": "100644"
+    },
+    {
+      "path": "test/evidence/host-services-beacon-recorder-development.json",
+      "sha256": "5363717a9e8019460854c9661e31c2cb95ee3475472267b6417e917324d9b3d1",
+      "size": 14148,
       "mode": "100644"
     },
     {
@@ -371,8 +395,8 @@
     },
     {
       "path": "test/host-services-fixture.mjs",
-      "sha256": "e6cb4cdc9c631ad8a94e4a57489238efb3c45bc4a5efd12b4db81f97a803d7e2",
-      "size": 13776,
+      "sha256": "c1f4679f33da714f64a63ad9a94569ab137eae6bfb9e4613fe1b058f97e873ed",
+      "size": 14553,
       "mode": "100644"
     },
     {
@@ -431,8 +455,8 @@
     },
     {
       "path": "tools/host-services-probe.mjs",
-      "sha256": "37b9f6380a7885af3244b5fa32106fdd1859dd68e948b7952a34e3d5025a2e29",
-      "size": 16316,
+      "sha256": "2190fb65464bd99795d8d71da3dbbb5520aeae8241bc92ab6e592a9831056d1b",
+      "size": 16752,
       "mode": "100644"
     },
     {

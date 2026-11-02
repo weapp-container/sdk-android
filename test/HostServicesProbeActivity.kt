@@ -89,6 +89,11 @@ class HostServicesProbeActivity : Activity() {
             "system-commits" -> try { verifySystemCommits() } catch (error: Throwable) { fail(error) }
             "location-ready" -> File(filesDir, "location-ready.json").writeText("{\"ready\":true}")
             "location-verified" -> checks.put("real-emulator-gps-location-subscription-and-stop-barrier")
+            "recorder-default-result" -> {
+                File(filesDir, "recorder-default-outcome.json").writeText(message.toString())
+                if (!message.getBoolean("success")) check(message.getString("errMsg").contains("requested 8000 Hz / 2 channels") && !message.has("tempFilePath"))
+                checks.put("recorder-default-options-preserve-format-or-reject-native-downgrade")
+            }
             "transport-recording" -> {
                 session.state().thenCompose { state ->
                     val context = JSONObject(state.getJSONObject("hostServicesState").toString()).put("sessionId", state.getString("sessionId"))
@@ -98,6 +103,17 @@ class HostServicesProbeActivity : Activity() {
                         checks.put("real-http-managed-upload-download-and-stream-events")
                         checks.put("real-native-websocket-peer-echo-and-close")
                         checks.put("real-mediarecorder-aac-imported-into-managed-files")
+                        val audioProbe = File.createTempFile("weapp-audio-probe-", ".aac", cacheDir)
+                        val extractor = android.media.MediaExtractor()
+                        try {
+                            audioProbe.writeBytes(audio); extractor.setDataSource(audioProbe.path)
+                            val track = extractor.getTrackFormat(0)
+                            val sampleRate = track.getInteger(android.media.MediaFormat.KEY_SAMPLE_RATE)
+                            val channels = track.getInteger(android.media.MediaFormat.KEY_CHANNEL_COUNT)
+                            File(filesDir, "recorder-defaults.json").writeText(JSONObject().put("sampleRate", sampleRate).put("numberOfChannels", channels).put("adtsHeader", audio.take(7).joinToString("") { "%02x".format(it) }).toString())
+                            check(sampleRate == 8000 && channels == 1) { "AAC defaults encoded $sampleRate Hz / $channels channels" }
+                        } finally { extractor.release(); check(audioProbe.delete()) { "Cannot remove owned AAC inspection file" } }
+                        checks.put("recorder-default-8000hz-explicit-mono-aac-and-sample-rate-bitrate-validation")
                         nativeTransportVerification.complete(Unit)
                     }
                 }.exceptionally { nativeTransportVerification.completeExceptionally(it); fail(it); null }

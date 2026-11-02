@@ -35,7 +35,7 @@ class AndroidRecorderApis(
     private val objects = mutableMapOf<String, HostCall>()
     private data class Subscription(val call: HostCall, val objectId: String, val event: String, var sequence: Long = 0)
     private val subscriptions = mutableMapOf<String, Subscription>()
-    private data class Recording(val objectId: String, val owner: HostCall, val recorder: MediaRecorder, val file: File, val started: Long, var paused: Long? = null, var pausedMs: Long = 0,
+    private data class Recording(val objectId: String, val owner: HostCall, val recorder: MediaRecorder, val file: File, val started: Long, val sampleRate: Int, val channels: Int, var paused: Long? = null, var pausedMs: Long = 0,
         var stopped: Boolean = false, var released: Boolean = false, var duration: Long = 0, var importedPath: String? = null, var published: Boolean = false, var stopFailure: RuntimeException? = null)
     private var recording: Recording? = null
     private val lifecycle = object : Application.ActivityLifecycleCallbacks {
@@ -106,13 +106,19 @@ class AndroidRecorderApis(
     @Suppress("DEPRECATION") private fun start(id: String, owner: HostCall, value: JSONObject) {
         require(recording == null && !closed && !owner.isCancelled && foreground && sessionVisible && binding != null)
         require(value.optString("format", "aac") == "aac") { "This recorder supports AAC only" }
-        val rate = value.optInt("sampleRate", 44100); require(rate in setOf(8000, 16000, 44100))
-        val channels = value.optInt("numberOfChannels", 1); require(channels in 1..2)
-        val bitrate = value.optInt("encodeBitRate", 64000); require(bitrate in 16000..128000)
-        val duration = value.optInt("duration", 60000); require(duration in 100..60000)
+        require(value.optString("audioSource", "auto") in setOf("auto", "mic")) { "This recorder supports auto/mic audioSource only" }
+        require(value.optString("audioMode", "default") == "default") { "This recorder supports default audioMode only" }
+        require(!value.has("frameSize")) { "AAC frame callbacks are not supported" }
+        fun integer(key: String, fallback: Int): Int { val raw = value.opt(key) ?: return fallback; require(raw is Number && raw.toDouble().isFinite() && raw.toDouble() == raw.toInt().toDouble()) { "$key must be an integer" }; return raw.toInt() }
+        val rate = integer("sampleRate", 8000)
+        val channels = integer("numberOfChannels", 2); require(channels in 1..2)
+        val bitrate = integer("encodeBitRate", 48000)
+        val bitrateRange = when (rate) { 8000, 11025 -> 16000..48000; 12000 -> 24000..64000; 16000 -> 24000..96000; 22050, 24000 -> 32000..128000; 32000 -> 48000..192000; 44100, 48000 -> 64000..320000; else -> error("Unsupported recorder sampleRate") }
+        require(bitrate in bitrateRange) { "encodeBitRate is outside the range for sampleRate" }
+        val duration = integer("duration", 60000); require(duration in 100..60000)
         val file = File(files.auxiliaryRoot(requireNotNull(owner.context)), "recording-${UUID.randomUUID()}.aac")
         val recorder = MediaRecorder()
-        recording = Recording(id, owner, recorder, file, SystemClock.elapsedRealtime())
+        recording = Recording(id, owner, recorder, file, SystemClock.elapsedRealtime(), rate, channels)
         try {
             recorder.setAudioSource(MediaRecorder.AudioSource.MIC); recorder.setOutputFormat(MediaRecorder.OutputFormat.AAC_ADTS); recorder.setAudioEncoder(MediaRecorder.AudioEncoder.AAC)
             recorder.setAudioSamplingRate(rate); recorder.setAudioChannels(channels); recorder.setAudioEncodingBitRate(bitrate); recorder.setMaxDuration(duration); recorder.setMaxFileSize(4L * 1048576); recorder.setOutputFile(file.path)
@@ -135,6 +141,20 @@ class AndroidRecorderApis(
         }
         if (publish && !active.published && !active.owner.isCancelled && !closed) {
             require(active.file.length() in 1..(4L * 1048576))
+            val extractor = android.media.MediaExtractor()
+            val mismatch = try {
+                extractor.setDataSource(active.file.path)
+                check(extractor.trackCount > 0) { "Recorder produced no audio track" }
+                val track = extractor.getTrackFormat(0)
+                val rate = track.getInteger(android.media.MediaFormat.KEY_SAMPLE_RATE)
+                val channels = track.getInteger(android.media.MediaFormat.KEY_CHANNEL_COUNT)
+                if (rate != active.sampleRate || channels != active.channels) IllegalStateException("Native encoder produced $rate Hz / $channels channels; requested ${active.sampleRate} Hz / ${active.channels} channels") else null
+            } finally { extractor.release() }
+            if (mismatch != null) {
+                active.stopFailure = mismatch
+                check(!active.file.exists() || active.file.delete()) { "Cannot remove rejected recorder staging file" }; recording = null
+                emit(active.objectId, "Error", JSONObject().put("errMsg", "RecorderManager:fail ${mismatch.message}").put("errCode", -1)); throw mismatch
+            }
             val path = active.importedPath ?: files.importTemporary(active.file.readBytes(), "aac", requireNotNull(active.owner.context)).also { active.importedPath = it }
             emit(active.objectId, "Stop", JSONObject().put("tempFilePath", path).put("duration", active.duration).put("fileSize", active.file.length())); active.published = true
         }

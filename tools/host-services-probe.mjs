@@ -103,6 +103,8 @@ try {
   await new Promise(done=>setTimeout(done,500));
  }
  if(report.status==='passed'){if(!report.authorizationPurposeDisplay?.profile||!report.authorizationPurposeDisplay?.phone)throw Error('Both registered authorization purposes must have been visibly confirmed');report.probe.checks.push('native-authorization-ui-and-successful-grants-bind-registered-purpose-and-permission-version');}
+ const defaultOutcome=device(['shell','run-as',pkg,'cat','files/recorder-default-outcome.json'],{optional:true,timeout:10000});if(defaultOutcome.trim().startsWith('{'))report.recorderDefaultOutcome=JSON.parse(defaultOutcome);
+ const audioDefaults=device(['shell','run-as',pkg,'cat','files/recorder-defaults.json'],{optional:true,timeout:10000});if(audioDefaults.trim().startsWith('{'))report.recorderDefaults=JSON.parse(audioDefaults);
  const image=device(['exec-out','screencap','-p'],{binary:true});writeFileSync(join(out,'screen.png'),image);
  const frame=device(['exec-out','run-as',pkg,'cat','files/host-services-frame.png'],{binary:true,optional:true});if(frame?.length)writeFileSync(join(out,'host-services-frame.png'),frame);
  const pid=device(['shell','pidof',pkg],{optional:true}).trim();
