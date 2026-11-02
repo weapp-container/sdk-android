@@ -1,0 +1,286 @@
+{
+  "schemaVersion": 1,
+  "sdkVersion": "0.1.0-preview.6.0",
+  "date": "2026-11-02",
+  "status": "passed",
+  "scope": "Development source compilation and native terminal/framing boundary checks only; no release, device or parity acceptance",
+  "contract": {
+    "path": "examples/host-services/NFC-CONTRACT.json",
+    "sha256": "c0bc07ef93fe8cf95e3898e770d8902468ec58cc5c8da228b988ee7e8d2738a1",
+    "officialLeafCount": 66,
+    "potentialImplementedLeafCount": 66
+  },
+  "checks": [
+    {
+      "consumer": "flutter",
+      "status": "passed",
+      "sourceCount": 27,
+      "sourceStability": "before/after/current hashes match",
+      "sources": [
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNfcTerminal.kt",
+          "sha256": "7227a322a7c07187c93f20d31098b02caef7aa07153d00996f165decbc6d7482"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidWifiApis.kt",
+          "sha256": "0c7511502d12bff3ce26b78b9b05e31c8969620f3e7de5bf738d6a301bbfec2f"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFiles.kt",
+          "sha256": "8caac403f73d13fc56e76a716fd60504ab7465197d747daa2f39c2beafe4db36"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconApis.kt",
+          "sha256": "6ad1f27171e72057a7675447f00aca2d47a46ba6806a8cc3f093a8a7c5bacb6f"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidRecorderApis.kt",
+          "sha256": "a40b1ea1f5fc63f5868d920edd8c6a2db6770399c1050c10344f934b10086c41"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeMedia.kt",
+          "sha256": "0be45a13f2cff7b5f2d2afeb1c2f900908f52aa7758c508124cbd987b7a080ee"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
+          "sha256": "842d3cf6515c2779df45fc79b3b64714a2c0041c10ee6f02baae191cdaef759d"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidCodeScanner.kt",
+          "sha256": "66353935c2bf20adf2df3d9cf22cb831f815869c3194f19334187f254640d7c7"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
+          "sha256": "da90dfe9719f63b519650bf2e1ed5f52e9442ffe74f4be3395e2d8c1efa82f6b"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFileScopes.kt",
+          "sha256": "d0670eb3e587f36733d276519107e8420cd10102501e80547c344b435d73d4e3"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBluetoothApis.kt",
+          "sha256": "22336f203611f114447902709a81f9e2ee074bb9a47cfa0ad4a3b5c1733be38a"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/NativeBridge.kt",
+          "sha256": "995bcbe4737a0b51bc204d516bdc5e9b82e4d4a57fc7ca5c5844e86f2cd9f4a7"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPermissionConsent.kt",
+          "sha256": "1e06d986f76859a353f9fa41394d0be4c58c07212b5f79771b5e2d323c3e7f93"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPayments.kt",
+          "sha256": "b4fce44546676050c5cc12c6d56317ff8b07e9aa2b01c3ad2f802b3d0148e748"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidSystemApis.kt",
+          "sha256": "fa1be4e3c4c5e936b1184132feac77d4ef4dde81ed8e3e1fb78c1f910265a423"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
+          "sha256": "f55e552019dae0481b723f8800dbe7f4a4f8db569a420ffa9f526762910152e6"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeDeviceServices.kt",
+          "sha256": "87ae073429a9d76f48cd72f42bbf3af5f897d144066fe1321187da6548a2a7d8"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconPayload.kt",
+          "sha256": "b0866b39cf94f154557c8c1bdfaf364a810058dc30705d8edb1c165e098dd8b0"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNdefApis.kt",
+          "sha256": "e62a5fb7c9a62e719727942ed8ca911c44033df59147bfc2f6cdbce2ea1dbf1e"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/EglPresenter.kt",
+          "sha256": "7e5d3b40d3de4f113f9405bc4ad19074b3675fbc2ecff8078cb0c5c2c1bd79f1"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidDeviceApis.kt",
+          "sha256": "410a5c33f276208793be067c5de8d1da987dd11e24670eaea8ad6c3b90e213f9"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerView.kt",
+          "sha256": "7731c65968a0e851014cee27ecfaa37c5f69e6742bdaefa0fd7f55585991d873"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNetworkApis.kt",
+          "sha256": "ad47cc0376fbdf5a0624d85f2626afa1431848be8f41b2428f590b3481e95f66"
+        },
+        {
+          "path": "sdk/flutter/weapp_container_android/android/src/main/kotlin/dev/weapp/container/flutter/LayoutFailureDiagnostic.kt",
+          "sha256": "0789a46f7f6ea450e236bb73667c9722bd3f4d422fdda1022711e9db962533ba"
+        },
+        {
+          "path": "sdk/flutter/weapp_container_android/android/src/main/kotlin/dev/weapp/container/flutter/WeappContainerAndroidPlugin.kt",
+          "sha256": "e0fb11c81b2366c5097b9cfe4bc58e3a7c39d1a987353fc99741757829c53ca8"
+        },
+        {
+          "path": "sdk/flutter/weapp_container_android/android/src/main/kotlin/dev/weapp/container/flutter/HostLayoutCoherence.kt",
+          "sha256": "6ca314caf5ea3bb3cb5f42bd180037a97f7f4517fd55d716c4b791b83f8217f3"
+        },
+        {
+          "path": "sdk/flutter/weapp_container_android/android/src/main/kotlin/dev/weapp/container/flutter/ChromeViewport.kt",
+          "sha256": "7e03950f0883c19129129f85463d59458774065030e396e6176428dc65925786"
+        }
+      ],
+      "commandFile": "/var/folders/nc/lnt357c50gdcwqlvymm9jn040000gn/T/weapp-host-services-plugin-types-90hitrxt/flutter-command.json",
+      "commandSha256": "cfde0b1d22fb862d02f37b49abcce14313b1f11dcfd7c72ff238de3de3334660",
+      "logSha256": "54e31ea6cc13adc505fc2952ea0e2511637a358edeb351bb7782193d38eb8629",
+      "diagnostics": "Android SDK deprecation/override warnings retained in log"
+    },
+    {
+      "consumer": "react-native",
+      "status": "passed",
+      "sourceCount": 29,
+      "sourceStability": "before/after/current hashes match",
+      "sources": [
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNfcTerminal.kt",
+          "sha256": "7227a322a7c07187c93f20d31098b02caef7aa07153d00996f165decbc6d7482"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidWifiApis.kt",
+          "sha256": "0c7511502d12bff3ce26b78b9b05e31c8969620f3e7de5bf738d6a301bbfec2f"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFiles.kt",
+          "sha256": "8caac403f73d13fc56e76a716fd60504ab7465197d747daa2f39c2beafe4db36"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconApis.kt",
+          "sha256": "6ad1f27171e72057a7675447f00aca2d47a46ba6806a8cc3f093a8a7c5bacb6f"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidRecorderApis.kt",
+          "sha256": "a40b1ea1f5fc63f5868d920edd8c6a2db6770399c1050c10344f934b10086c41"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeMedia.kt",
+          "sha256": "0be45a13f2cff7b5f2d2afeb1c2f900908f52aa7758c508124cbd987b7a080ee"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
+          "sha256": "842d3cf6515c2779df45fc79b3b64714a2c0041c10ee6f02baae191cdaef759d"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidCodeScanner.kt",
+          "sha256": "66353935c2bf20adf2df3d9cf22cb831f815869c3194f19334187f254640d7c7"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
+          "sha256": "da90dfe9719f63b519650bf2e1ed5f52e9442ffe74f4be3395e2d8c1efa82f6b"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFileScopes.kt",
+          "sha256": "d0670eb3e587f36733d276519107e8420cd10102501e80547c344b435d73d4e3"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBluetoothApis.kt",
+          "sha256": "22336f203611f114447902709a81f9e2ee074bb9a47cfa0ad4a3b5c1733be38a"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/NativeBridge.kt",
+          "sha256": "995bcbe4737a0b51bc204d516bdc5e9b82e4d4a57fc7ca5c5844e86f2cd9f4a7"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPermissionConsent.kt",
+          "sha256": "1e06d986f76859a353f9fa41394d0be4c58c07212b5f79771b5e2d323c3e7f93"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPayments.kt",
+          "sha256": "b4fce44546676050c5cc12c6d56317ff8b07e9aa2b01c3ad2f802b3d0148e748"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidSystemApis.kt",
+          "sha256": "fa1be4e3c4c5e936b1184132feac77d4ef4dde81ed8e3e1fb78c1f910265a423"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
+          "sha256": "f55e552019dae0481b723f8800dbe7f4a4f8db569a420ffa9f526762910152e6"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeDeviceServices.kt",
+          "sha256": "87ae073429a9d76f48cd72f42bbf3af5f897d144066fe1321187da6548a2a7d8"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconPayload.kt",
+          "sha256": "b0866b39cf94f154557c8c1bdfaf364a810058dc30705d8edb1c165e098dd8b0"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNdefApis.kt",
+          "sha256": "e62a5fb7c9a62e719727942ed8ca911c44033df59147bfc2f6cdbce2ea1dbf1e"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/EglPresenter.kt",
+          "sha256": "7e5d3b40d3de4f113f9405bc4ad19074b3675fbc2ecff8078cb0c5c2c1bd79f1"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidDeviceApis.kt",
+          "sha256": "410a5c33f276208793be067c5de8d1da987dd11e24670eaea8ad6c3b90e213f9"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerView.kt",
+          "sha256": "7731c65968a0e851014cee27ecfaa37c5f69e6742bdaefa0fd7f55585991d873"
+        },
+        {
+          "path": "sdk/android/library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNetworkApis.kt",
+          "sha256": "ad47cc0376fbdf5a0624d85f2626afa1431848be8f41b2428f590b3481e95f66"
+        },
+        {
+          "path": "sdk/react-native/android/src/main/java/com/sonofmagic/weapp/container/reactnative/WeappContainerViewManager.kt",
+          "sha256": "f281aa6d4fb8665c0cb1e301d01a25116b29c503b9c75f80a3b87068a65d3dd3"
+        },
+        {
+          "path": "sdk/react-native/android/src/main/java/com/sonofmagic/weapp/container/reactnative/WeappContainerPackage.kt",
+          "sha256": "1926bbccb29a1cb6babf8ff266ff09037dc0ccc675799d05e0523a76e9b0969f"
+        },
+        {
+          "path": "sdk/react-native/android/src/main/java/com/sonofmagic/weapp/container/reactnative/WeappContainerModule.kt",
+          "sha256": "480efd7380250675f5f4ba18e78b8dfb6018628ec3f5f86e20f6d4b74969d96d"
+        },
+        {
+          "path": "sdk/react-native/codegen/android/generated/java/com/sonofmagic/weapp/container/reactnative/NativeWeappContainerSpec.java",
+          "sha256": "fe57c118f02698096bf31885084fb4b03937accee283434a46a42b246c60de36"
+        },
+        {
+          "path": "sdk/react-native/codegen/android/generated/java/com/facebook/react/viewmanagers/WeappContainerNativeViewManagerInterface.java",
+          "sha256": "29d617d8f2bf5b0fc74609cd0de945778d4b7fa9901f64abd3148cb8aa4cd816"
+        },
+        {
+          "path": "sdk/react-native/codegen/android/generated/java/com/facebook/react/viewmanagers/WeappContainerNativeViewManagerDelegate.java",
+          "sha256": "5aed5150485ce352011fde2bc6a357c50a994f034c085aa6b5912343a2075782"
+        }
+      ],
+      "commandFile": "/var/folders/nc/lnt357c50gdcwqlvymm9jn040000gn/T/weapp-host-services-plugin-types-90hitrxt/react-native-command.json",
+      "commandSha256": "ce8df75313764a83a6058d388c62a8e25d2490466fb9902d577ecc10d1f85523",
+      "logSha256": "05befed99ecc161e18367a5fd2b6a993f86fe04e231621e5ba9745ddc4f60b85",
+      "diagnostics": "Android SDK deprecation/override warnings retained in log"
+    }
+  ],
+  "nativeBoundaryTests": {
+    "status": "passed",
+    "scope": "Real host JVM executes production AndroidNfcTerminal and cancellation/retry assertions",
+    "sources": [
+      {
+        "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNfcTerminal.kt",
+        "sha256": "7227a322a7c07187c93f20d31098b02caef7aa07153d00996f165decbc6d7482"
+      },
+      {
+        "path": "test/AndroidNfcTerminalTest.kt",
+        "sha256": "660dcd0e634ea4406898d2742697820c864d3f1b9a1e6c817e58c2ac98c126db"
+      }
+    ],
+    "commandFile": "/var/folders/nc/lnt357c50gdcwqlvymm9jn040000gn/T/weapp-host-services-plugin-types-167irj3u/commands.json",
+    "commandSha256": "a85cfc68ed670f99a6e4ec6a78becca60dfde2e3d09a2523709f6743c446c840",
+    "stdoutSha256": "d563dadec4052a5044040e321673b36a6dd0d23123def679dd87da1d7832c814"
+  },
+  "limitations": [
+    "No NFC-capable device, physical tag, system reader UI or NFC permissions exercised",
+    "No signed iOS TAG entitlement, AID or FeliCa systemcode accepted on hardware",
+    "No tag technology chipset parity or concurrent host reader acceptance",
+    "No new runtime binary linked, packaged or published"
+  ]
+}

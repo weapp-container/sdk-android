@@ -1,0 +1,201 @@
+{
+  "schemaVersion": 1,
+  "semanticBaseline": "3.17.3",
+  "typePackageVersion": "5.2.3",
+  "typeInput": {
+    "path": "types/wx/lib.wx.api.d.ts",
+    "sha256": "25e9e6fdab1b4282ee5231d8f8de7a31a177d2edc690ec834e0da479cc166245"
+  },
+  "officialLeafCount": 66,
+  "leaves": {
+    "NFCAdapter": [
+      "object:NFCAdapter.getIsoDep",
+      "object:NFCAdapter.getMifareClassic",
+      "object:NFCAdapter.getMifareUltralight",
+      "object:NFCAdapter.getNdef",
+      "object:NFCAdapter.getNfcA",
+      "object:NFCAdapter.getNfcB",
+      "object:NFCAdapter.getNfcF",
+      "object:NFCAdapter.getNfcV",
+      "object:NFCAdapter.offDiscovered",
+      "object:NFCAdapter.onDiscovered",
+      "object:NFCAdapter.startDiscovery",
+      "object:NFCAdapter.stopDiscovery",
+      "object:NFCAdapter.tech"
+    ],
+    "Ndef": [
+      "object:Ndef.close",
+      "object:Ndef.connect",
+      "object:Ndef.isConnected",
+      "object:Ndef.offNdefMessage",
+      "object:Ndef.onNdefMessage",
+      "object:Ndef.setTimeout",
+      "object:Ndef.writeNdefMessage"
+    ],
+    "IsoDep": [
+      "object:IsoDep.close",
+      "object:IsoDep.connect",
+      "object:IsoDep.getHistoricalBytes",
+      "object:IsoDep.getMaxTransceiveLength",
+      "object:IsoDep.isConnected",
+      "object:IsoDep.setTimeout",
+      "object:IsoDep.transceive"
+    ],
+    "MifareClassic": [
+      "object:MifareClassic.close",
+      "object:MifareClassic.connect",
+      "object:MifareClassic.getMaxTransceiveLength",
+      "object:MifareClassic.isConnected",
+      "object:MifareClassic.setTimeout",
+      "object:MifareClassic.transceive"
+    ],
+    "MifareUltralight": [
+      "object:MifareUltralight.close",
+      "object:MifareUltralight.connect",
+      "object:MifareUltralight.getMaxTransceiveLength",
+      "object:MifareUltralight.isConnected",
+      "object:MifareUltralight.setTimeout",
+      "object:MifareUltralight.transceive"
+    ],
+    "NfcA": [
+      "object:NfcA.close",
+      "object:NfcA.connect",
+      "object:NfcA.getAtqa",
+      "object:NfcA.getMaxTransceiveLength",
+      "object:NfcA.getSak",
+      "object:NfcA.isConnected",
+      "object:NfcA.setTimeout",
+      "object:NfcA.transceive"
+    ],
+    "NfcB": [
+      "object:NfcB.close",
+      "object:NfcB.connect",
+      "object:NfcB.getMaxTransceiveLength",
+      "object:NfcB.isConnected",
+      "object:NfcB.setTimeout",
+      "object:NfcB.transceive"
+    ],
+    "NfcF": [
+      "object:NfcF.close",
+      "object:NfcF.connect",
+      "object:NfcF.getMaxTransceiveLength",
+      "object:NfcF.isConnected",
+      "object:NfcF.setTimeout",
+      "object:NfcF.transceive"
+    ],
+    "NfcV": [
+      "object:NfcV.close",
+      "object:NfcV.connect",
+      "object:NfcV.getMaxTransceiveLength",
+      "object:NfcV.isConnected",
+      "object:NfcV.setTimeout",
+      "object:NfcV.transceive"
+    ]
+  },
+  "nativeHeaders": [
+    {
+      "name": "NFCTagReaderSession.h",
+      "sha256": "e5aab65e2086b8a8c6faf96bcfa5e0e3c5ffd20ee69ce4ef0ddf2a38485cd436",
+      "url": "https://developer.apple.com/documentation/corenfc/nfctagreadersession"
+    },
+    {
+      "name": "NFCISO7816Tag.h",
+      "sha256": "3da2e7641be305009d5e14fbd92d5b2c61f2819a98b1cea392ea9565e5860dca",
+      "url": "https://developer.apple.com/documentation/corenfc/nfciso7816tag"
+    },
+    {
+      "name": "NFCMiFareTag.h",
+      "sha256": "45380fe3c437c6db36871e1be5ba43c1672627042c6ea6c00698ab37d8fab433",
+      "url": "https://developer.apple.com/documentation/corenfc/nfcmifaretag"
+    },
+    {
+      "name": "NFCFeliCaTag.h",
+      "sha256": "52370d17651283c089c2ee6064cd39ea73c1d73d3cd3ee5e22fbd4ea5a99509a",
+      "url": "https://developer.apple.com/documentation/corenfc/nfcfelicatag"
+    },
+    {
+      "name": "NFCISO15693Tag.h",
+      "sha256": "a5c01933f2f0418d474351151ee8dc8fc04bea6ba1593c27d5e5af23162769e9",
+      "url": "https://developer.apple.com/documentation/corenfc/nfciso15693tag"
+    },
+    {
+      "name": "NFCNDEFTag.h",
+      "sha256": "3a59e410131149a669f018999c3cc244af862da534e552c41806ecf9d9e1d433",
+      "url": "https://developer.apple.com/documentation/corenfc/nfcndeftag"
+    }
+  ],
+  "iosConstraints": {
+    "unregisteredTechnologies": [
+      "MifareClassic",
+      "NfcA",
+      "NfcB"
+    ],
+    "missingNativeMaximum": [
+      "IsoDep.getMaxTransceiveLength",
+      "MifareUltralight.getMaxTransceiveLength"
+    ],
+    "isoDep": "Only valid ISO7816 APDU; OS enforces signed TAG entitlement and configured AID allowlist; raw RF framing not provided",
+    "mifareUltralight": "Native sendMiFareCommand only for actual ultralight family, Crypto1 unsupported",
+    "nfcF": "Native sendFeliCaCommandPacket max254 bytes excludes LEN/CRC; adapter translates official wire packet including LEN",
+    "nfcV": "Native sendRequest flag+command+data total<=256 bytes; adapter rejoins response flag+data",
+    "qualification": "Host opt-in/configuration is not proof of signed entitlement; native reader activation/invalidation is authoritative",
+    "officialHeaderExcerpts": [
+      {
+        "header": "NFCMiFareTag.h",
+        "quote": "Support MIFARE UltraLight, Plus, and DESFire products. Crypto1 protocol is not supported."
+      },
+      {
+        "header": "NFCTagReaderSession.h",
+        "quote": "NFCPollingISO14443 Support both Type A & B modulation. NFCTagTypeISO7816Compatible and NFCTagTypeMiFare tags will be discovered.",
+        "implication": "The public tag protocols expose no general ISO14443-3 A/B raw transceive, ATQA or SAK interface."
+      },
+      {
+        "header": "NFCFeliCaTag.h",
+        "quote": "Maximum packet length is 254. Data length (LEN) byte and CRC bytes are calculated and inserted automatically."
+      },
+      {
+        "header": "NFCISO15693Tag.h",
+        "quote": "The request data frame is concatenation of 8 bits request flag, 8 bits command code, and optional data. Total length of the data frame cannot exceed 256 bytes."
+      },
+      {
+        "header": "NFCISO7816Tag.h",
+        "quote": "initWithData: return nil if input data does not contain a valid APDU."
+      },
+      {
+        "headers": [
+          "NFCISO7816Tag.h",
+          "NFCMiFareTag.h"
+        ],
+        "observation": "Neither complete public protocol declaration exposes a maximum raw-transceive size or getter. No hardware maximum is fabricated for IsoDep or MifareUltralight."
+      }
+    ]
+  },
+  "androidSDK": {
+    "apiLevel": 36,
+    "androidJarSha256": "d9eb9da824d9e247a352f570f01e1169e725b2954bca9e283a71786c59b59f9a",
+    "technologyClasses": [
+      "android.nfc.tech.Ndef",
+      "android.nfc.tech.IsoDep",
+      "android.nfc.tech.MifareClassic",
+      "android.nfc.tech.MifareUltralight",
+      "android.nfc.tech.NfcA",
+      "android.nfc.tech.NfcB",
+      "android.nfc.tech.NfcF",
+      "android.nfc.tech.NfcV"
+    ],
+    "reference": "https://developer.android.com/reference/android/nfc/tech/package-summary",
+    "timeoutSetters": [
+      "IsoDep",
+      "MifareClassic",
+      "MifareUltralight",
+      "NfcA",
+      "NfcF"
+    ],
+    "noTimeoutSetter": [
+      "Ndef",
+      "NfcB",
+      "NfcV"
+    ],
+    "maximum": "Each raw technology getMaxTransceiveLength uses its actual Android getter; no chosen constant substitutes for hardware limits"
+  }
+}

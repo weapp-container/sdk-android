@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "fd1ddc0ef6c0da694d775a5d73db511a85f1c45e",
-  "review": "Explicit native Wi-Fi opt-in using public Android OS APIs, native confirmation and bounded owner resources; exact source-stable 21-check development probe",
+  "sourceBaseCommit": "c6623cce58e271a5e625bb3b76a209dfbb833821",
+  "review": "Implement official NFC tag technologies with real per-tag limits and native worker terminal cleanup; current Kotlin compilation and host JVM boundary evidence",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -115,6 +115,18 @@
       "path": "docs/EMBEDDING.md",
       "sha256": "b7728e72f98944f7056f6076c42f825e4ad78334fe2c0bce522d4073e3ad7fc1",
       "size": 7449,
+      "mode": "100644"
+    },
+    {
+      "path": "examples/host-services/NFC-APIS.md",
+      "sha256": "be98143073a181d7798cdeeac5d7e0520dd35587cb2c87d18b590e805ee25f00",
+      "size": 1749,
+      "mode": "100644"
+    },
+    {
+      "path": "examples/host-services/NFC-CONTRACT.json",
+      "sha256": "c0bc07ef93fe8cf95e3898e770d8902468ec58cc5c8da228b988ee7e8d2738a1",
+      "size": 7226,
       "mode": "100644"
     },
     {
@@ -257,14 +269,20 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNdefApis.kt",
-      "sha256": "a697478df91dd6ca7acb12d682c756346ed107603f805b54024afb7473017cc3",
-      "size": 16375,
+      "sha256": "e62a5fb7c9a62e719727942ed8ca911c44033df59147bfc2f6cdbce2ea1dbf1e",
+      "size": 24221,
       "mode": "100644"
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNetworkApis.kt",
       "sha256": "ad47cc0376fbdf5a0624d85f2626afa1431848be8f41b2428f590b3481e95f66",
       "size": 23101,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNfcTerminal.kt",
+      "sha256": "7227a322a7c07187c93f20d31098b02caef7aa07153d00996f165decbc6d7482",
+      "size": 798,
       "mode": "100644"
     },
     {
@@ -364,6 +382,12 @@
       "mode": "100644"
     },
     {
+      "path": "test/AndroidNfcTerminalTest.kt",
+      "sha256": "660dcd0e634ea4406898d2742697820c864d3f1b9a1e6c817e58c2ac98c126db",
+      "size": 830,
+      "mode": "100644"
+    },
+    {
       "path": "test/HostServicesProbeActivity.kt",
       "sha256": "eac088a15b3f0f33fa83dbdd6e992d7d0c5de8dfc2bcb105ab0e9fef506af88a",
       "size": 20698,
@@ -397,6 +421,12 @@
       "path": "test/evidence/host-services-network-recording-development.json",
       "sha256": "c6ff0bfd15e08657aec6ae9acaee465451eb584f538a8a39400336024ced2b93",
       "size": 9284,
+      "mode": "100644"
+    },
+    {
+      "path": "test/evidence/host-services-nfc-development.json",
+      "sha256": "c29e2ac36cf703b49d82d4c3d72dd23bf6d03a47911b9d00ba86472c42cbedc5",
+      "size": 15380,
       "mode": "100644"
     },
     {
