@@ -136,6 +136,13 @@ token closure 始终留在 native；小程序只收到短时、单次、绑定�
 `identity.prepareAccountState(session, operationId, newTrustedContext)`，再完成清理
 future。新的快照必须在清理 ACK 之前准备；旧账号任意快照不能复用。
 
+连续换号立即阻止旧身份，但清理 hook 按实际终结串行执行。新 epoch 的 hook 和
+ACK 必须等待此前已启动的 future 完成；取消或忽略旧结果不代表原生资源已释放。
+尚未开始的过时 hook 会跳过。关闭同样等待整条清理队列；失败可在当前操作显式重试。
+宿主应在准确的设备、文件和后台工作全部结束后才完成 hook future。
+可用 `node tools/test-account-cleanup.mjs --kotlin-lib <compiler-lib-directory>`
+编译运行取消、迟到终结、失败重试和关闭屏障测试。
+
 `AndroidAppPayments(activity, backend, wechatAppId)` 同时注册 `wx.requestPayment` 与 `weappContainer.payment.request`，只接收服务端 `orderId`，拒绝
 JSAPI 签名冒充 APP Pay。宿主显式引入官方微信/支付宝 Android SDK，并配置 Manifest、
 应用 ID、回调 Activity 和混淆规则。微信回调从官方 WXApi.handleIntent 的

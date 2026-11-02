@@ -84,6 +84,8 @@ class WeappContainerSession internal constructor(
     private var accountCustomCleanupDone = false
     private var accountCustomCleanupAwaiting = false
     private var accountCustomCleanupFailed = false
+    private val accountCleanupQueue = AccountCleanupQueue { worker.post(it) }
+    private var closeAwaitingAccountCleanup = false
     @Volatile var accountCleanupHandler: ((String) -> CompletableFuture<Unit>)? = null
     private val calls = mutableMapOf<String, HostCall>()
     private val pendingLoads = ArrayDeque<PendingLoad>()
@@ -377,6 +379,15 @@ class WeappContainerSession internal constructor(
         }
     }
     private fun beginCloseResources() {
+        if (closeAwaitingAccountCleanup) return
+        val accountCleanup = accountCleanupQueue.drained()
+        if (!accountCleanup.isDone) {
+            closeAwaitingAccountCleanup = true
+            accountCleanup.whenComplete { _, _ -> worker.post {
+                closeAwaitingAccountCleanup = false; beginCloseResources()
+            } }
+            return
+        }
         if (closeUiResetDone) { finishNativeClose(); return }
         if (closeUiResetAwaiting) return
         if (closeUiResetActions.isEmpty()) {
@@ -738,7 +749,7 @@ class WeappContainerSession internal constructor(
         }
     }
     private fun progressAccountSwitch() {
-        if (!accountDetachPending || !accountUiResetDone || accountCustomCleanupAwaiting || accountCustomCleanupFailed) return
+        if (closing || closed || !accountDetachPending || !accountUiResetDone || accountCustomCleanupAwaiting || accountCustomCleanupFailed) return
         try {
             if (!accountNativeDetached) {
                 if (accountDetachAttempts >= 3) return
@@ -751,18 +762,23 @@ class WeappContainerSession internal constructor(
             }
             val operationId = checkNotNull(accountSwitchOperationId)
             val hook = accountCleanupHandler
-            if (!accountCustomCleanupDone && hook != null) {
+            if (!accountCustomCleanupDone) {
                 accountCustomCleanupAwaiting = true
-                main.post {
-                    try {
-                        hook(operationId).whenComplete { _, error -> worker.post {
-                            if (accountSwitchOperationId != operationId) return@post
-                            accountCustomCleanupAwaiting = false
-                            if (error != null) { accountCustomCleanupFailed = true; emitError(error) }
-                            else { accountCustomCleanupDone = true; progressAccountSwitch() }
-                        } }
-                    } catch (error: Throwable) { worker.post { if (accountSwitchOperationId == operationId) { accountCustomCleanupAwaiting = false; accountCustomCleanupFailed = true; emitError(error) } } }
-                }
+                accountCleanupQueue.enqueue {
+                    // A queued superseded operation owns no work. An operation
+                    // already inside a hook still holds this tail until its future ends.
+                    if (closing || closed || accountSwitchOperationId != operationId || hook == null) CompletableFuture.completedFuture(Unit)
+                    else CompletableFuture<Unit>().also { terminal -> main.post {
+                        try { hook(operationId).whenComplete { _, error ->
+                            if (error == null) terminal.complete(Unit) else terminal.completeExceptionally(error)
+                        } } catch (error: Throwable) { terminal.completeExceptionally(error) }
+                    } }
+                }.whenComplete { _, error -> worker.post cleanupFinished@{
+                    if (closing || closed || accountSwitchOperationId != operationId) return@cleanupFinished
+                    accountCustomCleanupAwaiting = false
+                    if (error != null) { accountCustomCleanupFailed = true; emitError(error) }
+                    else { accountCustomCleanupDone = true; progressAccountSwitch() }
+                } }
                 return
             }
             command("acknowledgeAccountCleanup", JSONObject().put("operationId", checkNotNull(accountSwitchOperationId)))
