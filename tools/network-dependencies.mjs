@@ -6,6 +6,7 @@ import {join} from 'node:path';
 const inputs=[
  {file:'okhttp-4.12.0.jar',url:'https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar',sha256:'b1050081b14bb7a3a7e55a4d3ef01b5dcfabc453b4573a4fc019767191d5f4e0'},
  {file:'okio-jvm-3.6.0.jar',url:'https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar',sha256:'67543f0736fc422ae927ed0e504b98bc5e269fda0d3500579337cb713da28412'},
+ {file:'core-3.5.3.jar',url:'https://repo.maven.apache.org/maven2/com/google/zxing/core/3.5.3/core-3.5.3.jar',sha256:'8d8064c1636fdaef7189dd9055c7d59950a8940a12f2293956446ec3c109fd82'},
 ];
 export async function networkDependencies(directory){
  mkdirSync(directory,{recursive:true});

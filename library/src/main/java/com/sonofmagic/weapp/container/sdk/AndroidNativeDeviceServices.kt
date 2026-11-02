@@ -10,6 +10,8 @@ class AndroidNativeDeviceServices(
     allowLoopbackForDevelopment: Boolean = false,
     enableBluetooth: Boolean = true,
     permissions: AndroidPermissionBroker? = null,
+    enableNfc: Boolean = false,
+    soterAttestationProvider: AndroidSoterAttestationProvider? = null,
 ) : AutoCloseable {
     private val files = AndroidManagedFiles(activity)
     private val device = AndroidDeviceApis(activity, permissions)
@@ -17,19 +19,20 @@ class AndroidNativeDeviceServices(
     private val media = AndroidNativeMedia(activity, files, permissions)
     private val network = AndroidNetworkApis(files, networkOrigins, allowLoopbackForDevelopment)
     private val recorder = AndroidRecorderApis(activity, files, permissions)
+    private val system = AndroidSystemApis(activity, files, permissions, enableNfc, soterAttestationProvider)
     private var installed = false
     private var closed = false
     fun install(session: WeappContainerSession): CompletableFuture<Void> {
         check(!installed && !closed); installed = true
         return files.install(session).thenCompose {
-            CompletableFuture.allOf(device.install(session), media.install(session), network.install(session), recorder.install(session), bluetooth?.install(session) ?: CompletableFuture.completedFuture(null))
+            CompletableFuture.allOf(device.install(session), media.install(session), network.install(session), recorder.install(session), system.install(session), bluetooth?.install(session) ?: CompletableFuture.completedFuture(null))
         }
     }
-    fun rebindActivity(activity: Activity?) { check(!closed); device.rebindActivity(activity); bluetooth?.rebindActivity(activity); media.rebindActivity(activity); recorder.rebindActivity(activity) }
+    fun rebindActivity(activity: Activity?) { check(!closed); system.rebindActivity(activity); device.rebindActivity(activity); bluetooth?.rebindActivity(activity); media.rebindActivity(activity); recorder.rebindActivity(activity) }
     override fun close() {
         if (closed) return
         var failure: Throwable? = null
-        for (adapter in listOfNotNull<AutoCloseable>(recorder, media, bluetooth, device, network)) try { adapter.close() } catch (error: Throwable) { if (failure == null) failure = error else failure.addSuppressed(error) }
+        for (adapter in listOfNotNull<AutoCloseable>(system, recorder, media, bluetooth, device, network)) try { adapter.close() } catch (error: Throwable) { if (failure == null) failure = error else failure.addSuppressed(error) }
         if (failure != null) throw failure
         files.close(); closed = true
     }

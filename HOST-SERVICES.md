@@ -44,6 +44,29 @@ RecorderManager 使用真实 MediaRecorder，独立检查 `scope.record` 和 REC
 16–128kbps；临时原生文件完成后导入同一受管目录。隐藏、后台、取消、换号和关闭
 停止麦克风；释放或删除失败时保留资源供清理重试。
 
+系统适配器按宿主 Manifest 声明安装通讯录、日历与扫码 API。通讯录需要
+WRITE_CONTACTS，日历需要 READ_CALENDAR / WRITE_CALENDAR；小程序授权和实际 OS
+权限分别核验，并在原生 UI 确认联系人或选择可写日历之后才提交系统 provider
+事务。日历不生成官方小程序链接/签名；提醒提前量以秒输入，Android 仅支持能精确
+表示为整分钟的非负提前量。
+
+相机扫码使用 Camera2 实际 YUV 帧与 ZXing Core 3.5.3，支持普通二维码、条码、
+Data Matrix、PDF417；当前不提供相册入口或微信码解码。其他相机 owner 应先释放
+设备，再打开扫码 UI。取消、隐藏和关闭等待 CameraDevice.onClosed 与解码线程结束。
+[Maven 依赖与许可证](THIRD-PARTY-NOTICES.md) 包括 OkHttp、Okio、ZXing 以及
+OkHttp public suffix 数据的许可文本；Gradle 将这些文本保留到 AAR assets。
+
+NFC 需要宿主显式 `enableNfc = true`、NFC permission 与实际 NfcAdapter，当前只
+安装 NDEF reader/writer。它使用真实 reader mode、标签连接、读写、超时与关闭，
+不声明 ISO-DEP、MIFARE 或 HCE 支持。NDEF 字节/事件都有上限，换号等待 I/O
+线程和 discovery 回调排空。外部真实标签尚未验收。
+
+SOTER 的支持/录入查询同时检查实际指纹硬件和宿主的
+`AndroidSoterAttestationProvider`。没有 provider 时返回空 supportMode/false，
+不注册 startSoterAuthentication。provider 必须运行真实 SOTER 认证并签名指定
+challenge；SDK 校验结果的 raw challenge 与非空 base64 签名，普通指纹成功不能
+替代可信签名。当前只提供 fingerprint 模式集成入口。
+
 设备适配器包括真实剪贴板、网络状态、电量、窗口亮度与常亮、震动、原生系统 UI、
 WGS84 定位及传感器。传感器当前支持 normal 采样；GCJ-02 需要独立坐标服务。
 BLE 适配器拥有自己的扫描器和 GATT，按设备串行提交操作；关闭不会关闭宿主全局
@@ -129,3 +152,8 @@ SDK/fixture/JNI 源码和真实 GPU 截图哈希，并记录构建前后一致�
 WebSocket echo/close、实际 AAC ADTS 帧、换号关闭旧请求/socket，以及主动注入一次
 清理失败后，确认核心未提前 closed、第二次 close 成功。loopback 网络和模拟器
 麦克风不等于生产 TLS、物理录音或发行验收。
+
+系统扩展探针额外通过真实联系人与日历 provider 提交，并独立核对 600 秒提醒
+写为 10 分钟、没有 signer 时 SOTER 不可用。探针只删除自身随机 marker 的
+联系人与临时 calendar account；扫码识别、实体 NFC 与真实 SOTER 签名仍为
+独立设备验收范围。

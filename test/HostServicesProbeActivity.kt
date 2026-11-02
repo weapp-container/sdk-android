@@ -23,6 +23,7 @@ class HostServicesProbeActivity : Activity() {
     private lateinit var media: AndroidNativeMedia
     private lateinit var network: AndroidNetworkApis
     private lateinit var recorder: AndroidRecorderApis
+    private lateinit var system: AndroidSystemApis
     private lateinit var containerView: WeappContainerView
     private lateinit var application: JSONObject
     private lateinit var domain: DemoHostDomain
@@ -37,6 +38,9 @@ class HostServicesProbeActivity : Activity() {
     private var finishing = false
     private var brightness = -1f
     private val nativeTransportVerification = CompletableFuture<Unit>()
+    private val systemMarker = "weapp-native-probe-${java.util.UUID.randomUUID()}"
+    private var calendarUri: android.net.Uri? = null
+    private val createdContacts = mutableSetOf<Long>()
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         brightness = window.attributes.screenBrightness
@@ -51,8 +55,10 @@ class HostServicesProbeActivity : Activity() {
         val networkOrigin = requireNotNull(intent.getStringExtra("networkOrigin"))
         network = AndroidNetworkApis(files, setOf(origin, networkOrigin, networkOrigin.replace("http://", "ws://")), true)
         recorder = AndroidRecorderApis(this, files)
+        system = AndroidSystemApis(this, files)
         domain = DemoHostDomain(DemoEnvironment(URI(origin), requireNotNull(intent.getStringExtra("demoControl"))))
         reference = ReferenceHostServices(this, domain)
+        try { createProbeCalendar() } catch (error: Throwable) { fail(error); return }
         session.eventListener = ContainerEventListener { event ->
             events.put(event)
             if (event.optString("type") == "message") onMessage(event.optJSONObject("message") ?: JSONObject())
@@ -62,13 +68,13 @@ class HostServicesProbeActivity : Activity() {
             application = configuration.getJSONObject("application"); check(application.getString("packRoot") == root)
             reference.install(session)
         }.thenCompose {
-            files.install(session).thenCompose { CompletableFuture.allOf(device.install(session), media.install(session), network.install(session), recorder.install(session)) }
+            files.install(session).thenCompose { CompletableFuture.allOf(device.install(session), media.install(session), network.install(session), recorder.install(session), system.install(session)) }
         }.thenCompose { session.load(PackSource.Directory(pack), LoadOptions(options = launchOptions("A"))) }
             .exceptionally { fail(it); null }
         main.postDelayed({ if (!finishing) fail(IllegalStateException("Native host-services probe timed out")) }, 120000)
     }
     private fun account(principal: String, epoch: String) = JSONObject().put("principalId", principal).put("epoch", epoch)
-    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()).put("networkOrigin", intent.getStringExtra("networkOrigin")))
+    private fun launchOptions(phase: String) = JSONObject().put("query", JSONObject().put("phase", phase).put("businessOrigin", domain.environment.origin.toString()).put("networkOrigin", intent.getStringExtra("networkOrigin")).put("systemMarker", systemMarker))
     private fun onMessage(message: JSONObject) {
         android.util.Log.i("WeappHostProbe", "guest: $message")
         when (message.optString("kind")) {
@@ -80,6 +86,7 @@ class HostServicesProbeActivity : Activity() {
                 checks.put("native-reference-payment-waits-for-server-paid-confirmation")
             }
             "phone-ready" -> preparePhoneTap()
+            "system-commits" -> try { verifySystemCommits() } catch (error: Throwable) { fail(error) }
             "transport-recording" -> {
                 session.state().thenCompose { state ->
                     val context = JSONObject(state.getJSONObject("hostServicesState").toString()).put("sessionId", state.getString("sessionId"))
@@ -160,7 +167,7 @@ class HostServicesProbeActivity : Activity() {
             }.whenComplete { _, closeError ->
                 if (closeError != null) { finishReport(closeError); return@whenComplete }
                 try {
-                    recorder.close(); network.close(); media.close(); files.close(); device.close(); reference.close(); domain.close()
+                    system.close(); recorder.close(); network.close(); media.close(); files.close(); device.close(); reference.close(); domain.close()
                     check(window.attributes.screenBrightness == brightness)
                     check(window.attributes.flags and WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON == 0)
                     checks.put("close-drains-camera-and-restores-window-resources")
@@ -174,16 +181,45 @@ class HostServicesProbeActivity : Activity() {
         finishing = true
         session.closeAsync().whenComplete { _, cleanupError ->
             if (cleanupError != null) error.addSuppressed(cleanupError)
-            runCatching { recorder.close() }; runCatching { network.close() }; runCatching { media.close() }; runCatching { device.close() }; runCatching { files.close() }; runCatching { reference.close() }; runCatching { domain.close() }
+            runCatching { system.close() }; runCatching { recorder.close() }; runCatching { network.close() }; runCatching { media.close() }; runCatching { device.close() }; runCatching { files.close() }; runCatching { reference.close() }; runCatching { domain.close() }
             finishReport(error)
         }
     }
     private fun finishReport(error: Throwable?) {
-        val report = JSONObject().put("status", if (error == null) "passed" else "failed").put("checks", checks).put("events", events)
+        var failure = error
+        try { cleanSystemProviderFixtures() } catch (cleanup: Throwable) { if (failure == null) failure = cleanup else failure.addSuppressed(cleanup) }
+        val report = JSONObject().put("status", if (failure == null) "passed" else "failed").put("checks", checks).put("events", events)
             .put("scope", "Authored Android emulator development fixture; no physical camera, external BLE peripheral, merchant, parity or release claim")
-        if (error != null) report.put("error", android.util.Log.getStackTraceString(error))
+        if (failure != null) report.put("error", android.util.Log.getStackTraceString(failure))
         File(filesDir, "host-services-probe.json").writeText(report.toString(2))
         android.util.Log.i("WeappHostProbe", report.toString())
+    }
+    private fun createProbeCalendar() {
+        val base = android.provider.CalendarContract.Calendars.CONTENT_URI.buildUpon().appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true").appendQueryParameter("account_name", systemMarker).appendQueryParameter("account_type", "LOCAL").build()
+        calendarUri = checkNotNull(contentResolver.insert(base, android.content.ContentValues().apply {
+            put("account_name", systemMarker); put("account_type", "LOCAL"); put("name", systemMarker); put("calendar_displayName", systemMarker)
+            put("calendar_color", 0xff336699.toInt()); put("calendar_access_level", 700); put("ownerAccount", systemMarker); put("visible", 1); put("sync_events", 1); put("calendar_timezone", "UTC")
+        }))
+    }
+    private fun verifySystemCommits() {
+        val contacts = android.provider.ContactsContract.Data.CONTENT_URI
+        contentResolver.query(contacts, arrayOf("raw_contact_id"), "mimetype = ? AND data1 = ?", arrayOf(android.provider.ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE, systemMarker), null)?.use { cursor -> while (cursor.moveToNext()) createdContacts.add(cursor.getLong(0)) }
+        check(createdContacts.size == 1) { "Native contact provider does not contain the confirmed contact" }
+        val calendarId = android.content.ContentUris.parseId(checkNotNull(calendarUri))
+        contentResolver.query(android.provider.CalendarContract.Events.CONTENT_URI, arrayOf("_id", "dtstart", "dtend"), "calendar_id = ? AND title = ?", arrayOf(calendarId.toString(), systemMarker), null)?.use { cursor ->
+            check(cursor.moveToFirst() && cursor.getLong(1) == 1800000000000L && cursor.getLong(2) == 1800003600000L)
+            val event = cursor.getLong(0)
+            contentResolver.query(android.provider.CalendarContract.Reminders.CONTENT_URI, arrayOf("minutes"), "event_id = ?", arrayOf(event.toString()), null)?.use { reminder -> check(reminder.moveToFirst() && reminder.getInt(0) == 10) { "Calendar alarm lead seconds were not converted to native minutes" } } ?: error("No native reminder provider")
+        } ?: error("No native calendar provider")
+        checks.put("native-confirmed-contact-and-calendar-provider-commits-with-correct-reminder-units")
+        checks.put("soter-support-and-enrollment-do-not-fabricate-a-signer")
+    }
+    private fun cleanSystemProviderFixtures() {
+        // Only the test's cryptographically unique note/calendar account is owned here.
+        contentResolver.query(android.provider.ContactsContract.Data.CONTENT_URI, arrayOf("raw_contact_id"), "mimetype = ? AND data1 = ?", arrayOf(android.provider.ContactsContract.CommonDataKinds.Note.CONTENT_ITEM_TYPE, systemMarker), null)?.use { cursor -> while (cursor.moveToNext()) createdContacts.add(cursor.getLong(0)) }
+        for (id in createdContacts) check(contentResolver.delete(android.content.ContentUris.withAppendedId(android.provider.ContactsContract.RawContacts.CONTENT_URI, id), null, null) == 1)
+        createdContacts.clear()
+        calendarUri?.let { uri -> check(contentResolver.delete(uri.buildUpon().appendQueryParameter(android.provider.CalendarContract.CALLER_IS_SYNCADAPTER, "true").appendQueryParameter("account_name", systemMarker).appendQueryParameter("account_type", "LOCAL").build(), null, null) == 1) }; calendarUri = null
     }
     private fun copyPack(asset: String, output: File): File {
         val names = assets.list(asset) ?: emptyArray()

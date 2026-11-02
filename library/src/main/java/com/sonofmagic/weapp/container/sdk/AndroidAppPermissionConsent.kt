@@ -56,7 +56,7 @@ internal class AndroidAppPermissionConsent(private val activity: () -> Activity,
             .setPositiveButton("允许") { _, _ -> finish(true, true) }.setNegativeButton("拒绝") { _, _ -> finish(false, true) }
             .setOnCancelListener { finish(false, false) }.create()
         pending[call.id] = { finish(false, false) }
-        call.onCancel = { finish(false, false) }; dialog.show()
+        call.addCancellationHandler { finish(false, false) }; dialog.show()
     }
     fun reset() { for (finish in pending.values.toList()) finish(); pending.clear() }
 }

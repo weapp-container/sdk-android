@@ -1,7 +1,7 @@
 plugins { id("com.android.library"); kotlin("android"); `maven-publish` }
 group = "com.sonofmagic.weapp"
 version = "0.1.0-preview.6.0"
-dependencies { implementation("com.squareup.okhttp3:okhttp:4.12.0") }
+dependencies { implementation("com.squareup.okhttp3:okhttp:4.12.0"); implementation("com.google.zxing:core:3.5.3") }
 val nativeRoot = providers.gradleProperty("weappSdkNativeDir").map { rootProject.file(it) }
 val licensesRoot = providers.gradleProperty("weappSdkLicensesDir").map { rootProject.file(it) }
 val generatedJni = layout.buildDirectory.dir("generated/jniLibs")
@@ -48,6 +48,8 @@ val copyNativeLibraries = tasks.register<Copy>("copyNativeLibraries") {
 }
 val copySdkNotices = tasks.register<Copy>("copySdkNotices") {
     from(rootProject.file("LICENSE")) { into("weapp-container") }
+    from(rootProject.file("THIRD-PARTY-NOTICES.md")) { into("weapp-container/sdk-dependencies") }
+    from(rootProject.file("licenses")) { into("weapp-container/sdk-dependencies/licenses") }
     from(licensesRoot) { into("weapp-container/licenses") }
     from(nativeRoot.map { it.resolve("RUNTIME-LICENSE") }) { into("weapp-container") }
     into(generatedNotices)

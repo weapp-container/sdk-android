@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "9ab109a3da28b7d8788d12cb8b5c7ac5c90d4bc8",
-  "review": "Review native network, managed transfers, WebSocket, microphone, awaited cleanup and actual 14-check emulator probe source",
+  "sourceBaseCommit": "36fc80bdb0ce91e9159661c6fef71e5c90f2ecd8",
+  "review": "Review native contacts/calendar transactions, Camera2+ZXing scanner, opt-in NDEF, genuine provider-gated SOTER, Maven notices and exact16-check development probe",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "ef97283c1d278f873abc2918f767c5d8711a557951376c77f5e14ba2c132a60e",
-      "size": 9065,
+      "sha256": "e41313ce5f85537a9015f787696f22e145faa193c8e6f5e3c4e8c5573ec91be2",
+      "size": 11092,
       "mode": "100644"
     },
     {
@@ -49,6 +49,12 @@
       "path": "README.md",
       "sha256": "31a9dd8eb147d6fe1e51343849dec9d8d8e8a7a230c62abe79f9ce663d1909fc",
       "size": 10512,
+      "mode": "100644"
+    },
+    {
+      "path": "THIRD-PARTY-NOTICES.md",
+      "sha256": "2ce2165d822a5569d069e8b9fabee25fffc9f89941086aa0a7848ecff6302ad9",
+      "size": 1611,
       "mode": "100644"
     },
     {
@@ -137,8 +143,8 @@
     },
     {
       "path": "library/build.gradle.kts",
-      "sha256": "5a2329932244ab591dd9ca7eaf80fd20f5b49992816ea0a72a4b51db28693302",
-      "size": 3967,
+      "sha256": "482e30aef1404b99be824f92967df666e1fa9f4a0097b7ae0c62ee51aba4d4e6",
+      "size": 4205,
       "mode": "100644"
     },
     {
@@ -185,14 +191,20 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPermissionConsent.kt",
-      "sha256": "1684772e6d1a76dbdd47c33b45f2b5fe752e6d401e88e31f2d9ee9c765eb8048",
-      "size": 3796,
+      "sha256": "1e06d986f76859a353f9fa41394d0be4c58c07212b5f79771b5e2d323c3e7f93",
+      "size": 3808,
       "mode": "100644"
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBluetoothApis.kt",
       "sha256": "22336f203611f114447902709a81f9e2ee074bb9a47cfa0ad4a3b5c1733be38a",
       "size": 23824,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidCodeScanner.kt",
+      "sha256": "66353935c2bf20adf2df3d9cf22cb831f815869c3194f19334187f254640d7c7",
+      "size": 10020,
       "mode": "100644"
     },
     {
@@ -215,14 +227,20 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeDeviceServices.kt",
-      "sha256": "b46e5a56337e98ac3345709489f76d95155ee49c93d2a50fc8964a344b705f4b",
-      "size": 2030,
+      "sha256": "7e02ea87c68186b2486a5ba0b098daef370fb62cfdc918d546343ed480021ede",
+      "size": 2309,
       "mode": "100644"
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeMedia.kt",
       "sha256": "0be45a13f2cff7b5f2d2afeb1c2f900908f52aa7758c508124cbd987b7a080ee",
       "size": 27756,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNdefApis.kt",
+      "sha256": "a697478df91dd6ca7acb12d682c756346ed107603f805b54024afb7473017cc3",
+      "size": 16375,
       "mode": "100644"
     },
     {
@@ -235,6 +253,12 @@
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidRecorderApis.kt",
       "sha256": "765a171ba9dc773076d0ff308d55b9e295908e8fec865b138a63850acd07dd91",
       "size": 13762,
+      "mode": "100644"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidSystemApis.kt",
+      "sha256": "fa1be4e3c4c5e936b1184132feac77d4ef4dde81ed8e3e1fb78c1f910265a423",
+      "size": 23806,
       "mode": "100644"
     },
     {
@@ -274,6 +298,24 @@
       "mode": "100644"
     },
     {
+      "path": "licenses/Apache-2.0.txt",
+      "sha256": "a60eea817514531668d7e00765731449fe14d059d3249e0bc93b36de45f759f2",
+      "size": 10847,
+      "mode": "100644"
+    },
+    {
+      "path": "licenses/MPL-2.0.txt",
+      "sha256": "66a3107d5ad6a058aab753eaac2047ccb2ed0e39465dd0fe5844da3e300d5172",
+      "size": 16727,
+      "mode": "100644"
+    },
+    {
+      "path": "licenses/okhttp-publicsuffix-NOTICE.txt",
+      "sha256": "8a9c58fbded5ea3474315e4a9824ca8b1486098a1a03e897e0b19419d5e1876a",
+      "size": 218,
+      "mode": "100644"
+    },
+    {
       "path": "package.json",
       "sha256": "d10bbba5d0041bf32b42aaa387ed428a1786beb90ce2ab65814602c04b58fc9f",
       "size": 500,
@@ -293,8 +335,8 @@
     },
     {
       "path": "test/HostServicesProbeActivity.kt",
-      "sha256": "2bcb533b53cb78555d792892743b36ad3ac32df7f5d418edde15ff402e12baf9",
-      "size": 13301,
+      "sha256": "5e71bfc9ea050685319de576e8a011ee8a1350ce625ce17af98e4f6ba12b827b",
+      "size": 17431,
       "mode": "100644"
     },
     {
@@ -316,9 +358,15 @@
       "mode": "100644"
     },
     {
+      "path": "test/evidence/host-services-system-development.json",
+      "sha256": "14d4d155f8ce59f5ca72818e9a9e1c03af97530c92db9fc2992d0dd910b51813",
+      "size": 10685,
+      "mode": "100644"
+    },
+    {
       "path": "test/host-services-fixture.mjs",
-      "sha256": "78e8b3464352cda078fc46b62c9f5070d2849c777ec74068189168e0c2273925",
-      "size": 12172,
+      "sha256": "e01ff471ef259a2de175d147473f96c51cef29f10cbed33c28b4ec0f608b8d48",
+      "size": 12841,
       "mode": "100644"
     },
     {
@@ -377,8 +425,8 @@
     },
     {
       "path": "tools/host-services-probe.mjs",
-      "sha256": "d1312ebd5af60abdfb8c0facb4e2bee227627cd79ae7de25b814b5c3433fecfe",
-      "size": 13436,
+      "sha256": "3e690144b0c4fcbc65ddb557ccb52d59f0e6381f41d7b3d149ab1ddf9ae2da7c",
+      "size": 13970,
       "mode": "100644"
     },
     {
@@ -389,8 +437,8 @@
     },
     {
       "path": "tools/network-dependencies.mjs",
-      "sha256": "8d742d81d260ef9bdaeda859cbbd1051787046bad6a5b1ebb166fa888d698c21",
-      "size": 1366,
+      "sha256": "ba566daf9be05c540c4e39aa42d2efd6aa88d33267b80201ed9eb2b06bb5a5da",
+      "size": 1552,
       "mode": "100644"
     },
     {
