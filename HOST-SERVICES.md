@@ -7,6 +7,13 @@
 加载 pack。`registerApiHandler` 接入微信 API；业务扩展继续使用
 `registerHostMethod`。未安装的 API 明确不支持。
 
+`readHostApiResource(context, offset, length)` 透传资源 setter 的原始可信 context，
+返回 `{bytes,totalBytes}`；单块最多 1 MiB。先检查 runtime 的
+`hostServices.apiResourceChunks == "1.0"`，保留 context 中的十进制 epoch、deadline
+和 session/call ID，不用 transport ID 替换。只读命令仍受运行时账号、期限与调用
+存活检查；换号、结算、取消或超时后拒绝，旧 runtime 明确不支持。它不会创建
+owner、进入 JS 或触发表面呈现，也不赋予任意路径读取权限。
+
 ```kotlin
 val toolkit = AndroidNativeDeviceServices(activity,
     networkOrigins = setOf("https://api.example.com", "wss://api.example.com"),

@@ -231,9 +231,13 @@ class WeappContainerSession internal constructor(
     /** Allowlisted host-services transport for native embeddings, Flutter and React Native. */
     @JvmOverloads fun hostServicesCommand(operation: String, payload: JSONObject = JSONObject()): CompletableFuture<Any?> {
         val copied = JSONObject(payload.toString())
-        val allowed = setOf("configureHostServices", "registerApiHandler", "updateHostServiceSnapshots", "authorizeInstalledPack", "migrateLegacyStorage", "deleteAccountData", "hostApiEvent", "hostComponents", "managedFileScope", "hostComponentEvent", "authorizePhoneButton", "acknowledgeAccountCleanup", "retryAccountCleanup", "switchAccount", "queryAccountSwitch", "updateAccountSwitchLaunch", "retryAccountSwitch", "cancelAccountSwitch", "createHostBinary", "readHostBinary", "retainHostBinary", "releaseHostBinary")
+        val allowed = setOf("configureHostServices", "registerApiHandler", "updateHostServiceSnapshots", "authorizeInstalledPack", "migrateLegacyStorage", "deleteAccountData", "hostApiEvent", "hostComponents", "managedFileScope", "hostComponentEvent", "authorizePhoneButton", "acknowledgeAccountCleanup", "retryAccountCleanup", "switchAccount", "queryAccountSwitch", "updateAccountSwitchLaunch", "retryAccountSwitch", "cancelAccountSwitch", "hostApiResource", "createHostBinary", "readHostBinary", "retainHostBinary", "releaseHostBinary")
         return task {
             ensureOpen(); require(operation in allowed || operation in setOf("hostComponentFrame", "prepareAccountHostServiceSnapshots")) { "Not a host-services command: $operation" }
+            if (operation == "hostApiResource") {
+                if (handle == 0L) throw ContainerException("ERR_NOT_READY", "A live API call owner is required")
+                return@task command(operation, copied)
+            }
             if (operation == "configureHostServices") {
                 check(!loaded && pendingLoads.isEmpty()) { "Configure host services before load" }
                 val result = if (handle != 0L) command(operation, copied) as? JSONObject else null
@@ -273,6 +277,9 @@ class WeappContainerSession internal constructor(
         }
     }
     fun emitHostApiEvent(event: JSONObject): CompletableFuture<Any?> = hostServicesCommand("hostApiEvent", event)
+    /** Read the asset of an exact live API call; requires apiResourceChunks 1.0. */
+    @JvmOverloads fun readHostApiResource(context: JSONObject, offset: Int = 0, length: Int): CompletableFuture<JSONObject> =
+        hostServicesCommand("hostApiResource", JSONObject().put("context", context).put("offset", offset).put("length", length)).thenApply { it as JSONObject }
     fun createHostBinary(bytes: ByteArray): CompletableFuture<Any?> {
         require(bytes.size <= 1024 * 1024) { "Host binary chunks are bounded to 1 MiB" }
         return hostServicesCommand("createHostBinary", JSONObject().put("bytes", JSONArray().apply { bytes.forEach { put(it.toInt() and 255) } }))

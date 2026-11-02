@@ -2,6 +2,17 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 const source = readFileSync(new URL('../library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt', import.meta.url), 'utf8');
+test('API resource reads keep the live native context and avoid lifecycle work', () => {
+  const method=source.slice(source.indexOf('@JvmOverloads fun hostServicesCommand('),source.indexOf('fun emitHostApiEvent('));
+  assert.match(method,/val allowed = setOf\([^\n]*"hostApiResource"/);
+  const start=method.indexOf('if (operation == "hostApiResource")');
+  const branch=method.slice(start,method.indexOf('if (operation == "configureHostServices")'));
+  assert.ok(start>method.indexOf('ensureOpen()'));
+  assert.match(branch,/handle == 0L.*ERR_NOT_READY/);
+  assert.match(branch,/return@task command\(operation, copied\)/);
+  assert.doesNotMatch(branch,/createNative|drainEvents|present\(|progressAccountSwitch|acknowledge/);
+  assert.match(source,/readHostApiResource\(context: JSONObject[^\n]*\n\s*hostServicesCommand\("hostApiResource", JSONObject\(\)\.put\("context", context\)/);
+});
 test('public journal queries return before native creation, event drain and presentation', () => {
   const method = source.slice(source.indexOf('@JvmOverloads fun executeCommand('), source.indexOf('/** Same-size native observations'));
   const branch = method.indexOf('if (operation == "queryDevPackAttempt")');

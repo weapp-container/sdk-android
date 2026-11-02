@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "5b47754a86676a8c147c030e7708238a500c42d4",
-  "review": "Serialize account cleanup actual terminals across rapid switches and close; preserve cancellation, retry and historical runtime locks",
+  "sourceBaseCommit": "47cca3662e3aff95543b0d7dcc8db56c1c6f700b",
+  "review": "Expose gated read-only API resource chunks while preserving exact native call context and account revocation",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "87e32fdbf70b762a7355574eb2e350ff482e161d3e4eaeaf2c012eea39224f7b",
-      "size": 14910,
+      "sha256": "17494dae3e5a943799f41703978b19babc8c52b2b60a6d6d08ff139ac737c15f",
+      "size": 15461,
       "mode": "100644"
     },
     {
@@ -335,8 +335,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
-      "sha256": "1ec9aa1405accf44e8074ad4d50e449e945b800684ab5f39aa6016dfd2d0b195",
-      "size": 51769,
+      "sha256": "d1f91576af61a5623d9c7b0ec11f67c2b5bcdc4e303d1d716b92485d0ecb1fdd",
+      "size": 52391,
       "mode": "100644"
     },
     {
@@ -473,8 +473,8 @@
     },
     {
       "path": "test/passive-journal.test.mjs",
-      "sha256": "8ed9d94245e9d646439e80c1c8a994cb107b814393e927c286ba590002bd7405",
-      "size": 1887,
+      "sha256": "f8817f031811b14c4630eb6e41a13be0274e5e941375df67ee5dd5a324eb319e",
+      "size": 2776,
       "mode": "100644"
     },
     {
