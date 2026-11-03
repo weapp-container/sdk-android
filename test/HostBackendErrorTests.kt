@@ -3,6 +3,13 @@ package com.sonofmagic.weapp.container.sdk
 import org.json.JSONObject
 
 fun main() {
+    fun reject(error: HostBackendError): JSONObject {
+        var completed: JSONObject? = null
+        val reply = HostReply { completed = it }
+        reply.reject(if (error.code == "permission_denied") HostErrorCode.PERMISSION_DENIED else HostErrorCode.INVALID_REQUEST,
+            error.message, false, error.details)
+        return checkNotNull(completed).getJSONObject("error")
+    }
     val plain = parseHostBackendError(
         JSONObject()
             .put("error", "invalid_app_session")
@@ -42,6 +49,10 @@ fun main() {
     check(reply.details.getBoolean("envelopeDetails"))
     check(reply.details.getString("collision") == "nested")
     check(listOf("code", "message", "error", "details").none { reply.details.has(it) })
+    val completion = reject(reply)
+    check(completion.getString("code") == "permission_denied" && completion.getString("message") == "consent required")
+    check(completion.getJSONObject("details").getInt("errCode") == 4017)
+    check(completion.getJSONObject("details").getString("errMsg") == "login:fail custom backend message")
     reply.details.put("provider", "changed by receiver")
     check(nested.details.getString("provider") == "identity-provider")
 
@@ -59,6 +70,7 @@ fun main() {
     val unknownReply = projectHostIdentityError("wx.login", "unknown_provider_code", null, null)
     check(unknownReply.code == "invalid_request" && unknownReply.details.getInt("errCode") == -1)
     check(unknownReply.details.getString("errMsg") == "wx.login:fail Host identity request failed")
+    check(reject(unknownReply).getJSONObject("details").getInt("errCode") == -1)
     val permissionReply = projectHostIdentityError("wx.login", "invalid_app_session", "expired", JSONObject()
         .put("errCode", JSONObject.NULL).put("errMsg", JSONObject.NULL))
     check(permissionReply.code == "permission_denied" && permissionReply.details.getInt("errCode") == 2001)
