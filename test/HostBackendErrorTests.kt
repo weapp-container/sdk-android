@@ -89,6 +89,17 @@ fun main() {
             check(wireError.getJSONObject("details").getString("providerId") == "identity-provider")
         }
     }
+    for (code in listOf("unsupported_capability", "ERR_UNSUPPORTED_CAPABILITY")) {
+        val provider = parseHostBackendError(JSONObject("""
+            {"error":{"code":"$code","message":"Runtime capability unavailable",
+                "errCode":4017,"errMsg":"login:fail provider original","capability":"identity"}}
+        """))
+        val wireError = reject(projectHostIdentityError("wx.login", provider.code, provider.message, provider.details))
+        check(wireError.getString("code") == "unsupported") { "$code lost the core unsupported classification" }
+        check(wireError.getJSONObject("details").getInt("errCode") == 4017)
+        check(wireError.getJSONObject("details").getString("errMsg") == "login:fail provider original")
+        check(wireError.getJSONObject("details").getString("capability") == "identity")
+    }
     for (alias in listOf("consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal")) {
         for (code in listOf(alias, "ERR_" + alias.uppercase(java.util.Locale.ROOT))) {
             val wireError = reject(projectHostIdentityError("wx.login", code, "authorization rejected", null))

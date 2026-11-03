@@ -46,7 +46,7 @@ internal fun projectHostIdentityError(api: String, code: String?, message: Strin
         "permission_denied", "consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal" -> HostErrorCode.PERMISSION_DENIED
         "timeout" -> HostErrorCode.TIMEOUT
         "cancelled" -> HostErrorCode.CANCELLED
-        "unsupported" -> HostErrorCode.UNSUPPORTED
+        "unsupported", "unsupported_capability" -> HostErrorCode.UNSUPPORTED
         else -> HostErrorCode.INVALID_REQUEST
     }
     val resolvedMessage = message?.takeIf { it.isNotBlank() } ?: "Host identity request failed"

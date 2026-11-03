@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "5db66b7d35077cf64b065510d7837c50e476462a",
-  "review": "Preserve canonical and ERR-prefixed identity container classifications through typed HostErrorCode and actual HostReply serialization regression",
+  "sourceBaseCommit": "69f2fce4717bbf9f54c1ebfe94d9a045c007e7af",
+  "review": "Recognize core unsupported capability aliases while preserving raw API error fields in actual Kotlin HostReply serialization regression",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "06583f27b1fe847cce426685e8b3be78aa823e97915d8260e11448707fac1835",
-      "size": 18116,
+      "sha256": "ef065c698f8b98f2c893aefd03266a07430559535ba1c46add162167e9620ae6",
+      "size": 18216,
       "mode": "100644"
     },
     {
@@ -317,8 +317,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostBackendError.kt",
-      "sha256": "1325eeb992b48aabbfc19db3044a5a2c24a251451fdd7dcf098a849311d98aa7",
-      "size": 2807,
+      "sha256": "356f29a0009b21e5d680db05352a24910488b5a7c7ce28d79f0cb94e83538087",
+      "size": 2833,
       "mode": "100644"
     },
     {
@@ -413,8 +413,8 @@
     },
     {
       "path": "test/HostBackendErrorTests.kt",
-      "sha256": "924730891f152f592c87692f8a05bfb7186a51b32b4f3ef9caa91bd146bf8e1d",
-      "size": 6523,
+      "sha256": "7d006217ac436fbd6e5d8ef0bc13bea0450be7de5787c086d8c42a4143e8d003",
+      "size": 7365,
       "mode": "100644"
     },
     {

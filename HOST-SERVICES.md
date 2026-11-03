@@ -234,8 +234,9 @@ excludes the structural `error`/`details` and classification `code`/`message` ke
 projection. Identity rejection preserves projected `errCode` and `errMsg`; only absent values
 receive the adapter defaults. Canonical `invalid_request`, `permission_denied`, `timeout`,
 `cancelled`, `unsupported` and their uppercase `ERR_*` forms keep the corresponding container
-classification. Consent and invalid/stale identity session codes map to `permission_denied`;
-unknown provider codes map to `invalid_request`. The projection carries a typed `HostErrorCode`
+classification. Consent and invalid/stale identity session codes map to `permission_denied`.
+The core `ERR_UNSUPPORTED_CAPABILITY` code and `unsupported_capability` alias map to `unsupported`.
+Unknown provider codes map to `invalid_request`. The projection carries a typed `HostErrorCode`
 directly to `HostReply.reject` so serialization cannot collapse these categories.
 Run `npm run test:host-backend-error -- --kotlin-lib <compiler-lib>
 --json-jar <org-json.jar>` for the pure projection and final identity rejection regression.
