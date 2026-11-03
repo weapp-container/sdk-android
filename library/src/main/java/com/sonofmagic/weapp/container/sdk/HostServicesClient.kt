@@ -157,11 +157,9 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
             session.registerApiHandler(api) { call, reply ->
                 fun fail(error: Throwable) {
                     val container = error as? ContainerException
-                    val permission = container?.code in setOf("consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal")
-                    val details = JSONObject(container?.details?.toString() ?: "{}")
-                    if (!details.has("errMsg")) details.put("errMsg", "$api:fail ${error.message ?: "host identity request failed"}")
-                    reply.reject(if (permission) HostErrorCode.PERMISSION_DENIED else HostErrorCode.INVALID_REQUEST, error.message ?: "Host identity request failed", false,
-                        details.put("errCode", details.opt("errCode").takeUnless { it == null || it == JSONObject.NULL } ?: if (permission) 2001 else -1))
+                    val failure = projectHostIdentityError(api, container?.code, error.message, container?.details)
+                    reply.reject(if (failure.code == "permission_denied") HostErrorCode.PERMISSION_DENIED else HostErrorCode.INVALID_REQUEST,
+                        failure.message, false, failure.details)
                 }
                 fun request(path: String, body: JSONObject, transform: (JSONObject) -> JSONObject) {
                     try { backend.request(call, path, body) { result -> result.fold({ value ->

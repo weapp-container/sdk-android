@@ -226,3 +226,11 @@ WebSocket echo/close、实际 AAC ADTS 帧、换号关闭旧请求/socket，以�
 及畸形长度/前缀边界测试；这不构成真实 Beacon 发射器、权限变更或射频验收。
 
 Native snapshot owner validation belongs to the negotiated runtime. The SDK passes the complete captured context unchanged and preserves the runtime error, including `ERR_CANCELLED` for a retired owner; it updates its rebuild cache only after successful validation. A credential refresh cannot replace this owner check.
+
+Backend errors keep their container classification (`code`, `message`) separate from public API
+fields. The adapter merges non-null extension fields in this order, with later sources winning:
+response envelope, envelope `details`, nested `error.details`, then nested `error` fields. It
+excludes the structural `error`/`details` and classification `code`/`message` keys from the public
+projection. Identity rejection preserves projected `errCode` and `errMsg`; only absent values
+receive the adapter defaults. Run `npm run test:host-backend-error -- --kotlin-lib <compiler-lib>
+--json-jar <org-json.jar>` for the pure projection and final identity rejection regression.

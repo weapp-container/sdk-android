@@ -149,7 +149,7 @@ internal fun unwrap(text: String): Any? {
         throw ContainerException(
             error.optString("code", "ERR_NATIVE"),
             error.optString("message", "Native operation failed"),
-            details = JSONObject(error.toString()),
+            details = parseHostBackendError(error).details,
         )
     }
     return result.opt("value").takeUnless { it == JSONObject.NULL }
