@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "e8e5385d2badb1557681def684320ec61479e2d4",
-  "review": "Review platform-only runtime dependency pins from clean core 2f1065fdeae0f4793b68a16b6a5f1830170e0c37; break wrapper archive self-dependency without rewriting ORIGIN",
+  "sourceBaseCommit": "d41cc5fe9adac2f67fe01802a9d057c0b5c885db",
+  "review": "Review Android backend error projection and preserve raw errCode, errMsg and extension fields through identity callbacks",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -316,6 +316,12 @@
       "mode": "100644"
     },
     {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostBackendError.kt",
+      "sha256": "679f1abe3cc39b4219df23b596d53faac63c3217bb1f20bb714e6bf057d4309e",
+      "size": 961,
+      "mode": "100644"
+    },
+    {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostIdentitySnapshot.kt",
       "sha256": "e02701760e4f071b937a9d02ffbb88a96a4924774980a1a92029174ca026b6ae",
       "size": 2157,
@@ -323,14 +329,14 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
-      "sha256": "7efbc485dd96360aa7f1635e6eb31a8da253b6f5821a6f6f3b4387e1a6532d4a",
-      "size": 18395,
+      "sha256": "1ddac62a2a61fda6d1cd63b74a6c3a7c10df7ace231acaef810042f6959dbd6a",
+      "size": 18703,
       "mode": "100644"
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
-      "sha256": "f55e552019dae0481b723f8800dbe7f4a4f8db569a420ffa9f526762910152e6",
-      "size": 7937,
+      "sha256": "5beea381ecf44accc96aabcdf13ac19b62ce885b968701706ce16991ce576d30",
+      "size": 8177,
       "mode": "100644"
     },
     {
@@ -403,6 +409,12 @@
       "path": "test/AndroidNfcTerminalTest.kt",
       "sha256": "660dcd0e634ea4406898d2742697820c864d3f1b9a1e6c817e58c2ac98c126db",
       "size": 830,
+      "mode": "100644"
+    },
+    {
+      "path": "test/HostBackendErrorTests.kt",
+      "sha256": "3ee30c7eed2db0d4721ecb3387eab85fa23ec37aa3420821ed203dd35483f112",
+      "size": 1356,
       "mode": "100644"
     },
     {
@@ -565,6 +577,12 @@
       "path": "tools/test-account-cleanup.mjs",
       "sha256": "430cc62b80e8e251200b0d48d2730ccf0e3aea8789e9178846573e809f5b04ef",
       "size": 1528,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/test-host-backend-error.mjs",
+      "sha256": "165fd8f0508b1fcd08ca06bad90173575f3f6e555b7cc59be15aee654052fc0f",
+      "size": 1945,
       "mode": "100644"
     },
     {
