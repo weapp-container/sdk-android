@@ -158,7 +158,7 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
                 fun fail(error: Throwable) {
                     val container = error as? ContainerException
                     val failure = projectHostIdentityError(api, container?.code, error.message, container?.details)
-                    reply.reject(if (failure.code == "permission_denied") HostErrorCode.PERMISSION_DENIED else HostErrorCode.INVALID_REQUEST,
+                    reply.reject(failure.code,
                         failure.message, false, failure.details)
                 }
                 fun request(path: String, body: JSONObject, transform: (JSONObject) -> JSONObject) {

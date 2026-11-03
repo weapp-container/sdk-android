@@ -232,5 +232,10 @@ fields. The adapter merges non-null extension fields in this order, with later s
 response envelope, envelope `details`, nested `error.details`, then nested `error` fields. It
 excludes the structural `error`/`details` and classification `code`/`message` keys from the public
 projection. Identity rejection preserves projected `errCode` and `errMsg`; only absent values
-receive the adapter defaults. Run `npm run test:host-backend-error -- --kotlin-lib <compiler-lib>
+receive the adapter defaults. Canonical `invalid_request`, `permission_denied`, `timeout`,
+`cancelled`, `unsupported` and their uppercase `ERR_*` forms keep the corresponding container
+classification. Consent and invalid/stale identity session codes map to `permission_denied`;
+unknown provider codes map to `invalid_request`. The projection carries a typed `HostErrorCode`
+directly to `HostReply.reject` so serialization cannot collapse these categories.
+Run `npm run test:host-backend-error -- --kotlin-lib <compiler-lib>
 --json-jar <org-json.jar>` for the pure projection and final identity rejection regression.

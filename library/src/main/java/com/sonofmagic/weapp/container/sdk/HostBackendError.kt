@@ -1,10 +1,18 @@
 package com.sonofmagic.weapp.container.sdk
 
 import org.json.JSONObject
+import java.util.Locale
 
 /** Container classification and public API fields are separate namespaces. */
 internal data class HostBackendError(
     val code: String,
+    val message: String,
+    val details: JSONObject,
+)
+
+/** A classified identity rejection is ready to serialize without another mapping. */
+internal data class HostIdentityError(
+    val code: HostErrorCode,
     val message: String,
     val details: JSONObject,
 )
@@ -33,13 +41,19 @@ internal fun parseHostBackendError(response: JSONObject): HostBackendError {
 }
 
 /** The exact projection passed to HostReply.reject, independent of Android UI. */
-internal fun projectHostIdentityError(api: String, code: String?, message: String?, fields: JSONObject?): HostBackendError {
-    val permission = code in setOf("consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal")
+internal fun projectHostIdentityError(api: String, code: String?, message: String?, fields: JSONObject?): HostIdentityError {
+    val classification = when (code?.removePrefix("ERR_")?.lowercase(Locale.ROOT)) {
+        "permission_denied", "consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal" -> HostErrorCode.PERMISSION_DENIED
+        "timeout" -> HostErrorCode.TIMEOUT
+        "cancelled" -> HostErrorCode.CANCELLED
+        "unsupported" -> HostErrorCode.UNSUPPORTED
+        else -> HostErrorCode.INVALID_REQUEST
+    }
     val resolvedMessage = message?.takeIf { it.isNotBlank() } ?: "Host identity request failed"
     val details = JSONObject(fields?.toString() ?: "{}")
     if (details.text("errMsg") == null) details.put("errMsg", "$api:fail $resolvedMessage")
-    if (!details.has("errCode") || details.isNull("errCode")) details.put("errCode", if (permission) 2001 else -1)
-    return HostBackendError(if (permission) "permission_denied" else "invalid_request", resolvedMessage, details)
+    if (!details.has("errCode") || details.isNull("errCode")) details.put("errCode", if (classification == HostErrorCode.PERMISSION_DENIED) 2001 else -1)
+    return HostIdentityError(classification, resolvedMessage, details)
 }
 
 private fun JSONObject.text(key: String): String? = (opt(key) as? String)?.takeIf { it.isNotBlank() }

@@ -3,11 +3,10 @@ package com.sonofmagic.weapp.container.sdk
 import org.json.JSONObject
 
 fun main() {
-    fun reject(error: HostBackendError): JSONObject {
+    fun reject(error: HostIdentityError): JSONObject {
         var completed: JSONObject? = null
         val reply = HostReply { completed = it }
-        reply.reject(if (error.code == "permission_denied") HostErrorCode.PERMISSION_DENIED else HostErrorCode.INVALID_REQUEST,
-            error.message, false, error.details)
+        reply.reject(error.code, error.message, false, error.details)
         return checkNotNull(completed).getJSONObject("error")
     }
     val plain = parseHostBackendError(
@@ -41,7 +40,7 @@ fun main() {
     )
     check(nested.code == "consent_required" && nested.message == "consent required")
     val reply = projectHostIdentityError("wx.login", nested.code, nested.message, nested.details)
-    check(reply.code == "permission_denied" && reply.message == "consent required")
+    check(reply.code == HostErrorCode.PERMISSION_DENIED && reply.message == "consent required")
     check(reply.details.getInt("errCode") == 4017)
     check(reply.details.getString("errMsg") == "login:fail custom backend message")
     check(reply.details.getString("requestId") == "request-1")
@@ -60,7 +59,7 @@ fun main() {
         .put("details", JSONObject().put("errCode", 4017).put("errMsg", "checkSession:fail provider"))))
     check(detailsOnly.code == "ERR_HOST_SERVICES" && detailsOnly.message == "checkSession:fail provider")
     val detailsReply = projectHostIdentityError("wx.checkSession", detailsOnly.code, detailsOnly.message, detailsOnly.details)
-    check(detailsReply.code == "invalid_request" && detailsReply.details.getInt("errCode") == 4017)
+    check(detailsReply.code == HostErrorCode.INVALID_REQUEST && detailsReply.details.getInt("errCode") == 4017)
     check(detailsReply.details.getString("errMsg") == "checkSession:fail provider")
 
     for (badCode in listOf(JSONObject(), JSONObject.NULL, false, 4017, "")) {
@@ -68,13 +67,35 @@ fun main() {
         check(unknown.code == "ERR_HOST_SERVICES" && unknown.message == "Host services request failed")
     }
     val unknownReply = projectHostIdentityError("wx.login", "unknown_provider_code", null, null)
-    check(unknownReply.code == "invalid_request" && unknownReply.details.getInt("errCode") == -1)
+    check(unknownReply.code == HostErrorCode.INVALID_REQUEST && unknownReply.details.getInt("errCode") == -1)
     check(unknownReply.details.getString("errMsg") == "wx.login:fail Host identity request failed")
     check(reject(unknownReply).getJSONObject("details").getInt("errCode") == -1)
     val permissionReply = projectHostIdentityError("wx.login", "invalid_app_session", "expired", JSONObject()
         .put("errCode", JSONObject.NULL).put("errMsg", JSONObject.NULL))
-    check(permissionReply.code == "permission_denied" && permissionReply.details.getInt("errCode") == 2001)
+    check(permissionReply.code == HostErrorCode.PERMISSION_DENIED && permissionReply.details.getInt("errCode") == 2001)
     check(permissionReply.details.getString("errMsg") == "wx.login:fail expired")
+
+    for (wire in listOf("invalid_request", "permission_denied", "timeout", "cancelled", "unsupported")) {
+        for (code in listOf(wire, "ERR_" + wire.uppercase(java.util.Locale.ROOT))) {
+            val provider = parseHostBackendError(JSONObject().put("error", JSONObject()
+                .put("code", code).put("message", "classified backend failure")
+                .put("errCode", 4017).put("errMsg", "login:fail provider original")
+                .put("providerId", "identity-provider")))
+            val classified = projectHostIdentityError("wx.login", provider.code, provider.message, provider.details)
+            val wireError = reject(classified)
+            check(wireError.getString("code") == wire) { "$code lost its container classification" }
+            check(wireError.getJSONObject("details").getInt("errCode") == 4017)
+            check(wireError.getJSONObject("details").getString("errMsg") == "login:fail provider original")
+            check(wireError.getJSONObject("details").getString("providerId") == "identity-provider")
+        }
+    }
+    for (alias in listOf("consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal")) {
+        for (code in listOf(alias, "ERR_" + alias.uppercase(java.util.Locale.ROOT))) {
+            val wireError = reject(projectHostIdentityError("wx.login", code, "authorization rejected", null))
+            check(wireError.getString("code") == "permission_denied")
+            check(wireError.getJSONObject("details").getInt("errCode") == 2001)
+        }
+    }
 
     val fallback = parseHostBackendError(JSONObject().put("errMsg", "backend unavailable"))
     check(fallback.code == "ERR_HOST_SERVICES" && fallback.message == "backend unavailable")
