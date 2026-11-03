@@ -24,13 +24,15 @@ class WeappContainerSession internal constructor(
     atomicHostLayout: Boolean = false,
     presenterFactory: (() -> Long) -> EglPresenter,
 ) {
-    @JvmOverloads constructor(context: Context, storageKey: String?, initialMetrics: WindowMetrics? = null, gpuRequired: Boolean? = null, devDiagnostics: Boolean = false, atomicHostLayout: Boolean = false) :
+    @JvmOverloads constructor(context: Context, storageKey: String?, initialMetrics: WindowMetrics? = null, gpuRequired: Boolean? = null, devDiagnostics: Boolean = false, atomicHostLayout: Boolean = false, systemTabBar: Boolean = false) :
         this(context, storageKey, initialMetrics.also { require(gpuRequired != false) { "Android native preview requires GPU" } }, atomicHostLayout, { EglPresenter(handle = it) }) {
         requiredGpu = gpuRequired
         diagnosticsEnabled = devDiagnostics
+        systemTabBarEnabled = systemTabBar
     }
     private var requiredGpu: Boolean? = null
     private var diagnosticsEnabled = false
+    private var systemTabBarEnabled = false
     private val atomicHostLayout = atomicHostLayout
     private var hostSurfaceIdentity: JSONObject? = null
     // Validation must precede allocating a thread or any native resources.
@@ -519,6 +521,7 @@ class WeappContainerSession internal constructor(
             .put("managedFilesRoot", File(app.filesDir, "weapp-container/managed-files").absolutePath)
         requiredGpu?.let { config.put("gpuRequired", it) }
         if (diagnosticsEnabled) config.put("devDiagnostics", true)
+        if (systemTabBarEnabled) config.put("systemTabBar", true)
         if (atomicHostLayout) config.put("hostLayout", JSONObject().put("protocolVersion", "1.0").put("atomic", true))
         hostServicesConfig?.let { config.put("hostServices", JSONObject(it.toString())) }
         if (storageKey != null) config.put("storageKey", storageKey).put("storageRoot", File(app.filesDir, "weapp-container/storage").absolutePath)

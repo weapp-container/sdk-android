@@ -117,3 +117,17 @@ Commit source and inventory together before building distributable packages. `so
 `runtime-artifacts.lock.json` pins only this SDK's native runtime slices. Wrapper archives are build outputs and are kept in the delivery manifest, so the SDK never depends on the hash of its own archive. Other platforms use their own SDK locks. Historical `ORIGIN.json` records remain unchanged.
 
 The `0.1.0-preview.6.0` generation is an unpublished local preview. Prepare it with the exact reviewed offline archive directory (`npm run runtime:prepare -- --artifact-dir <archives>`); a version pin does not imply that a release has been published.
+
+### System tab bar presenter admission
+
+`systemTabBar` is a trusted host configuration option. It defaults to `false`, and
+`false` is omitted from the wire configuration for compatibility. Set it to `true`
+with a paired runtime/SDK and an installed system tab chrome consumer, such as the
+dev Player Flutter tabs or its Windows/Gtk overlays.
+
+The runtime supports bounded `setTabBarBadge`, `removeTabBarBadge`,
+`showTabBarRedDot`, `hideTabBarRedDot`, and `setTabBarStyle` transactions with a
+Partial capability ceiling. Custom tab bars remain Unsupported. `showTabBar`,
+`hideTabBar`, and `setTabBarItem` are not implemented by this option. The flag
+admits the host consumer; it does not establish WeChat visual/parameter parity
+or platform acceptance.
