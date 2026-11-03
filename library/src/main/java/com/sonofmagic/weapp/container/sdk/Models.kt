@@ -9,7 +9,13 @@ import java.nio.ByteOrder
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ContainerException(val code: String, message: String, cause: Throwable? = null) : RuntimeException(message, cause)
+class ContainerException(
+    val code: String,
+    message: String,
+    cause: Throwable? = null,
+    /** Raw backend/native extension fields, kept separate from the container error class. */
+    val details: JSONObject = JSONObject(),
+) : RuntimeException(message, cause)
 
 sealed class PackSource {
     data class Asset(val path: String) : PackSource() {
@@ -140,7 +146,11 @@ internal fun unwrap(text: String): Any? {
     val result = JSONObject(text)
     if (!result.getBoolean("ok")) {
         val error = result.getJSONObject("error")
-        throw ContainerException(error.optString("code", "ERR_NATIVE"), error.optString("message", "Native operation failed"))
+        throw ContainerException(
+            error.optString("code", "ERR_NATIVE"),
+            error.optString("message", "Native operation failed"),
+            details = JSONObject(error.toString()),
+        )
     }
     return result.opt("value").takeUnless { it == JSONObject.NULL }
 }

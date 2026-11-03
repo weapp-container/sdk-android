@@ -54,7 +54,10 @@ class HostServicesClient(
                     while (true) { val count = input.read(buffer); if (count < 0) break; require(output.size() + count <= 262144) { "Backend response exceeds limit" }; output.write(buffer, 0, count) }
                     JSONObject(String(output.toByteArray(), Charsets.UTF_8))
                 } ?: JSONObject()
-                if (status !in 200..299) throw ContainerException(response.optString("error", "ERR_HOST_SERVICES"), response.optString("message", "Host services request failed"))
+                if (status !in 200..299) {
+                    val failure = parseHostBackendError(response)
+                    throw ContainerException(failure.code, failure.message, details = failure.details)
+                }
                 response
             }
             connection.set(null); ownedConnection?.let { active.remove(it); it.disconnect() }
@@ -153,9 +156,12 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
         *arrayOf("wx.login", "wx.checkSession", "wx.getUserInfo", "wx.getUserProfile", "component:button.open-type.getPhoneNumber", "weappContainer.identity.authorizePhone", "weappContainer.identity.logout", "weappContainer.identity.getState", "weappContainer.identity.onChange", "weappContainer.identity.offChange").map { api ->
             session.registerApiHandler(api) { call, reply ->
                 fun fail(error: Throwable) {
-                    val permission = (error as? ContainerException)?.code in setOf("consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal")
+                    val container = error as? ContainerException
+                    val permission = container?.code in setOf("consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal")
+                    val details = JSONObject(container?.details?.toString() ?: "{}")
+                    if (!details.has("errMsg")) details.put("errMsg", "$api:fail ${error.message ?: "host identity request failed"}")
                     reply.reject(if (permission) HostErrorCode.PERMISSION_DENIED else HostErrorCode.INVALID_REQUEST, error.message ?: "Host identity request failed", false,
-                        JSONObject().put("errMsg", "$api:fail ${error.message ?: "host identity request failed"}").put("errCode", if (permission) 2001 else -1))
+                        details.put("errCode", details.opt("errCode").takeUnless { it == null || it == JSONObject.NULL } ?: if (permission) 2001 else -1))
                 }
                 fun request(path: String, body: JSONObject, transform: (JSONObject) -> JSONObject) {
                     try { backend.request(call, path, body) { result -> result.fold({ value ->
