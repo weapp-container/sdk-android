@@ -108,6 +108,31 @@ fun main() {
         }
     }
 
+    for ((code, backendCode) in listOf(
+        "invalid_app_session" to null,
+        "ERR_INVALID_APP_SESSION" to null,
+        "permission_denied" to "invalid_app_session",
+        "ERR_PERMISSION_DENIED" to "ERR_INVALID_APP_SESSION",
+    )) {
+        val fields = JSONObject().put("errCode", 4017).put("errMsg", "checkSession:fail original provider message")
+            .put("providerId", "reference-provider")
+        if (backendCode != null) fields.put("backendCode", backendCode)
+        val original = ContainerException(code, "Application session expired", details = fields)
+        check(shouldRefreshHostIdentityAfterFailure(original)) { "$code/$backendCode did not refresh revoked application state" }
+        check(original.code == code && original.details.toString() == fields.toString())
+        val rejected = reject(projectHostIdentityError("wx.checkSession", original.code, original.message, original.details))
+        check(rejected.getString("code") == "permission_denied")
+        check(rejected.getString("message") == original.message)
+        check(rejected.getJSONObject("details").getInt("errCode") == 4017)
+        check(rejected.getJSONObject("details").getString("errMsg") == "checkSession:fail original provider message")
+        check(rejected.getJSONObject("details").getString("providerId") == "reference-provider")
+        if (backendCode != null) check(rejected.getJSONObject("details").getString("backendCode") == backendCode)
+    }
+    for (code in listOf("permission_denied", "invalid_host_session", "consent_required", "ERR_TIMEOUT", "ERR_CANCELLED", "ERR_HOST_SERVICES"))
+        check(!shouldRefreshHostIdentityAfterFailure(ContainerException(code, "Other failure")))
+    check(!shouldRefreshHostIdentityAfterFailure(IllegalStateException("invalid_app_session")))
+    check(!shouldRefreshHostIdentityAfterFailure(ContainerException("permission_denied", "Other failure", details = JSONObject().put("backendCode", 4017))))
+
     val fallback = parseHostBackendError(JSONObject().put("errMsg", "backend unavailable"))
     check(fallback.code == "ERR_HOST_SERVICES" && fallback.message == "backend unavailable")
     println("Android identity rejection preserves nested errCode/errMsg, extension precedence and independent container classification")

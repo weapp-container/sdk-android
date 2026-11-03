@@ -17,6 +17,17 @@ internal data class HostIdentityError(
     val details: JSONObject,
 )
 
+// Normalize only for policy decisions. The original backend code and public
+// fields remain available to the rejection projection without being rewritten.
+private fun hostIdentityFailureKind(code: String?): String? =
+    code?.removePrefix("ERR_")?.lowercase(Locale.ROOT)
+
+internal fun shouldRefreshHostIdentityAfterFailure(error: Throwable): Boolean {
+    val failure = error as? ContainerException ?: return false
+    return sequenceOf(failure.code, failure.details.text("backendCode"))
+        .any { hostIdentityFailureKind(it) == "invalid_app_session" }
+}
+
 internal fun parseHostBackendError(response: JSONObject): HostBackendError {
     val nested = response.optJSONObject("error")
     val code = nested?.text("code")
@@ -42,7 +53,7 @@ internal fun parseHostBackendError(response: JSONObject): HostBackendError {
 
 /** The exact projection passed to HostReply.reject, independent of Android UI. */
 internal fun projectHostIdentityError(api: String, code: String?, message: String?, fields: JSONObject?): HostIdentityError {
-    val classification = when (code?.removePrefix("ERR_")?.lowercase(Locale.ROOT)) {
+    val classification = when (hostIdentityFailureKind(code)) {
         "permission_denied", "consent_required", "invalid_host_session", "invalid_app_session", "host_identity_mismatch", "stale_principal" -> HostErrorCode.PERMISSION_DENIED
         "timeout" -> HostErrorCode.TIMEOUT
         "cancelled" -> HostErrorCode.CANCELLED

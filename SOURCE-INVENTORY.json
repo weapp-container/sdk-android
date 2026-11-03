@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "69f2fce4717bbf9f54c1ebfe94d9a045c007e7af",
-  "review": "Recognize core unsupported capability aliases while preserving raw API error fields in actual Kotlin HostReply serialization regression",
+  "sourceBaseCommit": "62c919025323f8e8562832b6ff33d00ea1ddae4b",
+  "review": "Unify Android session invalidation classification and refresh policy; add actual JNI QuickJS HTTP failure, original-error priority and stale-owner regression probe",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "ef065c698f8b98f2c893aefd03266a07430559535ba1c46add162167e9620ae6",
-      "size": 18216,
+      "sha256": "f88872064827fb9e0e04d6fe494b6d149aeb8534e22e54e1aa1e9da7c04f21af",
+      "size": 19673,
       "mode": "100644"
     },
     {
@@ -317,8 +317,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostBackendError.kt",
-      "sha256": "356f29a0009b21e5d680db05352a24910488b5a7c7ce28d79f0cb94e83538087",
-      "size": 2833,
+      "sha256": "41ea2c2cace4649a9b3c72984bc50fe6902afe78e2ee1292f2d56d07a4b8e136",
+      "size": 3376,
       "mode": "100644"
     },
     {
@@ -329,8 +329,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
-      "sha256": "6fc066b98de747c74859e05d3b3ccd4159a2e299734651b7a7f8f39e2bb843b0",
-      "size": 18210,
+      "sha256": "34306fd9cb9cd7d445ae8c38e280ac4ac75f46ef7bcef5c0cb0afdecadfa596d",
+      "size": 18193,
       "mode": "100644"
     },
     {
@@ -377,8 +377,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "737d59b81350b52dd78050cd93b9bacd832d77cde9dc03ac80c0b0a9ff38ff47",
-      "size": 711,
+      "sha256": "65aacf5994f133264db8d434df603df14468fbf4684d6b46f819aca730ff4045",
+      "size": 788,
       "mode": "100644"
     },
     {
@@ -413,8 +413,14 @@
     },
     {
       "path": "test/HostBackendErrorTests.kt",
-      "sha256": "7d006217ac436fbd6e5d8ef0bc13bea0450be7de5787c086d8c42a4143e8d003",
-      "size": 7365,
+      "sha256": "6383625ac99e17342a50a2d32729cd01d742f1b7d45b1a79da191adf1c3fcd87",
+      "size": 9329,
+      "mode": "100644"
+    },
+    {
+      "path": "test/HostIdentityRefreshProbeActivity.kt",
+      "sha256": "e1c607031fa5aa425e2dd98b99eaea6a376e10890aeaaa8d1596058d6606f64a",
+      "size": 12567,
       "mode": "100644"
     },
     {
@@ -490,6 +496,12 @@
       "mode": "100644"
     },
     {
+      "path": "test/identity-refresh-fixture.mjs",
+      "sha256": "a3e72cc00f01cddaa1c0b11bd7d6a490d9e8ec0128a3b61adc10fe14caa085ed",
+      "size": 12772,
+      "mode": "100644"
+    },
+    {
       "path": "test/native-input.test.mjs",
       "sha256": "787bbc57d16060f383a4379b9890c95619cec870e3ed1535c28bc9a89ef74c35",
       "size": 15309,
@@ -541,6 +553,12 @@
       "path": "tools/host-services-probe.mjs",
       "sha256": "92d1658634dcedb9ecb3bd0127d0b2fefb2bc11c9252cee72e05e225661e3752",
       "size": 17240,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/identity-refresh-probe.mjs",
+      "sha256": "b2671d9efc85aa80e7b7a503cdcaa3a2eff9c4d071debbab80a67af303107828",
+      "size": 13133,
       "mode": "100644"
     },
     {

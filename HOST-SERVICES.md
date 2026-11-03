@@ -147,6 +147,11 @@ token closure 始终留在 native；小程序只收到短时、单次、绑定�
 `hostServices.snapshotOwnerContext == "1.0"`；缺少该标记时明确报
 `ERR_UNSUPPORTED_CAPABILITY`，防止旧 runtime 静默忽略新的 owner 校验字段。
 
+服务端报告 `invalid_app_session`、`ERR_INVALID_APP_SESSION`，或在公开
+`backendCode` 字段中报告同一原因时，SDK 在拒绝原调用前尝试刷新身份快照。
+分类和刷新使用同一归一化规则，传给小程序的原始 `errCode`、`errMsg` 与公开扩展
+不改写。刷新自身失败时保留原调用错误和最后成功快照；它不伪造新的未登录状态。
+
 资料与手机号提示先向可信后端查询授权政策，原生 UI 展示服务端 purpose，
 授权记录和后续 code 同时绑定 purpose 与 permissionVersion。小程序传入的 desc
 不决定用途；拒绝同步服务端并刷新快照，取消保留取消语义。服务端政策变化后，
@@ -173,6 +178,24 @@ IWXAPIEventHandler 传给 `onWechatPayResponse`。官方回调之后仍须后端
 native 产物分别验收，不能由模拟响应、目录清单或源码存在性替代。
 
 ## 开发闭环验证
+
+会话失效刷新有独立的有限原生回归，可复用已经运行的 arm64 模拟器及明确选定的
+preview.6.0 native slice，不依赖相机、联系人、支付或授权提示：
+
+```sh
+node tools/identity-refresh-probe.mjs \
+  --serial emulator-5554 \
+  --native-dir /absolute/native/aarch64-linux-android \
+  --reference-root /absolute/host-services-reference \
+  --out /absolute/new-identity-probe-output
+```
+
+它经公开 SDK、JNI 和真实 QuickJS 调用 HTTP/SQLite 参考服务，检查三种失效错误形式、
+回调/complete/Promise 一次结算、原错优先于刷新断连，以及实际旧账号快照响应在新
+账号呈现后才释放时由 native 拒绝。输出记录所用 native producer、SDK 源码摘要、
+实际系统/协议和任务资源清理。探针保留借用模拟器，只卸载自己的包和 reverse、关闭
+自己的服务。手写 pack、当前源码 wrapper 与显式选择的历史 runtime 组成开发回归，
+不能作为全新 SDK 归档安装、编译器交付或当前 release 验收。
 
 `test/HostServicesProbeActivity.kt` 和 `tools/host-services-probe.mjs` 使用完整公开 SDK、
 真实 JNI 和 JS 引擎运行 authored pack。探针自动启动独立 loopback reference 业务服务，

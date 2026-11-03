@@ -167,7 +167,7 @@ class AndroidHostIdentity(private val activity: Activity, private val backend: H
                             try { reply.resolve(transform(value).put("errMsg", "$api:ok")) } catch (error: Throwable) { fail(error) }
                         }, ::fail) } } catch (error: Throwable) { fail(error) }
                     }, { error ->
-                        if ((error as? ContainerException)?.code == "invalid_app_session") try { refresh(session, call) { fail(error) } } catch (_: Throwable) { fail(error) }
+                        if (shouldRefreshHostIdentityAfterFailure(error)) try { refresh(session, call) { fail(error) } } catch (_: Throwable) { fail(error) }
                         else fail(error)
                     }) } } catch (error: Throwable) { fail(error) }
                 }
