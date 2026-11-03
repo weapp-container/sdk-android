@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "62c919025323f8e8562832b6ff33d00ea1ddae4b",
-  "review": "Unify Android session invalidation classification and refresh policy; add actual JNI QuickJS HTTP failure, original-error priority and stale-owner regression probe",
+  "sourceBaseCommit": "d03571f2890163af29aa6b19805d1be6ff738db7",
+  "review": "Keep the historical identity refresh fixture explicitly on the v1 consent protocol",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -497,8 +497,8 @@
     },
     {
       "path": "test/identity-refresh-fixture.mjs",
-      "sha256": "a3e72cc00f01cddaa1c0b11bd7d6a490d9e8ec0128a3b61adc10fe14caa085ed",
-      "size": 12772,
+      "sha256": "c68176e99f1021415c3f569b9d4816ee3c4eb735966d6030b05016aecc8461cd",
+      "size": 12883,
       "mode": "100644"
     },
     {

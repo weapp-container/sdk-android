@@ -68,7 +68,8 @@ export async function createIdentityRefreshServer({ referenceRoot, controlToken,
   const { randomBytes } = await import('node:crypto');
   const clientSecret = randomBytes(32).toString('base64url'), clientId = 'identity-probe-business';
   const application = { hostAppId: 'identity-refresh-host', tenantId: 'identity-refresh-tenant', publisherId: 'identity-refresh-publisher', appId: 'identity-refresh-probe', environment: 'develop', version: '1', packRoot };
-  const service = new HostServices({ issuerSecret: randomBytes(32).toString('base64url'), identitySecret: randomBytes(32).toString('base64url'), applications: [{ miniAppId: application.appId, hostAppId: application.hostAppId, tenantId: application.tenantId, environment: application.environment, clientId, clientSecret, trustedPackRoots: [packRoot] }] });
+  // This historical transport fixture exercises v1, not the new v2 consent contract.
+  const service = new HostServices({ issuerSecret: randomBytes(32).toString('base64url'), identitySecret: randomBytes(32).toString('base64url'), applications: [{ miniAppId: application.appId, identityProtocol: '1.0', hostAppId: application.hostAppId, tenantId: application.tenantId, environment: application.environment, clientId, clientSecret, trustedPackRoots: [packRoot] }] });
   const core = createHostServicesHandler(service), businessSessions = new Map(), active = new Set();
   const stats = { identitySnapshots: 0, checkFailures: 0, disconnectedSnapshots: 0, heldSnapshots: 0, releasedSnapshots: 0 };
   let mode = 'raw', disconnect = false, hold = false, held = null, closing = false;
