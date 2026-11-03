@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "d41cc5fe9adac2f67fe01802a9d057c0b5c885db",
-  "review": "Review Android backend error projection and preserve raw errCode, errMsg and extension fields through identity callbacks",
+  "sourceBaseCommit": "457fa753111dd89e49ba29d1781d0c4c201690b4",
+  "review": "Review unified backend API error projection, explicit nested-field precedence and pure identity rejection coverage",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -29,8 +29,8 @@
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "598767096fdee54af509149dcd23bf8eec6f7a9a82164ae08d210eeabf43c5a8",
-      "size": 17020,
+      "sha256": "56b2d234182e90919c40789c57063334d1bb66e0791d6521a5a4474f1d7ca113",
+      "size": 17690,
       "mode": "100644"
     },
     {
@@ -317,8 +317,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostBackendError.kt",
-      "sha256": "679f1abe3cc39b4219df23b596d53faac63c3217bb1f20bb714e6bf057d4309e",
-      "size": 961,
+      "sha256": "f60a28be2fa8ee2e0028b29573005a423641d4ee014992eb200c943616a1fb86",
+      "size": 2269,
       "mode": "100644"
     },
     {
@@ -329,14 +329,14 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
-      "sha256": "1ddac62a2a61fda6d1cd63b74a6c3a7c10df7ace231acaef810042f6959dbd6a",
-      "size": 18703,
+      "sha256": "c81dd15c2b328ff6c7cacd144562adf6d24e06ed09fce6c5fc7a7e889e493bf4",
+      "size": 18305,
       "mode": "100644"
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
-      "sha256": "5beea381ecf44accc96aabcdf13ac19b62ce885b968701706ce16991ce576d30",
-      "size": 8177,
+      "sha256": "0a95a7c9218268c167ffcbe40953e3a13f3d6978867fb7deb5b144220c90fd66",
+      "size": 8185,
       "mode": "100644"
     },
     {
@@ -377,8 +377,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "8a3af698e34aa7ce3a8ed92583b186467a8cd1c2d7f5dacf57b611ee17951364",
-      "size": 638,
+      "sha256": "737d59b81350b52dd78050cd93b9bacd832d77cde9dc03ac80c0b0a9ff38ff47",
+      "size": 711,
       "mode": "100644"
     },
     {
@@ -413,8 +413,8 @@
     },
     {
       "path": "test/HostBackendErrorTests.kt",
-      "sha256": "3ee30c7eed2db0d4721ecb3387eab85fa23ec37aa3420821ed203dd35483f112",
-      "size": 1356,
+      "sha256": "d840d45e83e1a893bc7ffc16333551a40444864d5fbf7ef562dbb047c7bb44e1",
+      "size": 4200,
       "mode": "100644"
     },
     {
