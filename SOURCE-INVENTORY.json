@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "457fa753111dd89e49ba29d1781d0c4c201690b4",
-  "review": "Review unified backend API error projection, explicit nested-field precedence and pure identity rejection coverage",
+  "sourceBaseCommit": "aa7e9d5b534a99bf076c23ab8feb8af1b44c0672",
+  "review": "Review real HostReply serialization regression with the locked Android 36 compile boundary",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -413,8 +413,8 @@
     },
     {
       "path": "test/HostBackendErrorTests.kt",
-      "sha256": "d840d45e83e1a893bc7ffc16333551a40444864d5fbf7ef562dbb047c7bb44e1",
-      "size": 4200,
+      "sha256": "fb5827887e9f8172c9020e1d502704c7a4fa96aedf80757e01816622c2f1524e",
+      "size": 5005,
       "mode": "100644"
     },
     {
@@ -581,8 +581,8 @@
     },
     {
       "path": "tools/test-host-backend-error.mjs",
-      "sha256": "165fd8f0508b1fcd08ca06bad90173575f3f6e555b7cc59be15aee654052fc0f",
-      "size": 1945,
+      "sha256": "049cb014edcf2f3231285993649437a12c229dd0ce1102e55c4f7cb7d57c69c8",
+      "size": 2399,
       "mode": "100644"
     },
     {
