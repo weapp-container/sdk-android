@@ -1,8 +1,8 @@
 {
   "schemaVersion": 1,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceBaseCommit": "7ee7c0547efa16e3a071228dd26e02adfabdc6b9",
-  "review": "Review trusted system TabBar presenter configuration, dynamic indicators and styles; preserve historical ORIGIN identity",
+  "sourceBaseCommit": "3a3783ffd4eba8f143b79d82d6c86a9ee8705fba",
+  "review": "Review explicit distribution policy identity, binary markers and pinned native packaging boundaries",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -436,6 +436,12 @@
       "mode": "100644"
     },
     {
+      "path": "test/distribution-identity.test.mjs",
+      "sha256": "8d5bf7593e90db09c6e5ded0604b500b288ccef2b22763d1a2670243e28272e9",
+      "size": 6160,
+      "mode": "100644"
+    },
+    {
       "path": "test/evidence/host-services-beacon-recorder-development.json",
       "sha256": "5363717a9e8019460854c9661e31c2cb95ee3475472267b6417e917324d9b3d1",
       "size": 14148,
@@ -515,8 +521,8 @@
     },
     {
       "path": "test/provenance.test.mjs",
-      "sha256": "5b915d104f9151121b3f5a857c448a604dc8160a547b08eb30b4f6410859c633",
-      "size": 2462,
+      "sha256": "3f266ab65cf01fd428a606e77d665bc9ab7593b3b007f369daeebe33067773ed",
+      "size": 2491,
       "mode": "100644"
     },
     {
@@ -527,8 +533,8 @@
     },
     {
       "path": "tools/build.mjs",
-      "sha256": "138e2a7270241805e6a3fbf437c524451c567378d39da6b94f08b0fa11319bd9",
-      "size": 9397,
+      "sha256": "a085cb29903f51f807bbced97313e49191703ebfea9857fbdc8e4feac9a6e6ff",
+      "size": 9603,
       "mode": "100644"
     },
     {
@@ -541,6 +547,12 @@
       "path": "tools/device-smoke.mjs",
       "sha256": "90cdaf30fd8bf45a36c0d51120ed68641dee3e02bfee826188440adb23560778",
       "size": 5127,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/distribution-identity.mjs",
+      "sha256": "2c4ee0d63bc96c2dace3184833f107b3c35dc87647886b6997896ebf1841386d",
+      "size": 2127,
       "mode": "100644"
     },
     {
@@ -563,8 +575,8 @@
     },
     {
       "path": "tools/native-input.mjs",
-      "sha256": "d0daec2d38980166d28075b3b05fe3e243b7e9cdf07f3c384e18bca85cfeae50",
-      "size": 11462,
+      "sha256": "3f9cf85359c1eeff399513e3ccb1b355a1db2d04542f73e46ad0fd8c8cbf563b",
+      "size": 12561,
       "mode": "100644"
     },
     {
@@ -575,14 +587,14 @@
     },
     {
       "path": "tools/prepare-runtime.mjs",
-      "sha256": "d314aceabcea7a5dfcaef7502f0206f9f78c8661f22fd0dfe7c324ec35f43dc1",
-      "size": 4281,
+      "sha256": "816694a94cffcc3b6efaf3c13b5f691efa1f54fa68917a3102b2237cef336e1b",
+      "size": 4476,
       "mode": "100644"
     },
     {
       "path": "tools/runtime-artifacts.mjs",
-      "sha256": "7731d018ce4c349c2c97a843e82a1d9029711f15a41fd7594cbf4f1a1c7b156c",
-      "size": 19113,
+      "sha256": "466a06cc256475e2a033c17ea9137ee73c19fdf56d2f71eeffd62a2dfde5bee1",
+      "size": 19718,
       "mode": "100644"
     },
     {
