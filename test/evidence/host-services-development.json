@@ -1,0 +1,239 @@
+{
+  "schemaVersion": 1,
+  "sdkVersion": "0.1.0-preview.6.0",
+  "date": "2026-11-02",
+  "status": "passed",
+  "scope": "Unpublished development native/wrapper/guest Android emulator probe; no physical-device, BLE peripheral, merchant, parity or release claim",
+  "nativeProducer": {
+    "schemaVersion": 1,
+    "sdkVersion": "0.1.0-preview.6.0",
+    "abiVersion": 1,
+    "sourceCommit": "bd7cedca2673fd2f895a89202b12c6f4a6990c2f",
+    "sourceDirty": true,
+    "target": "aarch64-linux-android",
+    "platform": "android",
+    "profile": "dev",
+    "viewDiagnostics": "off",
+    "features": [
+      "quickjs-native-android",
+      "skia-gpu-gles"
+    ],
+    "toolchain": {
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+      "androidNdk": "28.2.13676358",
+      "androidApi": 26
+    },
+    "startedAt": "2026-11-02T05:16:28.595Z",
+    "status": "built",
+    "artifacts": [
+      {
+        "file": "libweapp_container_sdk.so",
+        "bytes": 243847584,
+        "sha256": "4a5332717a5d118bfb3d85dad7147eee793b21db041d7f45795a605f1b77450b"
+      },
+      {
+        "file": "libweapp_container_sdk.a",
+        "bytes": 666326012,
+        "sha256": "4c0084dd1465b7d3a7c62394c04ccc111e2b2747bfdcffec9054f1c45050e2ff"
+      },
+      {
+        "file": "libc++_shared.so",
+        "bytes": 9236352,
+        "sha256": "ab4e6c71b96b851de45a8a9bd86369e7dbc2130a44b3b4520564be94847910f2"
+      },
+      {
+        "file": "platform-notices/android-ndk-28.2.13676358-NOTICE",
+        "bytes": 516438,
+        "sha256": "faf0dc52cf6ce9ab09a04b0c074a378dd2565ee1ed9bc1179d83793bcdba012e"
+      },
+      {
+        "file": "platform-notices/android-ndk-28.2.13676358-NOTICE.toolchain",
+        "bytes": 799639,
+        "sha256": "789714a9076571c580cf531bdcebec776a4d889c12c3c1108adafc6e4338710a"
+      },
+      {
+        "file": "weapp_container_sdk.h",
+        "bytes": 6842,
+        "sha256": "2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b"
+      },
+      {
+        "file": "weapp_container_sdk_gl.h",
+        "bytes": 793,
+        "sha256": "8812d0e25f023c745ffad7206552b2a58dce3d7291f0e2a661e6f4e521558de7"
+      }
+    ],
+    "thirdPartyInputs": null,
+    "finishedAt": "2026-11-02T05:17:30.019Z",
+    "exitCode": 0,
+    "sourceAfterBuild": {
+      "sourceCommit": "bd7cedca2673fd2f895a89202b12c6f4a6990c2f",
+      "sourceDirty": true
+    },
+    "sourceBeforePublication": {
+      "sourceCommit": "bd7cedca2673fd2f895a89202b12c6f4a6990c2f",
+      "sourceDirty": true
+    }
+  },
+  "sourceManifest": {
+    "path": "host-services-native-source.json",
+    "sha256": "c19bcfa74f78b04ccfefe3c4d18ec0c8eeb398a5df65413692048b80add919b6",
+    "stableDuringBuild": true
+  },
+  "wrapperSources": [
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPayments.kt",
+      "sha256": "b4fce44546676050c5cc12c6d56317ff8b07e9aa2b01c3ad2f802b3d0148e748"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPermissionConsent.kt",
+      "sha256": "1684772e6d1a76dbdd47c33b45f2b5fe752e6d401e88e31f2d9ee9c765eb8048"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBluetoothApis.kt",
+      "sha256": "22336f203611f114447902709a81f9e2ee074bb9a47cfa0ad4a3b5c1733be38a"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidDeviceApis.kt",
+      "sha256": "b941f59ce9b3b0411a17a103e6b3bfa956eed9484556c70f5c5b60189784cc66"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFileScopes.kt",
+      "sha256": "d0670eb3e587f36733d276519107e8420cd10102501e80547c344b435d73d4e3"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFiles.kt",
+      "sha256": "9c022f4491b6d8cf422cee5dd2e45e06bf1d35df6918a7c2704623c30313a9a7"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeMedia.kt",
+      "sha256": "0be45a13f2cff7b5f2d2afeb1c2f900908f52aa7758c508124cbd987b7a080ee"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/EglPresenter.kt",
+      "sha256": "7e5d3b40d3de4f113f9405bc4ad19074b3675fbc2ecff8078cb0c5c2c1bd79f1"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
+      "sha256": "ddbabd54df9eefeb2c1cc16eb237f2c2b208f363fabf1cdea8dcddeabf5e48bd"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
+      "sha256": "5794ed92566f40ee5e0c89ac5b1350375ff307ae04eab13e9faced6a7ffad5c9"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/NativeBridge.kt",
+      "sha256": "995bcbe4737a0b51bc204d516bdc5e9b82e4d4a57fc7ca5c5844e86f2cd9f4a7"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
+      "sha256": "f0953c82f095801873a06c5bbb1faf05ea231602f3cb1808b23c7debe201c528"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerView.kt",
+      "sha256": "7731c65968a0e851014cee27ecfaa37c5f69e6742bdaefa0fd7f55585991d873"
+    },
+    {
+      "path": "test/HostServicesProbeActivity.kt",
+      "sha256": "9a594b944a0bd3d07ec071cf75506d451fc0bd9441ef1d047f31a2546cc12913"
+    },
+    {
+      "path": "examples/host-services/ReferenceHostServices.kt",
+      "sha256": "4a28bd34f2da9e7913ba68cba312c51a6a629375633c50cc79a6fa85c26d1dd8"
+    }
+  ],
+  "fixtureSource": {
+    "sha256": "6449d7be0fa68e83cce0384baa496ad3647a5bf9346ae86fe79b3c32f978cae1"
+  },
+  "jniSource": {
+    "sha256": "a68014f3b779c41b712276072d89cc63e5a7b27ad4e5259ab602bfb7a30f5e16"
+  },
+  "probeTool": {
+    "path": "tools/host-services-probe.mjs",
+    "sha256": "05811f4091d639ebbb3d98d182f2c2c459ba26a69df9fd6ac8b7c771b6d5770b"
+  },
+  "apk": {
+    "sha256": "d88bc36cded1ef377e26cdf4e6cdab31daa789bdad86bf6589058c0dd0a6db97"
+  },
+  "checks": [
+    "real-login-redemption-and-native-identity-refresh",
+    "separate-native-profile-and-phone-consents-via-real-phone-button",
+    "native-reference-payment-waits-for-server-paid-confirmation",
+    "guest-file-write-read-and-traversal-rejection",
+    "new-guest-file-namespace-rejects-account-A",
+    "real-camera2-frame-imported-as-managed-jpeg",
+    "actual-gles-texture-frame-captured",
+    "account-delete-removes-user-files-and-native-metadata",
+    "close-drains-camera-and-restores-window-resources"
+  ],
+  "realPhoneButtonTap": {
+    "x": 445,
+    "y": 411
+  },
+  "frame": {
+    "sha256": "541f9409670fd4f944c8661a7b3fec7439850040932d4f0cc60074757d4581e1",
+    "bytes": 93043,
+    "pixels": [
+      1080,
+      2063
+    ],
+    "visuallyInspected": true,
+    "content": "Camera2 emulator virtual scene painted in the original Skia camera node"
+  },
+  "referenceBackend": {
+    "kind": "ephemeral-loopback-reference-only",
+    "tests": {
+      "passed": 29,
+      "failed": 0
+    },
+    "sources": [
+      {
+        "path": "scripts/demo-business-server.mjs",
+        "sha256": "95fc871d5a9b69e5c26ef89a2236e4d363231eef0029c8797d647e356795dc76"
+      },
+      {
+        "path": "src/cli.mjs",
+        "sha256": "39e5020500a34f43274cea30a09f4ad23b4939f1f2071928f4efae723b3fca7e"
+      },
+      {
+        "path": "src/crypto.mjs",
+        "sha256": "84b665cf2f56fa227472a8d57f151879bd881a0984f40cebdb5ccd5073f4dd6c"
+      },
+      {
+        "path": "src/errors.mjs",
+        "sha256": "8960d82a4047f56584a03401b095fca27533eb0837ee459c6dbe3ebf78503f49"
+      },
+      {
+        "path": "src/providers.mjs",
+        "sha256": "1141cedf7f38935041be0556e65509adc7b1fcfcd7d904cffe0e916578c4faf8"
+      },
+      {
+        "path": "src/server.mjs",
+        "sha256": "5e96a64c61a49adbc63360cf90c0e854ec2acd1e80e1ac4faf81fe58e75a2883"
+      },
+      {
+        "path": "src/service.mjs",
+        "sha256": "f6a9fa04967d521090208ac45d5f33b5f71b0564d704931cda3d7e309e4e5fb6"
+      }
+    ]
+  },
+  "cleanup": {
+    "errors": [],
+    "testPackageUninstalled": true,
+    "taskAdbReverseRemoved": true,
+    "ephemeralReferenceServerExited": true,
+    "ownedReadOnlyEmulatorStopped": true
+  },
+  "externalArtifacts": {
+    "directory": "/tmp/weapp-host-services-probe-final",
+    "rawReportSha256": "c441a9ad1e2792e6389c17f222da16a2d3f9cbbc3457da5363a7c7c7923fe990",
+    "sourceBuildDirectory": "/tmp/weapp-host-services-native-final"
+  },
+  "limitations": [
+    "Authored development fixture, not compiler parity evidence",
+    "Android emulator virtual camera, not a physical camera",
+    "Reference payment only, no official wallet or merchant transaction",
+    "No external BLE peripheral verification",
+    "Unpublished dev native bytes, not a release acceptance"
+  ]
+}
