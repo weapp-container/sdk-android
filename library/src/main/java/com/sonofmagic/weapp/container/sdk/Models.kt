@@ -9,7 +9,13 @@ import java.nio.ByteOrder
 import java.util.UUID
 import java.util.concurrent.atomic.AtomicBoolean
 
-class ContainerException(val code: String, message: String, cause: Throwable? = null) : RuntimeException(message, cause)
+class ContainerException(
+    val code: String,
+    message: String,
+    cause: Throwable? = null,
+    /** Raw backend/native extension fields, kept separate from the container error class. */
+    val details: JSONObject = JSONObject(),
+) : RuntimeException(message, cause)
 
 sealed class PackSource {
     data class Asset(val path: String) : PackSource() {
@@ -64,14 +70,35 @@ fun interface HostMethod { fun invoke(call: HostCall, reply: HostReply) }
 
 class HostCall internal constructor(
     val id: String, val method: String, val payload: Any?, val deadlineNs: Long?, val cancelToken: String?,
+    /** Frozen native identity; never reconstructed from payload or app options. */
+    val context: JSONObject? = null,
+    /** Full u64 value, including values outside Java's signed Long range. */
+    val deadlineNsDecimal: String? = deadlineNs?.toString(),
+    val keepsResourceAlive: Boolean = false,
 ) {
     private val cancelled = AtomicBoolean(false)
     private val cancellationDelivered = AtomicBoolean(false)
     @Volatile var onCancel: (() -> Unit)? = null
         set(value) { field = value; deliverCancellation() }
     val isCancelled: Boolean get() = cancelled.get()
+    /** Compose adapter cleanup with an existing permission or OS-operation cancellation hook. */
+    fun addCancellationHandler(handler: () -> Unit) {
+        if (isCancelled) { handler(); return }
+        val previous = onCancel
+        onCancel = {
+            var failure: Throwable? = null
+            try { previous?.invoke() } catch (error: Throwable) { failure = error }
+            try { handler() } catch (error: Throwable) { if (failure == null) failure = error else failure.addSuppressed(error) }
+            if (failure != null) throw failure
+        }
+    }
     internal fun cancel() { cancelled.set(true); deliverCancellation() }
-    private fun deliverCancellation() { val callback = onCancel; if (cancelled.get() && callback != null && cancellationDelivered.compareAndSet(false, true)) callback() }
+    private fun deliverCancellation() {
+        val callback = onCancel
+        if (cancelled.get() && callback != null && cancellationDelivered.compareAndSet(false, true)) {
+            try { callback() } catch (error: Throwable) { cancellationDelivered.set(false); throw error }
+        }
+    }
 }
 
 enum class HostErrorCode(internal val wire: String) {
@@ -79,14 +106,16 @@ enum class HostErrorCode(internal val wire: String) {
     CANCELLED("cancelled"), UNSUPPORTED("unsupported"),
 }
 
-class HostReply internal constructor(private val complete: (JSONObject) -> Unit) {
+class HostReply internal constructor(private val retain: () -> Unit = {}, private val complete: (JSONObject) -> Unit) {
     private val settled = AtomicBoolean(false)
+    /** Keep the creator's cancellation hook alive after a subscription/object is created. */
+    fun retainUntilCancelled() { retain() }
     fun resolve(value: Any? = null) {
         val payload = JSONObject().put("result", jsonCopy(value))
         if (settled.compareAndSet(false, true)) complete(payload)
     }
-    fun reject(code: HostErrorCode, message: String, retryable: Boolean = false) {
-        val payload = JSONObject().put("error", JSONObject().put("code", code.wire).put("message", message).put("retryable", retryable))
+    @JvmOverloads fun reject(code: HostErrorCode, message: String, retryable: Boolean = false, details: JSONObject = JSONObject()) {
+        val payload = JSONObject().put("error", JSONObject().put("code", code.wire).put("message", message).put("retryable", retryable).put("details", jsonCopy(details)))
         if (settled.compareAndSet(false, true)) complete(payload)
     }
 }
@@ -117,7 +146,11 @@ internal fun unwrap(text: String): Any? {
     val result = JSONObject(text)
     if (!result.getBoolean("ok")) {
         val error = result.getJSONObject("error")
-        throw ContainerException(error.optString("code", "ERR_NATIVE"), error.optString("message", "Native operation failed"))
+        throw ContainerException(
+            error.optString("code", "ERR_NATIVE"),
+            error.optString("message", "Native operation failed"),
+            details = parseHostBackendError(error).details,
+        )
     }
     return result.opt("value").takeUnless { it == JSONObject.NULL }
 }

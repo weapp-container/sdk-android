@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { distributionOptions } from './distribution-identity.mjs';
 import { verifySourceInventory } from './source-inventory.mjs';
 import { spawnSync } from 'node:child_process';
 import { existsSync, mkdirSync, readFileSync, readdirSync, writeFileSync, cpSync, rmSync } from 'node:fs';
@@ -11,6 +12,7 @@ import { copyPack, readNative, readNotices, requireNativeRoot, sourceProvenance,
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const reviewedSource = verifySourceInventory(root);
 const args = process.argv.slice(2);
+const expectedDistribution = distributionOptions(args);
 const sdk = process.env.ANDROID_HOME || process.env.ANDROID_SDK_ROOT || join(os.homedir(), 'Library/Android/sdk');
 const buildEnv = { ...process.env, ANDROID_HOME: sdk };
 function option(name, fallback) { const i=args.indexOf(name); return i < 0 ? fallback : args[i+1]; }
@@ -34,7 +36,7 @@ function findGradle() {
 const gradle=findGradle();
 const common=['--no-daemon','--console=plain']; if(args.includes('--offline')) common.push('--offline');
 const receiptPath=join(out,'validation.json');
-const receipt={schemaVersion:1,sdkVersion:SDK_VERSION,status:'building',...sourceProvenance(root), sourceInventorySha256: reviewedSource.inventorySha256,startedAt:new Date().toISOString(),nativeRoot:native,licensesRoot,native:[],deviceExecution:'not-run'};
+const receipt={schemaVersion:1,sdkVersion:SDK_VERSION,...expectedDistribution,status:'building',...sourceProvenance(root), sourceInventorySha256: reviewedSource.inventorySha256,startedAt:new Date().toISOString(),nativeRoot:native,licensesRoot,native:[],deviceExecution:'not-run'};
 const save=()=>{
   writeFileSync(receiptPath,JSON.stringify(receipt,null,2)+'\n');
   // Keep command paths and local build directories in external evidence only.
@@ -42,7 +44,7 @@ const save=()=>{
   const publicError = receipt.error && [root,native,licensesRoot,out,sdk,gradle]
     .sort((a,b)=>b.length-a.length).reduce((text,path)=>text.replaceAll(path,'<local-build-directory>'),receipt.error);
   const distribution = Object.fromEntries([
-    'schemaVersion','sdkVersion','status','sourceCommit','sourceDirty','sourceKind',
+    'schemaVersion','sdkVersion','distributionProfile','policySha256','status','sourceCommit','sourceDirty','sourceKind',
     'originSourceCommit','originManifestSha256','sourceInventorySha256','startedAt','finishedAt','native',
     'mavenArtifacts','binaries','checks','deviceExecution','fixtureIntegrity','pinnedRuntimeBytes',
   ].filter(key=>receipt[key]!==undefined).map(key=>[key,receipt[key]]));
@@ -53,7 +55,7 @@ const save=()=>{
 save();
 try {
 for (const target of ['aarch64-linux-android', 'x86_64-linux-android']) {
-  const input = readNative(native, target, ['libweapp_container_sdk.so', 'libc++_shared.so']);
+  const input = readNative(native, target, ['libweapp_container_sdk.so', 'libc++_shared.so'], expectedDistribution);
   receipt.native.push(nativeIdentity(input.receipt));
   readNotices(native, licensesRoot, target);
 }

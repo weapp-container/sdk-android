@@ -1,0 +1,341 @@
+{
+  "schemaVersion": 1,
+  "status": "passed",
+  "scope": "Unpublished development native/wrapper/guest Android emulator probe; no physical-device, BLE peripheral, merchant, parity or release claim",
+  "serial": "emulator-5580",
+  "checks": [
+    "recorder-default-options-preserve-format-or-reject-native-downgrade",
+    "real-http-managed-upload-download-and-stream-events",
+    "real-native-websocket-peer-echo-and-close",
+    "real-mediarecorder-aac-imported-into-managed-files",
+    "recorder-default-8000hz-explicit-mono-aac-and-sample-rate-bitrate-validation",
+    "real-emulator-gps-location-subscription-and-stop-barrier",
+    "native-confirmed-contact-and-calendar-provider-commits-with-correct-reminder-units",
+    "soter-support-and-enrollment-do-not-fabricate-a-signer",
+    "real-login-redemption-and-native-identity-refresh",
+    "separate-native-profile-and-phone-consents-via-real-phone-button",
+    "native-reference-payment-waits-for-server-paid-confirmation",
+    "guest-file-write-read-and-traversal-rejection",
+    "new-guest-file-namespace-rejects-account-A",
+    "account-retirement-closes-real-http-and-websocket-peers",
+    "real-camera2-frame-imported-as-managed-jpeg",
+    "actual-gles-texture-frame-captured",
+    "account-delete-removes-user-files-and-native-metadata",
+    "failed-native-cleanup-retains-core-until-close-retry-succeeds",
+    "close-drains-camera-and-restores-window-resources",
+    "native-authorization-ui-and-successful-grants-bind-registered-purpose-and-permission-version"
+  ],
+  "cleanupErrors": [],
+  "probeTool": {
+    "sha256": "2190fb65464bd99795d8d71da3dbbb5520aeae8241bc92ab6e592a9831056d1b"
+  },
+  "fixtureSource": {
+    "sha256": "c1f4679f33da714f64a63ad9a94569ab137eae6bfb9e4613fe1b058f97e873ed"
+  },
+  "networkFixtureSource": {
+    "sha256": "5ef69cfd1e0f3643a755180449ea9afd9c8ec135a9cc450e03b27eda57a78868"
+  },
+  "nativeProducer": {
+    "schemaVersion": 1,
+    "sdkVersion": "0.1.0-preview.6.0",
+    "abiVersion": 1,
+    "sourceCommit": "bd7cedca2673fd2f895a89202b12c6f4a6990c2f",
+    "sourceDirty": true,
+    "target": "aarch64-linux-android",
+    "platform": "android",
+    "profile": "dev",
+    "viewDiagnostics": "off",
+    "features": [
+      "quickjs-native-android",
+      "skia-gpu-gles"
+    ],
+    "toolchain": {
+      "rustc": "rustc 1.99.1 (58cf8f9c3 2026-10-13)",
+      "cargo": "cargo 1.99.1 (5f94df478 2026-08-27)",
+      "androidNdk": "28.2.13676358",
+      "androidApi": 26
+    },
+    "startedAt": "2026-11-02T05:16:28.595Z",
+    "status": "built",
+    "artifacts": [
+      {
+        "file": "libweapp_container_sdk.so",
+        "bytes": 243847584,
+        "sha256": "4a5332717a5d118bfb3d85dad7147eee793b21db041d7f45795a605f1b77450b"
+      },
+      {
+        "file": "libweapp_container_sdk.a",
+        "bytes": 666326012,
+        "sha256": "4c0084dd1465b7d3a7c62394c04ccc111e2b2747bfdcffec9054f1c45050e2ff"
+      },
+      {
+        "file": "libc++_shared.so",
+        "bytes": 9236352,
+        "sha256": "ab4e6c71b96b851de45a8a9bd86369e7dbc2130a44b3b4520564be94847910f2"
+      },
+      {
+        "file": "platform-notices/android-ndk-28.2.13676358-NOTICE",
+        "bytes": 516438,
+        "sha256": "faf0dc52cf6ce9ab09a04b0c074a378dd2565ee1ed9bc1179d83793bcdba012e"
+      },
+      {
+        "file": "platform-notices/android-ndk-28.2.13676358-NOTICE.toolchain",
+        "bytes": 799639,
+        "sha256": "789714a9076571c580cf531bdcebec776a4d889c12c3c1108adafc6e4338710a"
+      },
+      {
+        "file": "weapp_container_sdk.h",
+        "bytes": 6842,
+        "sha256": "2a4761c0650c72ccd8d0a791fb66ee48888e1ce182ba99f0c92673a2c44a8e9b"
+      },
+      {
+        "file": "weapp_container_sdk_gl.h",
+        "bytes": 793,
+        "sha256": "8812d0e25f023c745ffad7206552b2a58dce3d7291f0e2a661e6f4e521558de7"
+      }
+    ],
+    "thirdPartyInputs": null,
+    "finishedAt": "2026-11-02T05:17:30.019Z",
+    "exitCode": 0,
+    "sourceAfterBuild": {
+      "sourceCommit": "bd7cedca2673fd2f895a89202b12c6f4a6990c2f",
+      "sourceDirty": true
+    },
+    "sourceBeforePublication": {
+      "sourceCommit": "bd7cedca2673fd2f895a89202b12c6f4a6990c2f",
+      "sourceDirty": true
+    }
+  },
+  "referenceBackend": {
+    "kind": "ephemeral-loopback-reference-only",
+    "packRoot": "4f17cfa8e343425e6f3aa6f08642d5aa49f111955b7b33fbd09442865a17273f",
+    "sources": [
+      {
+        "path": "scripts/demo-business-server.mjs",
+        "sha256": "5bfdfe04430169b8efde31fdb861faa27b8d419596c6b6fd856d836f8aebd5bc"
+      },
+      {
+        "path": "src/cli.mjs",
+        "sha256": "39e5020500a34f43274cea30a09f4ad23b4939f1f2071928f4efae723b3fca7e"
+      },
+      {
+        "path": "src/crypto.mjs",
+        "sha256": "84b665cf2f56fa227472a8d57f151879bd881a0984f40cebdb5ccd5073f4dd6c"
+      },
+      {
+        "path": "src/errors.mjs",
+        "sha256": "8960d82a4047f56584a03401b095fca27533eb0837ee459c6dbe3ebf78503f49"
+      },
+      {
+        "path": "src/providers.mjs",
+        "sha256": "1141cedf7f38935041be0556e65509adc7b1fcfcd7d904cffe0e916578c4faf8"
+      },
+      {
+        "path": "src/server.mjs",
+        "sha256": "a374ee9b0dc895eaabb7cb899727cb0331323dbb87c0e2521f7879ebdabd775c"
+      },
+      {
+        "path": "src/service.mjs",
+        "sha256": "2d852adc7dc0cb8f879d69171016cd4cc00786f1da4625db3c5727098bee96d8"
+      }
+    ]
+  },
+  "networkDependencies": [
+    {
+      "file": "okhttp-4.12.0.jar",
+      "url": "https://repo.maven.apache.org/maven2/com/squareup/okhttp3/okhttp/4.12.0/okhttp-4.12.0.jar",
+      "sha256": "b1050081b14bb7a3a7e55a4d3ef01b5dcfabc453b4573a4fc019767191d5f4e0"
+    },
+    {
+      "file": "okio-jvm-3.6.0.jar",
+      "url": "https://repo.maven.apache.org/maven2/com/squareup/okio/okio-jvm/3.6.0/okio-jvm-3.6.0.jar",
+      "sha256": "67543f0736fc422ae927ed0e504b98bc5e269fda0d3500579337cb713da28412"
+    },
+    {
+      "file": "core-3.5.3.jar",
+      "url": "https://repo.maven.apache.org/maven2/com/google/zxing/core/3.5.3/core-3.5.3.jar",
+      "sha256": "8d8064c1636fdaef7189dd9055c7d59950a8940a12f2293956446ec3c109fd82"
+    }
+  ],
+  "wrapperSources": [
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPayments.kt",
+      "sha256": "b4fce44546676050c5cc12c6d56317ff8b07e9aa2b01c3ad2f802b3d0148e748"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPermissionConsent.kt",
+      "sha256": "1e06d986f76859a353f9fa41394d0be4c58c07212b5f79771b5e2d323c3e7f93"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconApis.kt",
+      "sha256": "6ad1f27171e72057a7675447f00aca2d47a46ba6806a8cc3f093a8a7c5bacb6f"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconPayload.kt",
+      "sha256": "b0866b39cf94f154557c8c1bdfaf364a810058dc30705d8edb1c165e098dd8b0"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBluetoothApis.kt",
+      "sha256": "22336f203611f114447902709a81f9e2ee074bb9a47cfa0ad4a3b5c1733be38a"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidCodeScanner.kt",
+      "sha256": "66353935c2bf20adf2df3d9cf22cb831f815869c3194f19334187f254640d7c7"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidDeviceApis.kt",
+      "sha256": "410a5c33f276208793be067c5de8d1da987dd11e24670eaea8ad6c3b90e213f9"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFileScopes.kt",
+      "sha256": "d0670eb3e587f36733d276519107e8420cd10102501e80547c344b435d73d4e3"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidManagedFiles.kt",
+      "sha256": "8caac403f73d13fc56e76a716fd60504ab7465197d747daa2f39c2beafe4db36"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeDeviceServices.kt",
+      "sha256": "5b455acfa40ad0a2ac583e2cc648317531b74bfdd3fc3a46a7c5741796c717a1"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNativeMedia.kt",
+      "sha256": "0be45a13f2cff7b5f2d2afeb1c2f900908f52aa7758c508124cbd987b7a080ee"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNdefApis.kt",
+      "sha256": "a697478df91dd6ca7acb12d682c756346ed107603f805b54024afb7473017cc3"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidNetworkApis.kt",
+      "sha256": "ad47cc0376fbdf5a0624d85f2626afa1431848be8f41b2428f590b3481e95f66"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidRecorderApis.kt",
+      "sha256": "a40b1ea1f5fc63f5868d920edd8c6a2db6770399c1050c10344f934b10086c41"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidSystemApis.kt",
+      "sha256": "fa1be4e3c4c5e936b1184132feac77d4ef4dde81ed8e3e1fb78c1f910265a423"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/EglPresenter.kt",
+      "sha256": "7e5d3b40d3de4f113f9405bc4ad19074b3675fbc2ecff8078cb0c5c2c1bd79f1"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/HostServicesClient.kt",
+      "sha256": "842d3cf6515c2779df45fc79b3b64714a2c0041c10ee6f02baae191cdaef759d"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/Models.kt",
+      "sha256": "f55e552019dae0481b723f8800dbe7f4a4f8db569a420ffa9f526762910152e6"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/NativeBridge.kt",
+      "sha256": "995bcbe4737a0b51bc204d516bdc5e9b82e4d4a57fc7ca5c5844e86f2cd9f4a7"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
+      "sha256": "da90dfe9719f63b519650bf2e1ed5f52e9442ffe74f4be3395e2d8c1efa82f6b"
+    },
+    {
+      "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerView.kt",
+      "sha256": "7731c65968a0e851014cee27ecfaa37c5f69e6742bdaefa0fd7f55585991d873"
+    },
+    {
+      "path": "test/HostServicesProbeActivity.kt",
+      "sha256": "4b5d2da943eb816e8268671e7643c9f5b94802c72c7d9232e7cddbebf6ba1056"
+    },
+    {
+      "path": "examples/host-services/ReferenceHostServices.kt",
+      "sha256": "4a28bd34f2da9e7913ba68cba312c51a6a629375633c50cc79a6fa85c26d1dd8"
+    }
+  ],
+  "jniSource": {
+    "sha256": "a68014f3b779c41b712276072d89cc63e5a7b27ad4e5259ab602bfb7a30f5e16"
+  },
+  "apk": {
+    "sha256": "f401bdcff0092dd974d933126eb8e02b42adecc40786f0658f5acd9e0647dc28"
+  },
+  "locationInput": {
+    "kind": "actual-emulator-console-gps",
+    "longitude": 120.123,
+    "latitude": 30.456
+  },
+  "authorizationPurposeDisplay": {
+    "profile": "在此小程序展示您的昵称和头像",
+    "phone": "在此小程序关联您的已验证手机号"
+  },
+  "realPhoneButtonTap": {
+    "x": 445,
+    "y": 332
+  },
+  "recorderDefaultOutcome": {
+    "errCode": -1,
+    "errMsg": "RecorderManager:fail Native encoder produced 8000 Hz / 1 channels; requested 8000 Hz / 2 channels",
+    "kind": "recorder-default-result",
+    "success": false
+  },
+  "recorderDefaults": {
+    "sampleRate": 8000,
+    "numberOfChannels": 1,
+    "adtsHeader": "fff16c4060fffc"
+  },
+  "sourceStability": {
+    "status": "passed",
+    "count": 34,
+    "changed": []
+  },
+  "sdkVersion": "0.1.0-preview.6.0",
+  "date": "2026-11-02",
+  "sourceManifest": {
+    "path": "host-services-native-source.json",
+    "sha256": "c19bcfa74f78b04ccfefe3c4d18ec0c8eeb398a5df65413692048b80add919b6",
+    "stableDuringBuild": true
+  },
+  "externalArtifacts": {
+    "directory": "/tmp/weapp-host-services-probe-recorder-defaults-03",
+    "rawReportSha256": "e93d821fd499fb39461462c46ce539397a22bff3cc0070bd75e37f069747892a",
+    "frameSha256": "958c75f22091cbaa0bef71717883b760b796a2a33047714cfad57503a3440066"
+  },
+  "beaconProtocolUnitTests": {
+    "status": "passed",
+    "scope": "Authored protocol bytes on host JVM; no radio/physical device claim",
+    "sources": [
+      {
+        "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidBeaconPayload.kt",
+        "sha256": "b0866b39cf94f154557c8c1bdfaf364a810058dc30705d8edb1c165e098dd8b0"
+      },
+      {
+        "path": "test/AndroidBeaconPayloadTests.kt",
+        "sha256": "e7179771a989eb387ebdb635653870cb18b568924baab3e189b85ea5a662d3a2"
+      }
+    ],
+    "sourceStability": "passed",
+    "directory": "/var/folders/nc/lnt357c50gdcwqlvymm9jn040000gn/T/weapp-beacon-payload-test-veb7x0uu",
+    "commandsSha256": "d491f329976e893533c38ab7527a57ec5ec3175973f35a523d64bc36c2c173ac",
+    "executionLogSha256": "e8056a8a87c51fa1ddf7b4f31c6e470fd2591ab91efec193db5b0604e3812c51"
+  },
+  "limitations": [
+    "Exact earlier unpublished core development snapshot; newer runtime commits and release/parity acceptance are not covered",
+    "Beacon adapters compiled but no real beacon advertisement, OS permission/adapter transition or radio acceptance",
+    "Authored iBeacon bytes exercise the decoder only; they are not physical-device evidence",
+    "MediaRecorder emulator downgraded default stereo to mono; final SDK explicitly rejects mismatched native output instead of importing it; successful actual AAC check uses explicit mono",
+    "No physical default stereo microphone, image/scan/NFC, real SOTER signer, BLE peripheral, official wallet or merchant transaction",
+    "Loopback HTTP/WebSocket only; no production TLS validation"
+  ],
+  "priorFailedAttempts": [
+    {
+      "directory": "/tmp/weapp-host-services-probe-recorder-defaults-01",
+      "status": "failed",
+      "reason": "Raw ADTS channel configuration check observed mono",
+      "rawReportSha256": "ff48ee3a495629bd72bde80445eaaf21fd68466365b2362417b7af8a30928c4f"
+    },
+    {
+      "directory": "/tmp/weapp-host-services-probe-recorder-defaults-02",
+      "status": "failed",
+      "reason": "MediaExtractor confirmed actual 8000 Hz / 1 channel while stereo requested; prompted output-format guard",
+      "rawReportSha256": "ef7634a52ac79cb2ff89fec473d7809cd1f73c7c5d332efd2f47c2197843a3f4"
+    }
+  ]
+}

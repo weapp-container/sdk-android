@@ -127,6 +127,13 @@ internal class EglPresenter(
         check(EGL14.eglSwapBuffers(display, target)) { "eglSwapBuffers failed: ${EGL14.eglGetError()}" }
         return true
     }
+    /** Remove retained pixels of a revoked account before awaiting its replacement. */
+    fun clear() {
+        if (!isOpen) return
+        current(); GLES20.glBindFramebuffer(GLES20.GL_FRAMEBUFFER, 0)
+        GLES20.glClearColor(0f, 0f, 0f, 0f); GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT)
+        check(EGL14.eglSwapBuffers(display, target)) { "Account revocation clear swap failed" }
+    }
     fun close() {
         var failure: Throwable? = null
         fun cleanup(action: () -> Unit) { try { action() } catch (error: Throwable) { if (failure == null) failure = error else failure!!.addSuppressed(error) } }

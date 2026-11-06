@@ -1,6 +1,6 @@
 {
   "name": "@weapp-container/sdk-android-tools",
-  "version": "0.1.0-preview.5.7",
+  "version": "0.1.0-preview.6.0",
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
@@ -13,6 +13,10 @@
     "runtime:prepare": "node tools/prepare-runtime.mjs",
     "build": "node tools/build.mjs",
     "test": "node --test test/*.test.mjs",
+    "test:account-cleanup": "node tools/test-account-cleanup.mjs",
+    "test:identity-snapshot": "node tools/test-identity-snapshot.mjs",
+    "test:host-backend-error": "node tools/test-host-backend-error.mjs",
+    "test:identity-refresh-native": "node tools/identity-refresh-probe.mjs",
     "check:origin": "node tools/check-origin.mjs"
   }
 }

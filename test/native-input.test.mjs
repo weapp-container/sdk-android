@@ -182,8 +182,8 @@ test('distribution selection cannot relax native path and symlink rules', t => {
 // Native changes require a new producer; the retained old lock cannot relabel it.
 test('current preview requires its exact native version and rejects every earlier preview producer', t => {
   const f = fixture(t);
-  assert.equal(SDK_VERSION, '0.1.0-preview.5.7');
-  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.5.7');
+  assert.equal(SDK_VERSION, '0.1.0-preview.6.0');
+  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.6.0');
   assert.equal(readNative(f.native, f.target, ['libfixture.a']).receipt.sdkVersion, NATIVE_RUNTIME_VERSION);
   for (const oldVersion of ['0.1.0-preview.5', '0.1.0-preview.5.1', '0.1.0-preview.5.2', '0.1.0-preview.5.3', '0.1.0-preview.5.4', '0.1.0-preview.5.5', '0.1.0-preview.5.6']) {
     f.receipt.sdkVersion = oldVersion; f.save();
@@ -198,4 +198,39 @@ test('runtime preparation rejects an earlier distribution lock before download',
   assert.throws(() => selectArtifact(manifest, {
     version: SDK_VERSION, platform: 'android', arch: 'arm64-v8a', component: 'runtime', abiVersion: 1,
   }), { code: 'ERR_RUNTIME_MANIFEST' });
+});
+
+
+// Wrapper archives are outputs, so they cannot appear in their own build inputs.
+test('reviewed lock binds exactly this SDK native slices without a wrapper dependency cycle', () => {
+  const manifest = JSON.parse(readFileSync(resolve(root, 'runtime-artifacts.lock.json')));
+  const platform = 'android', architectures = ["arm64-v8a", "x86_64"];
+  assert.equal(manifest.runtimeVersion, SDK_VERSION);
+  assert.equal(manifest.abiVersion, 1);
+  assert.equal(manifest.source.releaseTag, `runtime-v${SDK_VERSION}`);
+  assert.deepEqual(manifest.artifacts.map(item => item.arch).sort(), architectures);
+  assert.ok(manifest.artifacts.every(item => item.component === 'runtime' && item.platform === platform));
+  for (const arch of architectures) {
+    const selected = selectArtifact(manifest, {version: SDK_VERSION, abiVersion: 1, component: 'runtime', platform, arch});
+    assert.equal(selected.arch, arch);
+  }
+});
+
+
+test('modern View schema 3 packs retain full canonical integrity verification', t => {
+  const f = fixture(t), source = resolve(f.directory, 'modern-pack');
+  mkdirSync(resolve(source, 'blobs/sha256'), { recursive: true });
+  const bytes = Buffer.from('modern module fixture'), digest = hash(bytes);
+  writeFileSync(resolve(source, 'blobs/sha256', digest), bytes);
+  const manifest = { schemaVersion: 3, modules: [{ code: `sha256:${digest}` }], integrity: { algorithm: 'sha256', root: '' } };
+  const canonical = value => Array.isArray(value) ? `[${value.map(canonical).join(',')}]` : value && typeof value === 'object' ? `{${Object.keys(value).sort().map(key => `${JSON.stringify(key)}:${canonical(value[key])}`).join(',')}}` : JSON.stringify(value);
+  manifest.integrity.root = hash(canonical(manifest));
+  writeFileSync(resolve(source, 'manifest.json'), JSON.stringify(manifest));
+  assert.equal(copyPack(source, resolve(f.directory, 'modern-copy')), manifest.integrity.root);
+  writeFileSync(resolve(source, 'blobs/sha256', digest), 'changed');
+  assert.throws(() => copyPack(source, resolve(f.directory, 'modern-tampered')), /blob integrity/);
+  writeFileSync(resolve(source, 'blobs/sha256', digest), bytes);
+  manifest.schemaVersion = 2; manifest.integrity.root = ''; manifest.integrity.root = hash(canonical(manifest));
+  writeFileSync(resolve(source, 'manifest.json'), JSON.stringify(manifest));
+  assert.throws(() => copyPack(source, resolve(f.directory, 'unsupported')), /Invalid portable manifest/);
 });
