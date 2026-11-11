@@ -1,10 +1,12 @@
 # Weapp Container Android SDK
 
+The core runtime and SDK source are available under Apache-2.0. Build the current runtime from the [core source guide](https://github.com/weapp-container/weapp-container/blob/main/docs/sdk-repositories.md). Existing prebuilt archives retain their original licenses, access requirements and exact version/hash pins; this source update does not publish replacement binaries.
+
 [简体中文](README.md) · **English**
 
 Embed mini-program pages in an Android app with a Kotlin session, a native `TextureView`, host messaging, and local persistence. JavaScript runs in QuickJS; Skia GLES renders the page.
 
-Source version: **0.1.0-preview.6.0**. The wrapper source is [Apache-2.0](LICENSE). The closed-source runtime is licensed separately and supplied through the private [runtime-artifacts](https://github.com/weapp-container/runtime-artifacts) repository. This public repository contains no runtime binaries and grants no runtime usage rights.
+Source version: **0.1.0-preview.6.0**. The wrapper source is [Apache-2.0](LICENSE). Current runtime source is Apache-2.0 in the core repository. This SDK repository contains wrapper source; runtime binaries are built or installed separately.
 
 ## Requirements
 
