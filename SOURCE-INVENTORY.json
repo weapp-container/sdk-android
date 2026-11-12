@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.0",
-  "sourceFilesSha256": "9fab55c2e5099adcd0078118a1d0a48ad9092ec2b51b2f8fb098dee4f781a88d",
-  "review": "Install supported Android platform-tools instead of the removed legacy tools package in public workflows.",
+  "sourceFilesSha256": "51fa2fbc8fc3825169025e9fb31fa416fc5f90a97f93a58aabe00040ca65b84d",
+  "review": "Pin the verified public runtime release and review publication metadata",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -424,6 +424,12 @@
       "mode": "100644"
     },
     {
+      "path": "runtime-artifacts.0.1.0-preview.7.0.lock.json",
+      "sha256": "d2e84fc87b761b29f02fce75ffcc34d48f2541f455ba65f96430f8d3258fa66c",
+      "size": 3377,
+      "mode": "100644"
+    },
+    {
       "path": "runtime-artifacts.lock.json",
       "sha256": "7c6e038080562fcd30d18698259db84b60b639f72f1d6bd8188eb0caea1c8bdc",
       "size": 776,
@@ -487,6 +493,12 @@
       "path": "test/central-receipt.test.mjs",
       "sha256": "cc818dd1ca546a22048590a41175e3c501f14c26aff585fb5635feb5fdbe9789",
       "size": 2282,
+      "mode": "100644"
+    },
+    {
+      "path": "test/current-runtime-lock.test.mjs",
+      "sha256": "e87030f869e7bba34f0e29103d9120bee8029adc47fbf467c710d5b54081fe13",
+      "size": 1640,
       "mode": "100644"
     },
     {
@@ -677,8 +689,8 @@
     },
     {
       "path": "tools/prepare-runtime.mjs",
-      "sha256": "816694a94cffcc3b6efaf3c13b5f691efa1f54fa68917a3102b2237cef336e1b",
-      "size": 4476,
+      "sha256": "124e43099dc1fa19aef9e3e4d2821accaf98c30fe997969429344e8e8629d5b2",
+      "size": 4494,
       "mode": "100644"
     },
     {
