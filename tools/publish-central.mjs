@@ -4,15 +4,16 @@ import { dirname, join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { createHash } from 'node:crypto';
 import { completeDeployment } from './central-client.mjs';
+import { resumeDeployment } from './central-receipt.mjs';
 import { assetEntry, cleanSource, filesUnder, run, sha256, versionOf, writeRelease } from './public-release.mjs';
 const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const args = process.argv.slice(2), option = name => { const i = args.indexOf(name); return i < 0 ? undefined : args[i + 1]; };
 if (option('--resume')) {
   const path = resolve(option('--resume'));
-  const deployment = JSON.parse(readFileSync(path));
+  const { deployment, save } = resumeDeployment(root, path);
   const username = process.env.MAVEN_CENTRAL_USERNAME, password = process.env.MAVEN_CENTRAL_PASSWORD;
   if (!username || !password) throw Error('Central Portal user-token credentials are required');
-  await completeDeployment(deployment.deploymentId, { Authorization: `Bearer ${Buffer.from(`${username}:${password}`).toString('base64')}` }, value => writeFileSync(path, JSON.stringify(value, null, 2) + '\n'));
+  await completeDeployment(deployment.deploymentId, { Authorization: `Bearer ${Buffer.from(`${username}:${password}`).toString('base64')}` }, save);
   process.exit(0);
 }
 if (!option('--sdk') || !option('--out')) throw Error('Usage: publish-central.mjs --sdk <verified Android installation> --out <new directory> [--execute]');
@@ -53,8 +54,9 @@ try {
     const response = await fetch(`https://central.sonatype.com/api/v1/publisher/upload?publishingType=USER_MANAGED&name=${encodeURIComponent(stem)}`, { method: 'POST', headers, body, signal: AbortSignal.timeout(120000) });
     if (!response.ok) throw Error(`Central upload failed (${response.status}); no release was declared successful`);
     const deploymentId = (await response.text()).trim();
-    writeFileSync(join(out, 'deployment.json'), JSON.stringify({ deploymentId, state: 'UPLOADED', published: false }, null, 2) + '\n');
-    await completeDeployment(deploymentId, headers, value => writeFileSync(join(out, 'deployment.json'), JSON.stringify(value, null, 2) + '\n'));
+    const path = join(out, 'deployment.json');
+    writeFileSync(path, JSON.stringify({ deploymentId, sdkVersion: version, sourceCommit, bundleSha256: assetEntry(out, fileName).sha256, state: 'UPLOADED', published: false }, null, 2) + '\n');
+    await completeDeployment(deploymentId, headers, resumeDeployment(root, path).save);
     console.log(`Central deployment ${deploymentId} published after server validation.`);
   }
 } finally { rmSync(temporary, { recursive: true, force: true }); }
