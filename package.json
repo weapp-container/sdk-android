@@ -1,6 +1,6 @@
 {
   "name": "@weapp-container/sdk-android-tools",
-  "version": "0.1.0-preview.6.0",
+  "version": "0.1.0-preview.7.0",
   "private": true,
   "type": "module",
   "license": "Apache-2.0",
@@ -18,6 +18,7 @@
     "test:host-backend-error": "node tools/test-host-backend-error.mjs",
     "test:identity-refresh-native": "node tools/identity-refresh-probe.mjs",
     "check:origin": "node tools/check-origin.mjs",
+    "release:central": "node tools/publish-central.mjs",
     "docs:check": "node tools/documentation/check.mjs && node tools/documentation/check-content.mjs"
   }
 }

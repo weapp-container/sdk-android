@@ -2,12 +2,38 @@
 
 [简体中文](README.md) · **English**
 
+<a id="公开发行候选preview7"></a>
+## Public distribution candidate: preview.7
+
+The installation examples below describe the preview.7 distribution candidate. Check the named registry or release before using them; source publication does not establish package publication or device acceptance. The source-build examples later in this document refer to the reviewed preview.6 checkout below. The core builder currently emits preview.6, so do not combine that runtime with preview.7 wrappers.
+
+First public publication is being prepared. Use these commands once this version is visible in its registry. Historical private archives and locks retain their original identities.
+
+Version `0.1.0-preview.7.0` requires Android API 26+, arm64-v8a / x86_64 and Java 17. Resolve the public coordinate from Maven Central:
+
+```kotlin
+repositories { google(); mavenCentral() }
+dependencies { implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.0") }
+```
+
+The AAR includes JNI bindings, both runtime ABIs and dependency licenses. Application installation requires no Node.js, Rust or private repository access. Java/Kotlin namespaces remain `com.sonofmagic.weapp.container.sdk`.
+
+<a id="已复核的源码构建版本"></a>
+### Reviewed source-build checkout
+
+```sh
+git clone https://github.com/weapp-container/sdk-android.git sdk-android-source
+cd sdk-android-source
+git checkout be2a7c6085bbf2562f0a351855c69ee5167b3770
+```
+
+
 
 [Documentation](https://container.weapp.dev/en/docs/) · [Build from source](https://github.com/weapp-container/weapp-container/blob/main/docs/sdk-source-build.en.md) · [APIs and contracts](https://github.com/weapp-container/sdk-contract/blob/main/README.en.md)
 
 Embed mini-program pages within Android applications. The SDK provides Kotlin session management, native `TextureView`, host message channel, and local persistence, using QuickJS to execute JavaScript and Skia GLES to render pages.
 
-Current source version: **0.1.0-preview.6.0**. The SDK wrapper source is licensed under [Apache-2.0](LICENSE); runtime source is provided in the main repository under Apache-2.0. This repository contains the SDK wrapper source code, while the runtime library is built or installed separately.
+Reviewed source example version: **0.1.0-preview.6.0**. The SDK wrapper source is licensed under [Apache-2.0](LICENSE); runtime source is provided in the main repository under Apache-2.0. This repository contains the SDK wrapper source code, while the runtime library is built or installed separately.
 
 <a id="从当前源码开始"></a>
 ## Start from Source Code

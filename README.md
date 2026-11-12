@@ -2,12 +2,38 @@
 
 **简体中文** · [English](README.en.md)
 
+<a id="public-distribution-candidate-preview7"></a>
+## 公开发行候选：preview.7
+
+下列安装示例描述 preview.7 发行候选，使用前须确认对应注册源或 Release 已提供该版本；源码公开不代表包已发布或设备验收完成。本文后续源码构建示例使用下面固定的 preview.6 checkout。当前核心构建器仍输出 preview.6，不要将该运行库与 preview.7 包装层混用。
+
+首次公开发布正在准备；安装命令须在对应注册源出现本版本后使用。历史私有归档及其锁文件保持原样。
+
+版本 `0.1.0-preview.7.0`；Android API 26+，arm64-v8a / x86_64；Java 17。配置 Maven Central 后直接依赖公开坐标：
+
+```kotlin
+repositories { google(); mavenCentral() }
+dependencies { implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.0") }
+```
+
+AAR 包含 JNI 接入层、两种 ABI 的运行库和第三方许可。普通应用安装无需 Node.js、Rust 或私有仓库授权；Java/Kotlin 包名保持 `com.sonofmagic.weapp.container.sdk`。
+
+<a id="reviewed-source-build-checkout"></a>
+### 已复核的源码构建版本
+
+```sh
+git clone https://github.com/weapp-container/sdk-android.git sdk-android-source
+cd sdk-android-source
+git checkout be2a7c6085bbf2562f0a351855c69ee5167b3770
+```
+
+
 
 [开发文档](https://container.weapp.dev/docs/) · [源码构建](https://github.com/weapp-container/weapp-container/blob/main/docs/sdk-source-build.md) · [API 与协议](https://github.com/weapp-container/sdk-contract/blob/main/README.md)
 
 在 Android 应用中嵌入小程序页面。SDK 提供 Kotlin 会话、原生 `TextureView`、宿主消息通道和本地持久化，使用 QuickJS 执行 JavaScript、Skia GLES 渲染页面。
 
-当前源码版本：**0.1.0-preview.6.0**。SDK 封装源码采用 [Apache-2.0](LICENSE)；运行时源码在主仓库按 Apache-2.0 提供。本仓库包含 SDK 包装层源码，运行库单独构建或安装。
+已复核源码示例版本：**0.1.0-preview.6.0**。SDK 封装源码采用 [Apache-2.0](LICENSE)；运行时源码在主仓库按 Apache-2.0 提供。本仓库包含 SDK 包装层源码，运行库单独构建或安装。
 
 <a id="start-from-source-code"></a>
 ## 从当前源码开始

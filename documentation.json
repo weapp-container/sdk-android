@@ -68,8 +68,8 @@
         "repository": "weapp-container/sdk-android",
         "path": "README.md"
       },
-      "reviewedChineseSummary": "Weapp Container Android SDK；从当前源码开始；准备环境；1. 获取运行库；2. 构建 AAR 与 Maven 仓库；3. 嵌入页面；4. 通信与导航；5. 生命周期与存储",
-      "reviewedChineseSha256": "2472abdea2a5f0cfc0e403435d805a7e9f84b42c873f8f0fc9175d951bc093ee",
+      "reviewedChineseSummary": "合入 preview.7 公开发行候选的安装入口；保留已匹配的 preview.6 源码构建版本、历史锁与独立设备验收边界。",
+      "reviewedChineseSha256": "32eacab6ba32ce7c88ef2bf3ea2d8b1331ad3df61a031ca8a2c25681245f4307",
       "legacyHeadingIds": [
         "1-获取运行库",
         "2-构建-aar-与-maven-仓库",

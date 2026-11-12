@@ -1,14 +1,20 @@
 {
   "schemaVersion": 2,
-  "sdkVersion": "0.1.0-preview.6.0",
-  "sourceFilesSha256": "4bf47fa8419d86708e5c4c269eb29b2b78ea30551ba7c01e3926d8139fd87930",
-  "review": "Review bilingual documentation links across wrapped Markdown labels; preserve SDK behavior, historical ORIGIN and artifact locks.",
+  "sdkVersion": "0.1.0-preview.7.0",
+  "sourceFilesSha256": "9e929ad87d5c9e3cfad4d660f748d2f0ea841feff7b2a8cccded5d0ff4a3c647",
+  "review": "Merge public distribution candidate and review bilingual installation boundaries; retain pinned preview.6 source example, historical ORIGIN and artifact locks.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
     "sha256": "b58ba8b41c2f7967e9110d77765ab4e91c5304ecb8d7684cd5ed42fc57bbf2c4"
   },
   "files": [
+    {
+      "path": ".github/workflows/build-public.yml",
+      "sha256": "42f6b616055a2d223cc173076de3aeacf110388a6993550b59b089b50e0f4628",
+      "size": 1699,
+      "mode": "100644"
+    },
     {
       "path": ".github/workflows/checks.yml",
       "sha256": "1c18982a507217a8bbac7e65279383e5df5c6460689d5d92ad3e3332658eff00",
@@ -19,6 +25,12 @@
       "path": ".github/workflows/documentation.yml",
       "sha256": "6be53c9ba3b356899fdc53c29097b58e2a65d65bc74196d441efa29aa27487f1",
       "size": 446,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/public-sdk.yml",
+      "sha256": "3582ab912d24f859b0f543d95dab2002e17f091390adc8e4ae02a04f1007edaf",
+      "size": 476,
       "mode": "100644"
     },
     {
@@ -89,14 +101,14 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "c81c44f5195f77d226e9adaa351486ddd5ef128ab2aab297c0f982b4054ed3b6",
-      "size": 13015,
+      "sha256": "d3516baeb6193105751a107387cd34085086184ea983e5e1b5e32505ae1932c3",
+      "size": 14472,
       "mode": "100644"
     },
     {
       "path": "README.md",
-      "sha256": "2472abdea2a5f0cfc0e403435d805a7e9f84b42c873f8f0fc9175d951bc093ee",
-      "size": 10938,
+      "sha256": "32eacab6ba32ce7c88ef2bf3ea2d8b1331ad3df61a031ca8a2c25681245f4307",
+      "size": 12261,
       "mode": "100644"
     },
     {
@@ -107,14 +119,14 @@
     },
     {
       "path": "build.gradle.kts",
-      "sha256": "3602e32f35bf6287d2b8e209cbef783e24a1bc6a473de0d175e7d7d0820fdfab",
-      "size": 121,
+      "sha256": "876fe32c8d0f36d63b1f677e0e09bc50f3d4d254dd9389fede7c11e9ba505915",
+      "size": 179,
       "mode": "100644"
     },
     {
       "path": "consumer/build.gradle.kts",
-      "sha256": "7677d1030242134e97d3b86bea219c8dab723c35aaa600bb4f68094498684a04",
-      "size": 1071,
+      "sha256": "331492b1a6370a805feb79a93bd8b7333bf4b5620c242bdfe82f6518eefa47ac",
+      "size": 1076,
       "mode": "100644"
     },
     {
@@ -173,8 +185,8 @@
     },
     {
       "path": "documentation.json",
-      "sha256": "5faf7398f800e85a93bf4c9f724e81cdd997cc64cd9cddea0f6488fc1fdbb940",
-      "size": 5798,
+      "sha256": "14919b02a63e5f920ebfdfde380f0a8456e00b98e5cbbc17999f209d268ba426",
+      "size": 5754,
       "mode": "100644"
     },
     {
@@ -239,8 +251,8 @@
     },
     {
       "path": "library/build.gradle.kts",
-      "sha256": "66aa3fb52cc59e1e8d15b3e05b29a36cf156bce7084a09fd957d8b5ea1c8b056",
-      "size": 4434,
+      "sha256": "202e706810ef78b87bebb5ff685d6532c2d3cf9502954f887098a92804ff03a5",
+      "size": 5152,
       "mode": "100644"
     },
     {
@@ -455,8 +467,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "2491e1a2776f517d217eaf99e29e0137b75a585d484abd947470f28fd9d9a637",
-      "size": 890,
+      "sha256": "d23df19574a7abc14b97f949ebd0d9f7c0f34fe76f20f89fe917e31971ab0ed9",
+      "size": 947,
       "mode": "100644"
     },
     {
@@ -514,9 +526,15 @@
       "mode": "100644"
     },
     {
+      "path": "test/central-client.test.mjs",
+      "sha256": "f6fd3820723f0fc34fb30e24f9e18972a6136f818d42b3517c1c0b0e94f72658",
+      "size": 1515,
+      "mode": "100644"
+    },
+    {
       "path": "test/distribution-identity.test.mjs",
-      "sha256": "8d5bf7593e90db09c6e5ded0604b500b288ccef2b22763d1a2670243e28272e9",
-      "size": 6160,
+      "sha256": "ba45f402161629b1115022c94c9f6bee4dee349939c377561c43ee74c2c2cbff",
+      "size": 6158,
       "mode": "100644"
     },
     {
@@ -587,8 +605,8 @@
     },
     {
       "path": "test/native-input.test.mjs",
-      "sha256": "7180301cf0babcada739d937a2b9659e7129fed903731c8f8d14655d8e20780a",
-      "size": 16826,
+      "sha256": "bde5c50c0608de2c24cfd40d5bddab1e67d59cd5fcdeff21229434e26dae5777",
+      "size": 17111,
       "mode": "100644"
     },
     {
@@ -601,6 +619,12 @@
       "path": "test/provenance.test.mjs",
       "sha256": "3f266ab65cf01fd428a606e77d665bc9ab7593b3b007f369daeebe33067773ed",
       "size": 2491,
+      "mode": "100644"
+    },
+    {
+      "path": "test/public-release.test.mjs",
+      "sha256": "c76a8bd9a74205a71e24f5ffce08dc877217a2bc421580a3c6cd3a6509444dfa",
+      "size": 2749,
       "mode": "100644"
     },
     {
@@ -619,6 +643,12 @@
       "path": "tools/build.mjs",
       "sha256": "a085cb29903f51f807bbced97313e49191703ebfea9857fbdc8e4feac9a6e6ff",
       "size": 9603,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/central-client.mjs",
+      "sha256": "a3b3dd85c9130c12c6dd07b5e9e701c344505c84eab97a012277b302a584f684",
+      "size": 1692,
       "mode": "100644"
     },
     {
@@ -682,6 +712,12 @@
       "mode": "100644"
     },
     {
+      "path": "tools/download-production.mjs",
+      "sha256": "be7c75d07ad81331d2d55dfd630c3f92efed1f1ca5938a6e05e9cb47e9a70b84",
+      "size": 2257,
+      "mode": "100644"
+    },
+    {
       "path": "tools/gles-recovery.mjs",
       "sha256": "d08ca0052146c080af202adb7110e82b18f0d37635a1d2990adfd07c1b94c0e3",
       "size": 4924,
@@ -695,13 +731,13 @@
     },
     {
       "path": "tools/identity-refresh-probe.mjs",
-      "sha256": "b2671d9efc85aa80e7b7a503cdcaa3a2eff9c4d071debbab80a67af303107828",
+      "sha256": "2ba4c6b461372d52b3997497e5e473d69eab65919007528e39a51e922878cc7b",
       "size": 13133,
       "mode": "100644"
     },
     {
       "path": "tools/native-input.mjs",
-      "sha256": "e38e258edcd0bc427f616308d4282ac014297f63f7645bb2515f5b087a98daf8",
+      "sha256": "837888ddf6d2a5b922a0c6d3fe4a3044ead8e27ecf081c664b5016ee3c26f185",
       "size": 12573,
       "mode": "100644"
     },
@@ -718,8 +754,20 @@
       "mode": "100644"
     },
     {
+      "path": "tools/public-release.mjs",
+      "sha256": "a8691fca9be3c6def20195cbeced5b597e76be6ca6fb3329b7e1937b12f08ce3",
+      "size": 7288,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/publish-central.mjs",
+      "sha256": "bb39188725d35b87c001960568f6f54c53a5e32e3da55690f99d48ab28c0ed7d",
+      "size": 5517,
+      "mode": "100644"
+    },
+    {
       "path": "tools/runtime-artifacts.mjs",
-      "sha256": "17b6f4f4ec2a1b743fe1e2632b3a119f0cf2bf7fd3b7fa1e15df32da5d8bb882",
+      "sha256": "3246476e3a0a8a5161f0e5290a205e5ac88c19a53fe231fc79698d9bea58af18",
       "size": 21000,
       "mode": "100644"
     },
