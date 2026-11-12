@@ -1,92 +1,15 @@
 # Weapp Container Android SDK
 
-Historical storage: updated downloaders map the nine frozen legacy `runtime-artifacts` versions to the private `weapp-container/runtime-artifacts-private-archive`, retaining original lock bytes, hashes and licenses and recording the resolved repository. Old downloaders must upgrade. The new repository at the old name contains retired tool source only; new runtime releases use the core repository. Private archive access still requires authorization, with no cross-repository fallback.
+First public publication is being prepared. Use these commands once this version is visible in its registry. Historical private archives and locks retain their original identities.
 
-Historical release audit (2026-11-12): Both default runtime pins differ from the current same-name legacy assets; default online preparation fails integrity checks. Build from matching clean source or explicitly select an independently reviewed matching manifest with `--manifest`; do not merely replace old hashes. See the [audit and migration record](https://github.com/weapp-container/weapp-container/blob/main/docs/runtime-artifacts-migration.md).
-
-Runtime packaging and publication now live in the [core repository](https://github.com/weapp-container/weapp-container/tree/main/tools/runtime-artifacts). New manifests select exact core releases through `--manifest`. The default lock retains its historical `runtime-artifacts` source, version, hashes and bundled licenses. The retired repository remains a read-only archive; downloads never fall back between repositories. Private repositories still require read access; source licensing does not imply public binary availability.
-
-The core runtime and SDK source are available under Apache-2.0. Build the current runtime from the [core source guide](https://github.com/weapp-container/weapp-container/blob/main/docs/sdk-repositories.md). Existing prebuilt archives retain their original licenses, access requirements and exact version/hash pins; this source update does not publish replacement binaries.
-
-[简体中文](README.md) · **English**
-
-Embed mini-program pages in an Android app with a Kotlin session, a native `TextureView`, host messaging, and local persistence. JavaScript runs in QuickJS; Skia GLES renders the page.
-
-Source version: **0.1.0-preview.6.0**. The wrapper source is [Apache-2.0](LICENSE). Current runtime source is Apache-2.0 in the core repository. This SDK repository contains wrapper source; runtime binaries are built or installed separately.
-
-## Requirements
-
-| Component | Requirement |
-| --- | --- |
-| Application | Android API 26+ |
-| Architectures | `arm64-v8a`, `x86_64` |
-| Build tools | Node.js 24+, Python 3, JDK 17+, Gradle 8.9 |
-| Android toolchain | SDK / Build Tools 36, NDK `27.1.12297006`, CMake `3.22.1` |
-
-Set `ANDROID_HOME`. Use `ANDROID_NDK_HOME` and `GRADLE` to select tool paths if needed. Integration uses prebuilt runtime binaries without a Rust toolchain or core source.
-
-## 1. Obtain the runtime
-
-```sh
-git clone https://github.com/weapp-container/sdk-android.git
-cd sdk-android
-```
-
-After obtaining runtime access, supply `WEAPP_CONTAINER_RUNTIME_TOKEN` through your credential environment, restricted to **Contents: read** on the private artifact repository. Keep credentials out of source files and command arguments.
-
-```sh
-node tools/prepare-runtime.mjs
-```
-
-For authorized offline archives:
-
-```sh
-node tools/prepare-runtime.mjs --artifact-dir /absolute/runtime-archives
-```
-
-The installer checks **0.1.0-preview.6.0**, ABI 1, architecture, size, and SHA-256 against [runtime-artifacts.lock.json](runtime-artifacts.lock.json), then installs to `.runtime/install/native` and `.runtime/install/licenses`. Missing archives, denied access, or integrity mismatches fail the operation and preserve the previous installation. A committed pin does not imply public download access.
-
-Use `--manifest /absolute/reviewed-lock.json` for an explicitly reviewed archive manifest. `WEAPP_CONTAINER_RUNTIME_TIMEOUT_MS` adjusts the download deadline from `1` to `3600000` milliseconds; the default is 15 minutes.
-
-## 2. Build the AAR and Maven repository
-
-Supply a previously built and verified portable pack directory:
-
-```sh
-node tools/build.mjs --native-root .runtime/install/native --licenses-root .runtime/install/licenses --pack /absolute/verified-portable-pack
-```
-
-`artifacts/android` contains the release AAR, local `maven/` repository, independent R8 consumer, and validation reports. `--pack` supplies that consumer; the builder does not search a core checkout for examples.
-
-Add the generated repository to your app's `settings.gradle.kts`, adjusting the path:
+Version `0.1.0-preview.7.0` requires Android API 26+, arm64-v8a / x86_64 and Java 17. Resolve the public coordinate from Maven Central:
 
 ```kotlin
-dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url = uri("/absolute/sdk-android/artifacts/android/maven") }
-    }
-}
+repositories { google(); mavenCentral() }
+dependencies { implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.0") }
 ```
 
-Add the dependency in your app's `build.gradle.kts` and preserve the verified runtime bytes:
-
-```kotlin
-android {
-    defaultConfig { minSdk = 26 }
-    packaging {
-        jniLibs.keepDebugSymbols += setOf(
-            "**/libweapp_container_sdk.so", "**/libc++_shared.so",
-        )
-    }
-}
-dependencies {
-    implementation("com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.6.0")
-}
-```
-
-This uses your locally built repository and does not require a public Maven publication. The sample consumer uses test signing for its release variant; configure your own signing for a production application.
+The AAR includes JNI bindings, both runtime ABIs and dependency licenses. Application installation requires no Node.js, Rust or private repository access. Java/Kotlin namespaces remain `com.sonofmagic.weapp.container.sdk`.
 
 ## 3. Embed a page
 

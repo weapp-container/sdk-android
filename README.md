@@ -1,90 +1,15 @@
 # Weapp Container Android SDK
 
-历史发行审计（2026-11-12）：两个默认 runtime pin 均与旧仓库当前同名资产不符，默认在线准备会被完整性校验拒绝。请从匹配的干净源码构建，或通过 `--manifest` 显式选取独立审核过的配套清单；不要仅修改旧哈希。[差异与迁移记录](https://github.com/weapp-container/weapp-container/blob/main/docs/runtime-artifacts-migration.md)。
+首次公开发布正在准备；安装命令须在对应注册源出现本版本后使用。历史私有归档及其锁文件保持原样。
 
-运行库发行工具已迁入 [核心仓库](https://github.com/weapp-container/weapp-container/tree/main/tools/runtime-artifacts)。新清单使用核心仓库的精确版本 Release；用 `--manifest` 显式选取。更新后的下载器把旧锁中的 `runtime-artifacts` 标识定向到私有的 `weapp-container/runtime-artifacts-private-archive`，仅允许九个冻结版本，保留原版本、哈希及随附许可，回执记录实际存储库。旧版下载器需升级；同名新仓库只保留停更工具源码。无跨仓库回退，私有档案仍需读取权限，源码许可不代表历史发行物公开可用。
-
-核心运行时与 SDK 自有源码采用 Apache-2.0，可按[主仓库源码构建说明](https://github.com/weapp-container/weapp-container/blob/main/docs/sdk-repositories.md)构建当前运行库。现有预编译归档保留原许可、访问要求及精确版本和哈希锁；本次源码更新不发布替代二进制。
-
-**简体中文** · [English](README.en.md)
-
-在 Android 应用中嵌入小程序页面。SDK 提供 Kotlin 会话、原生 `TextureView`、宿主消息通道和本地持久化，使用 QuickJS 执行 JavaScript、Skia GLES 渲染页面。
-
-当前源码版本：**0.1.0-preview.6.0**。SDK 封装源码采用 [Apache-2.0](LICENSE)；运行时源码在主仓库按 Apache-2.0 提供。本仓库包含 SDK 包装层源码，运行库单独构建或安装。
-
-## 准备环境
-
-| 项目 | 要求 |
-| --- | --- |
-| 应用系统 | Android API 26+ |
-| 原生架构 | `arm64-v8a`、`x86_64` |
-| 构建工具 | Node.js 24+、Python 3、JDK 17+、Gradle 8.9 |
-| Android 工具链 | SDK / Build Tools 36、NDK `27.1.12297006`、CMake `3.22.1` |
-
-配置 `ANDROID_HOME`；可用 `ANDROID_NDK_HOME` 和 `GRADLE` 指定工具路径。应用接入使用预编译运行库，无需 Rust 或核心源码。
-
-## 1. 获取运行库
-
-```sh
-git clone https://github.com/weapp-container/sdk-android.git
-cd sdk-android
-```
-
-获得运行库访问授权后，通过凭据环境提供 `WEAPP_CONTAINER_RUNTIME_TOKEN`，权限限定为私有产物仓库的 **Contents: read**。不要把凭据写进源码或命令参数。
-
-```sh
-node tools/prepare-runtime.mjs
-```
-
-使用已获授权的离线归档：
-
-```sh
-node tools/prepare-runtime.mjs --artifact-dir /absolute/runtime-archives
-```
-
-工具按 [runtime-artifacts.lock.json](runtime-artifacts.lock.json) 校验 **0.1.0-preview.6.0**、ABI 1、架构、大小和 SHA-256，安装到 `.runtime/install/native` 和 `.runtime/install/licenses`。缺少归档、无下载权限或校验不符时会失败；已有安装在失败时保留。锁文件中的 pin 不代表运行库可公开下载。
-
-自定义归档清单使用 `--manifest /absolute/reviewed-lock.json`。慢速网络可通过 `WEAPP_CONTAINER_RUNTIME_TIMEOUT_MS` 调整下载超时，范围为 `1`–`3600000` 毫秒，默认 15 分钟。
-
-## 2. 构建 AAR 与 Maven 仓库
-
-准备一份已经构建并校验的 portable pack 目录：
-
-```sh
-node tools/build.mjs --native-root .runtime/install/native --licenses-root .runtime/install/licenses --pack /absolute/verified-portable-pack
-```
-
-输出位于 `artifacts/android`，包括 release AAR、本地 `maven/` 仓库、独立 R8 consumer 及校验报告。`--pack` 用于构建该 consumer，不从核心仓库自动寻找样例。
-
-在应用的 `settings.gradle.kts` 中加入生成的仓库，路径按实际目录调整：
+版本 `0.1.0-preview.7.0`；Android API 26+，arm64-v8a / x86_64；Java 17。配置 Maven Central 后直接依赖公开坐标：
 
 ```kotlin
-dependencyResolutionManagement {
-    repositories {
-        google()
-        mavenCentral()
-        maven { url = uri("/absolute/sdk-android/artifacts/android/maven") }
-    }
-}
+repositories { google(); mavenCentral() }
+dependencies { implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.0") }
 ```
 
-在应用的 `build.gradle.kts` 中添加依赖，并保留已校验运行库的原始字节：
-
-```kotlin
-android {
-    defaultConfig { minSdk = 26 }
-    packaging {
-        jniLibs.keepDebugSymbols += setOf(
-            "**/libweapp_container_sdk.so", "**/libc++_shared.so",
-        )
-    }
-}
-dependencies {
-    implementation("com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.6.0")
-}
-```
-
-这里使用本地构建的 Maven 仓库，不要求该坐标已发布到公共 Maven 服务。consumer 的 release 使用测试签名，正式应用需配置自己的签名。
+AAR 包含 JNI 接入层、两种 ABI 的运行库和第三方许可。普通应用安装无需 Node.js、Rust 或私有仓库授权；Java/Kotlin 包名保持 `com.sonofmagic.weapp.container.sdk`。
 
 ## 3. 嵌入页面
 
