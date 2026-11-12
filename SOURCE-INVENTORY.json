@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.0",
-  "sourceFilesSha256": "2b71bd1dfb0ac0efe52d64f6a7934104df9b336f4e3c0f83a91c387028e61f9f",
-  "review": "Bind Central deployment recovery to the exact producer and signed bundle",
+  "sourceFilesSha256": "9fab55c2e5099adcd0078118a1d0a48ad9092ec2b51b2f8fb098dee4f781a88d",
+  "review": "Install supported Android platform-tools instead of the removed legacy tools package in public workflows.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -11,8 +11,8 @@
   "files": [
     {
       "path": ".github/workflows/build-public.yml",
-      "sha256": "3a038d28473d5002ce897ff7557af6cb7aa8d266f927672b428de38581661e65",
-      "size": 1789,
+      "sha256": "f45a8274952ae989f4c0f2ceb039ead27aceb163e6c5ba18ce9cf49f0d5fbe24",
+      "size": 1838,
       "mode": "100644"
     },
     {
