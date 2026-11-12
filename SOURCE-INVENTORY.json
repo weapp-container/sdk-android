@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.0",
-  "sourceFilesSha256": "b19dc1e244c1ecb2cc6a05f7eb48d911a63f5de5d3466c9b91830000acd44903",
-  "review": "Prepare validated public preview distributions",
+  "sourceFilesSha256": "8764061871ebd805a9467cfa1596c243910b79ac29e08b8e8675bab84a3f8e7e",
+  "review": "Complete public release workflows and installation documentation",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -11,8 +11,8 @@
   "files": [
     {
       "path": ".github/workflows/build-public.yml",
-      "sha256": "42f6b616055a2d223cc173076de3aeacf110388a6993550b59b089b50e0f4628",
-      "size": 1699,
+      "sha256": "3a038d28473d5002ce897ff7557af6cb7aa8d266f927672b428de38581661e65",
+      "size": 1789,
       "mode": "100644"
     },
     {
@@ -73,6 +73,12 @@
       "path": "ORIGIN.json",
       "sha256": "b58ba8b41c2f7967e9110d77765ab4e91c5304ecb8d7684cd5ed42fc57bbf2c4",
       "size": 22359,
+      "mode": "100644"
+    },
+    {
+      "path": "PUBLIC-RELEASE.md",
+      "sha256": "0aaf32aec5bb9e711f628d0bbb687d68350ee3e0308b85b38c2a3f88fa8bd0ea",
+      "size": 3475,
       "mode": "100644"
     },
     {
@@ -652,6 +658,12 @@
       "mode": "100644"
     },
     {
+      "path": "tools/package-public.mjs",
+      "sha256": "ea81f8de0f385a9e42898d1116710dd122857c40ae5efa85969f333e3a3ff52c",
+      "size": 1691,
+      "mode": "100644"
+    },
+    {
       "path": "tools/prepare-runtime.mjs",
       "sha256": "816694a94cffcc3b6efaf3c13b5f691efa1f54fa68917a3102b2237cef336e1b",
       "size": 4476,
@@ -667,6 +679,12 @@
       "path": "tools/publish-central.mjs",
       "sha256": "bb39188725d35b87c001960568f6f54c53a5e32e3da55690f99d48ab28c0ed7d",
       "size": 5517,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/publish-release.mjs",
+      "sha256": "7afc377ecaa031530bcded79eada31c2654c3a68d6596ed78d7a2522c8f45b53",
+      "size": 455,
       "mode": "100644"
     },
     {
