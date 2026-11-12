@@ -42,6 +42,7 @@ jobs:
       - uses: android-actions/setup-android@v3
       - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0' 'ndk;27.1.12297006' 'cmake;3.22.1'
       - run: node tools/build.mjs --native-root .runtime/native --licenses-root .runtime/licenses --pack .runtime/acceptance-pack
+      - run: node tools/package-public.mjs --sdk artifacts/android --out artifacts/public
       - uses: actions/upload-artifact@v4
         if: always()
         with:
