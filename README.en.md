@@ -204,6 +204,7 @@ Core runtime and SDK source code are licensed under Apache-2.0 and can be built 
 ```sh
 git clone https://github.com/weapp-container/sdk-android.git
 cd sdk-android
+git checkout be2a7c6085bbf2562f0a351855c69ee5167b3770
 ```
 
 After obtaining runtime access authorization, provide credentials via the environment variable `WEAPP_CONTAINER_RUNTIME_TOKEN`, with permissions restricted to **Contents: read** for private product repositories. Do not embed credentials in source code or command-line arguments.

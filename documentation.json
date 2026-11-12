@@ -68,8 +68,8 @@
         "repository": "weapp-container/sdk-android",
         "path": "README.md"
       },
-      "reviewedChineseSummary": "合入 preview.7 公开发行候选的安装入口；保留已匹配的 preview.6 源码构建版本、历史锁与独立设备验收边界。",
-      "reviewedChineseSha256": "32eacab6ba32ce7c88ef2bf3ea2d8b1331ad3df61a031ca8a2c25681245f4307",
+      "reviewedChineseSummary": "同步最新公开发行工作流入口，保留固定 preview.6 源码用法与 preview.7 发行候选的独立边界。",
+      "reviewedChineseSha256": "22cadda327106c56ac9353b72504e8edf5f7ef6079686709deeb3128bf3c2349",
       "legacyHeadingIds": [
         "1-获取运行库",
         "2-构建-aar-与-maven-仓库",
@@ -155,6 +155,19 @@
       },
       "reviewedChineseSummary": "双语文档维护；更新一组文档；网站快照；检查与测试",
       "reviewedChineseSha256": "6c0d12dd12a6cd4a1076e912f2a09d959772638769da314e76d1708cc7c5a64e",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "public-release",
+      "zh": "PUBLIC-RELEASE.md",
+      "en": "PUBLIC-RELEASE.en.md",
+      "section": "tools",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "PUBLIC-RELEASE.md"
+      },
+      "reviewedChineseSummary": "维护者发行顺序、认证、不可变资产与平台独立验收条件；不会自动发布或修改历史发行物。",
+      "reviewedChineseSha256": "5f461c3ae95014135c5e700815289f672b1fae43ff3dc55c498c0118d977e1d6",
       "legacyHeadingIds": []
     }
   ],
