@@ -3,6 +3,13 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { SDK_VERSION, selectArtifact } from '../tools/runtime-artifacts.mjs';
 
+test('Android user agent agrees with the Maven and runtime version', () => {
+  const source = readFileSync(new URL('../library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt', import.meta.url), 'utf8');
+  const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url)));
+  assert.equal(source.match(/WeappContainerAndroid\/([^"\s]+)/)?.[1], pkg.version);
+  assert.equal(pkg.version, SDK_VERSION);
+});
+
 test('current public pin supplies every native target and wrapper without historical fallback', () => {
   const pin = JSON.parse(readFileSync(new URL(`../runtime-artifacts.${SDK_VERSION}.lock.json`, import.meta.url)));
   assert.deepEqual(pin.source, { repository: 'weapp-container/weapp-container', releaseTag: `runtime-v${SDK_VERSION}` });
