@@ -1,4 +1,8 @@
+<a id="android-hosting-capabilities"></a>
 # Android 宿主能力
+
+**简体中文** · [English](HOST-SERVICES.en.md)
+
 
 这些适配器需要匹配当前 host-services 协议的 native runtime；旧 preview runtime
 不能通过只替换 Kotlin 源码获得新能力。源码编译通过不代表设备、渠道或商户验收。
@@ -177,6 +181,7 @@ IWXAPIEventHandler 传给 `onWechatPayResponse`。官方回调之后仍须后端
 实际设备权限、蓝牙外设、相机画面、媒体帧、账号切换和真实商户交易仍须以当前
 native 产物分别验收，不能由模拟响应、目录清单或源码存在性替代。
 
+<a id="develop-closed-loop-verification"></a>
 ## 开发闭环验证
 
 会话失效刷新有独立的有限原生回归，可复用已经运行的 arm64 模拟器及明确选定的
@@ -248,18 +253,7 @@ WebSocket echo/close、实际 AAC ADTS 帧、换号关闭旧请求/socket，以�
 新源码完整编译，JVM 执行 authored 广播字节的 UUID、无符号 major/minor、距离估计
 及畸形长度/前缀边界测试；这不构成真实 Beacon 发射器、权限变更或射频验收。
 
-Native snapshot owner validation belongs to the negotiated runtime. The SDK passes the complete captured context unchanged and preserves the runtime error, including `ERR_CANCELLED` for a retired owner; it updates its rebuild cache only after successful validation. A credential refresh cannot replace this owner check.
+原生快照所有者验证属于协商的运行时。SDK 会原样传递完整的捕获上下文，并保留运行时错误，包括已退任所有者的 `ERR_CANCELLED`；它仅在验证成功后才会更新其重建缓存。凭证刷新无法替代此所有者检查。
 
-Backend errors keep their container classification (`code`, `message`) separate from public API
-fields. The adapter merges non-null extension fields in this order, with later sources winning:
-response envelope, envelope `details`, nested `error.details`, then nested `error` fields. It
-excludes the structural `error`/`details` and classification `code`/`message` keys from the public
-projection. Identity rejection preserves projected `errCode` and `errMsg`; only absent values
-receive the adapter defaults. Canonical `invalid_request`, `permission_denied`, `timeout`,
-`cancelled`, `unsupported` and their uppercase `ERR_*` forms keep the corresponding container
-classification. Consent and invalid/stale identity session codes map to `permission_denied`.
-The core `ERR_UNSUPPORTED_CAPABILITY` code and `unsupported_capability` alias map to `unsupported`.
-Unknown provider codes map to `invalid_request`. The projection carries a typed `HostErrorCode`
-directly to `HostReply.reject` so serialization cannot collapse these categories.
-Run `npm run test:host-backend-error -- --kotlin-lib <compiler-lib>
---json-jar <org-json.jar>` for the pure projection and final identity rejection regression.
+后端错误保持其容器分类（`code`、`message`）与公共API字段分离。适配器按照以下顺序合并非空扩展字段，后出现的源优先：响应封装体、封装体`details`、嵌套的`error.details`，然后是嵌套的`error`字段。它从公共投影中排除结构字段`error`/`details`以及分类字段`code`/`message`。身份拒绝保留投影的`errCode`和`errMsg`；只有缺失值才会接收适配器的默认值。标准的`invalid_request`、`permission_denied`、`timeout`、`cancelled`、`unsupported`及其大写形式`ERR_*`保持相应的容器分类。授权和无效/过期身份会话代码映射到`permission_denied`。核心`ERR_UNSUPPORTED_CAPABILITY`代码和`unsupported_capability`别名映射到`unsupported`。未知提供者代码映射到`invalid_request`。投影直接将带类型`HostErrorCode`传递到`HostReply.reject`，因此序列化无法合并这些类别。运行 `npm run test:host-backend-error -- --kotlin-lib <compiler-lib>
+--json-jar <org-json.jar>` 以运行纯投影和最终身份拒绝回归测试。

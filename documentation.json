@@ -1,0 +1,169 @@
+{
+  "schemaVersion": 1,
+  "repository": "weapp-container/sdk-android",
+  "defaultLocale": "zh-CN",
+  "locales": [
+    "zh-CN",
+    "en"
+  ],
+  "pages": [
+    {
+      "id": "CONTRACT",
+      "zh": "CONTRACT.md",
+      "en": "CONTRACT.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "CONTRACT.md"
+      },
+      "reviewedChineseSummary": "SDK 协议 v1；会话与调度；内部命令；开发重载（预览.4）；呈现；小程序 API；原生宿主 Chrome（预览版 4）",
+      "reviewedChineseSha256": "84d60eb04cdcaad598429c228f15d70bfe5712e431643d150b578252f3baab9c",
+      "legacyHeadingIds": [
+        "development-reload-preview4",
+        "internal-commands",
+        "mini-program-api",
+        "native-host-chrome-preview4",
+        "presentation",
+        "sdk-contract-v1",
+        "session-and-scheduling"
+      ]
+    },
+    {
+      "id": "HOST-SERVICES",
+      "zh": "HOST-SERVICES.md",
+      "en": "HOST-SERVICES.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "HOST-SERVICES.md"
+      },
+      "reviewedChineseSummary": "Android 宿主能力；开发闭环验证",
+      "reviewedChineseSha256": "bebb0b7e672948f184cd68b985ada6f4cfe4872604d6aea96e9a8aa63631082a",
+      "legacyHeadingIds": [
+        "android-宿主能力",
+        "开发闭环验证"
+      ]
+    },
+    {
+      "id": "OPEN_SOURCE",
+      "zh": "OPEN_SOURCE.md",
+      "en": "OPEN_SOURCE.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "OPEN_SOURCE.md"
+      },
+      "reviewedChineseSummary": "开源运行时集成",
+      "reviewedChineseSha256": "253d2545971cb8d03ebea4859913da305b00e0c902bdad63b5f643f32eaec77b",
+      "legacyHeadingIds": [
+        "open-source-runtime-integration"
+      ]
+    },
+    {
+      "id": "README",
+      "zh": "README.md",
+      "en": "README.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "README.md"
+      },
+      "reviewedChineseSummary": "Weapp Container Android SDK；从当前源码开始；准备环境；1. 获取运行库；2. 构建 AAR 与 Maven 仓库；3. 嵌入页面；4. 通信与导航；5. 生命周期与存储",
+      "reviewedChineseSha256": "2472abdea2a5f0cfc0e403435d805a7e9f84b42c873f8f0fc9175d951bc093ee",
+      "legacyHeadingIds": [
+        "1-获取运行库",
+        "2-构建-aar-与-maven-仓库",
+        "3-嵌入页面",
+        "4-通信与导航",
+        "5-生命周期与存储",
+        "weapp-container-android-sdk",
+        "准备环境",
+        "验证与更多用法"
+      ]
+    },
+    {
+      "id": "docs/EMBEDDING",
+      "zh": "docs/EMBEDDING.md",
+      "en": "docs/EMBEDDING.en.md",
+      "section": "runtime",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "docs/EMBEDDING.md"
+      },
+      "reviewedChineseSummary": "Android SDK 预览；构建与使用；嵌入；验证",
+      "reviewedChineseSha256": "30d1b1d428cd87749ef98a2e916d17a442e36a720c9104fe653566b0c0cbab77",
+      "legacyHeadingIds": [
+        "android-sdk-preview",
+        "build-and-consume",
+        "embedding",
+        "validation"
+      ]
+    },
+    {
+      "id": "examples/host-services/NFC-APIS",
+      "zh": "examples/host-services/NFC-APIS.md",
+      "en": "examples/host-services/NFC-APIS.en.md",
+      "section": "examples",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "examples/host-services/NFC-APIS.md"
+      },
+      "reviewedChineseSummary": "Android NFC",
+      "reviewedChineseSha256": "fb6a0131928593c6ecd36662ce9c47fc4468d474db5b7dffac47bc84f22b0aeb",
+      "legacyHeadingIds": [
+        "android-nfc"
+      ]
+    },
+    {
+      "id": "examples/host-services/README",
+      "zh": "examples/host-services/README.md",
+      "en": "examples/host-services/README.en.md",
+      "section": "examples",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "examples/host-services/README.md"
+      },
+      "reviewedChineseSummary": "本地宿主账号与 reference 支付接入",
+      "reviewedChineseSha256": "c534aad54b6b85a055ec810a30c2d25b4a6627f41c620bdc064bf72b873f0286",
+      "legacyHeadingIds": [
+        "本地宿主账号与-reference-支付接入"
+      ]
+    },
+    {
+      "id": "examples/host-services/WIFI-APIS",
+      "zh": "examples/host-services/WIFI-APIS.md",
+      "en": "examples/host-services/WIFI-APIS.en.md",
+      "section": "examples",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "examples/host-services/WIFI-APIS.md"
+      },
+      "reviewedChineseSummary": "Android Wi-Fi",
+      "reviewedChineseSha256": "004c03cf22356dd69287c60932cb5bf99934b88e273c41b32278dae57f5b9259",
+      "legacyHeadingIds": [
+        "android-wi-fi"
+      ]
+    },
+    {
+      "id": "tools/documentation/README",
+      "zh": "tools/documentation/README.md",
+      "en": "tools/documentation/README.en.md",
+      "section": "tools",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "tools/documentation/README.md"
+      },
+      "reviewedChineseSummary": "双语文档维护；更新一组文档；网站快照；检查与测试",
+      "reviewedChineseSha256": "6c0d12dd12a6cd4a1076e912f2a09d959772638769da314e76d1708cc7c5a64e",
+      "legacyHeadingIds": []
+    }
+  ],
+  "excluded": [
+    {
+      "path": "THIRD-PARTY-NOTICES.md",
+      "reason": "Original license or third-party notice; legal text is not translated.",
+      "sha256": "2ce2165d822a5569d069e8b9fabee25fffc9f89941086aa0a7848ecff6302ad9"
+    }
+  ],
+  "assets": []
+}

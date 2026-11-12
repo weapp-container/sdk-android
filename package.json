@@ -17,6 +17,7 @@
     "test:identity-snapshot": "node tools/test-identity-snapshot.mjs",
     "test:host-backend-error": "node tools/test-host-backend-error.mjs",
     "test:identity-refresh-native": "node tools/identity-refresh-probe.mjs",
-    "check:origin": "node tools/check-origin.mjs"
+    "check:origin": "node tools/check-origin.mjs",
+    "docs:check": "node tools/documentation/check.mjs && node tools/documentation/check-content.mjs"
   }
 }

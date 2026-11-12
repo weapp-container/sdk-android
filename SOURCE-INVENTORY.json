@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.6.0",
-  "sourceFilesSha256": "a0be8b41e57f42e233639dd262ddcff9a1f922f6208005f1a98ebad55540facf",
-  "review": "Isolate immutable legacy downloads in private storage and enforce reviewed publication scanning",
+  "sourceFilesSha256": "2be95d23430412bc3ff43cb288368966b32456db798d2da1ab89d6e46732613b",
+  "review": "Review bilingual developer documentation and maintenance checks; preserve SDK behavior, historical ORIGIN and artifact locks.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -13,6 +13,12 @@
       "path": ".github/workflows/checks.yml",
       "sha256": "1c18982a507217a8bbac7e65279383e5df5c6460689d5d92ad3e3332658eff00",
       "size": 483,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/documentation.yml",
+      "sha256": "6be53c9ba3b356899fdc53c29097b58e2a65d65bc74196d441efa29aa27487f1",
+      "size": 446,
       "mode": "100644"
     },
     {
@@ -34,15 +40,27 @@
       "mode": "100644"
     },
     {
+      "path": "CONTRACT.en.md",
+      "sha256": "2c3194c4b12e00dbed5d3c3de2d5830999980def647f59cf65211b48318bad8f",
+      "size": 13708,
+      "mode": "100644"
+    },
+    {
       "path": "CONTRACT.md",
-      "sha256": "dce2228bf7704101dbc0e6873a860dcb7a1883edf1a10e43f8742cd9b913f5db",
-      "size": 13457,
+      "sha256": "84d60eb04cdcaad598429c228f15d70bfe5712e431643d150b578252f3baab9c",
+      "size": 12906,
+      "mode": "100644"
+    },
+    {
+      "path": "HOST-SERVICES.en.md",
+      "sha256": "4a3695979576357ce16d973de09b9c1215652441a82958b89d2b5d6f96fdf7e2",
+      "size": 24577,
       "mode": "100644"
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "f88872064827fb9e0e04d6fe494b6d149aeb8534e22e54e1aa1e9da7c04f21af",
-      "size": 19673,
+      "sha256": "bebb0b7e672948f184cd68b985ada6f4cfe4872604d6aea96e9a8aa63631082a",
+      "size": 19656,
       "mode": "100644"
     },
     {
@@ -52,9 +70,15 @@
       "mode": "100644"
     },
     {
+      "path": "OPEN_SOURCE.en.md",
+      "sha256": "f2948c337b350a55e9cf7687542e9bdebb9b3281b4941830d1703b6adfec5e73",
+      "size": 1073,
+      "mode": "100644"
+    },
+    {
       "path": "OPEN_SOURCE.md",
-      "sha256": "1dee2538d2d740dce59b041c10fbb54f42ba523c3c87e546f883e62214309195",
-      "size": 987,
+      "sha256": "253d2545971cb8d03ebea4859913da305b00e0c902bdad63b5f643f32eaec77b",
+      "size": 1057,
       "mode": "100644"
     },
     {
@@ -65,14 +89,14 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "0367b7b5d80e72d718cdc303b71536f984a581af6e851d94e386a070e52dfb06",
-      "size": 9467,
+      "sha256": "c81c44f5195f77d226e9adaa351486ddd5ef128ab2aab297c0f982b4054ed3b6",
+      "size": 13015,
       "mode": "100644"
     },
     {
       "path": "README.md",
-      "sha256": "537ab36692a4eec4563b5961aa775733dc3b74acb90c2672bd33dfc5dd52da6e",
-      "size": 8553,
+      "sha256": "2472abdea2a5f0cfc0e403435d805a7e9f84b42c873f8f0fc9175d951bc093ee",
+      "size": 10938,
       "mode": "100644"
     },
     {
@@ -136,15 +160,33 @@
       "mode": "100644"
     },
     {
+      "path": "docs/EMBEDDING.en.md",
+      "sha256": "ff7815305d72f5d8fa7e0d97e3762d8f6c13953ddb100fd9234acead2b9296a4",
+      "size": 7599,
+      "mode": "100644"
+    },
+    {
       "path": "docs/EMBEDDING.md",
-      "sha256": "b7728e72f98944f7056f6076c42f825e4ad78334fe2c0bce522d4073e3ad7fc1",
-      "size": 7449,
+      "sha256": "30d1b1d428cd87749ef98a2e916d17a442e36a720c9104fe653566b0c0cbab77",
+      "size": 7206,
+      "mode": "100644"
+    },
+    {
+      "path": "documentation.json",
+      "sha256": "5faf7398f800e85a93bf4c9f724e81cdd997cc64cd9cddea0f6488fc1fdbb940",
+      "size": 5798,
+      "mode": "100644"
+    },
+    {
+      "path": "examples/host-services/NFC-APIS.en.md",
+      "sha256": "0623b4d213f1c740267f3813f8d8916755d31e7042d9e1d877e2310ca6f7a3cb",
+      "size": 2653,
       "mode": "100644"
     },
     {
       "path": "examples/host-services/NFC-APIS.md",
-      "sha256": "be98143073a181d7798cdeeac5d7e0520dd35587cb2c87d18b590e805ee25f00",
-      "size": 1749,
+      "sha256": "fb6a0131928593c6ecd36662ce9c47fc4468d474db5b7dffac47bc84f22b0aeb",
+      "size": 1797,
       "mode": "100644"
     },
     {
@@ -154,9 +196,15 @@
       "mode": "100644"
     },
     {
+      "path": "examples/host-services/README.en.md",
+      "sha256": "10abd6a09ee246ddb6a77a627af61098c320fcd14467bc1daf6b9b1b681b5203",
+      "size": 3545,
+      "mode": "100644"
+    },
+    {
       "path": "examples/host-services/README.md",
-      "sha256": "74706f323012a138a30a5c4b8a6198065cf924492c689e176bb32ecb451f1d17",
-      "size": 2857,
+      "sha256": "c534aad54b6b85a055ec810a30c2d25b4a6627f41c620bdc064bf72b873f0286",
+      "size": 2969,
       "mode": "100644"
     },
     {
@@ -166,9 +214,15 @@
       "mode": "100644"
     },
     {
+      "path": "examples/host-services/WIFI-APIS.en.md",
+      "sha256": "76ffc0bcf607e2414af6a2c538f2b103933e5e200e26e3da8478b9d048667774",
+      "size": 4436,
+      "mode": "100644"
+    },
+    {
       "path": "examples/host-services/WIFI-APIS.md",
-      "sha256": "ef89cdeab39e29ffae6bcd9bb8aa1b43abb93b413de74fb3d1d7eda1b625a231",
-      "size": 3702,
+      "sha256": "004c03cf22356dd69287c60932cb5bf99934b88e273c41b32278dae57f5b9259",
+      "size": 3751,
       "mode": "100644"
     },
     {
@@ -401,8 +455,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "65aacf5994f133264db8d434df603df14468fbf4684d6b46f819aca730ff4045",
-      "size": 788,
+      "sha256": "2491e1a2776f517d217eaf99e29e0137b75a585d484abd947470f28fd9d9a637",
+      "size": 890,
       "mode": "100644"
     },
     {
@@ -583,6 +637,48 @@
       "path": "tools/distribution-identity.mjs",
       "sha256": "2c4ee0d63bc96c2dace3184833f107b3c35dc87647886b6997896ebf1841386d",
       "size": 2127,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/README.en.md",
+      "sha256": "0771ea3d888cddc15444f452964da24b74e517aefd1f162d1de2af965f19d7fa",
+      "size": 2742,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/README.md",
+      "sha256": "6c0d12dd12a6cd4a1076e912f2a09d959772638769da314e76d1708cc7c5a64e",
+      "size": 2435,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check-content.mjs",
+      "sha256": "d37144b18bf7d42d181b08a476afcc1f5dea9425e6b4993f03aabad14033eb70",
+      "size": 4110,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check-content.test.mjs",
+      "sha256": "60f2d77ab72a2413798d8750f8e538d3b3dd0424c7037298162312cab5cce245",
+      "size": 2742,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check.mjs",
+      "sha256": "fabee7124bd8292b2b5f320d1378933285c50aa4a9ffb8674dde4330bb10ed55",
+      "size": 9626,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check.test.mjs",
+      "sha256": "665b1fcaf924fba0026ad72b8c07e48f2e5647f6c2794ac84bfb93a6c037fa83",
+      "size": 5388,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/review.mjs",
+      "sha256": "fe32de1c2483099eccc4ef1734b576a2a7368f873905af75482bc36ac856a9e2",
+      "size": 992,
       "mode": "100644"
     },
     {

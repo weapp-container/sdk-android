@@ -1,5 +1,8 @@
 # Android NFC
 
+**简体中文** · [English](NFC-APIS.en.md)
+
+
 基线固定为微信基础库 3.17.3、miniprogram-api-typings 5.2.3，官方 66 叶清单见
 NFC-CONTRACT.json。保持 `enableNfc: false` 默认关闭和既有 NDEF 接口兼容。
 显式启用且具有实际 NfcAdapter 与 Manifest NFC 权限后才注册。
