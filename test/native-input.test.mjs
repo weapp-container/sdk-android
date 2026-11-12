@@ -182,8 +182,8 @@ test('distribution selection cannot relax native path and symlink rules', t => {
 // Native changes require a new producer; the retained old lock cannot relabel it.
 test('current preview requires its exact native version and rejects every earlier preview producer', t => {
   const f = fixture(t);
-  assert.equal(SDK_VERSION, '0.1.0-preview.6.0');
-  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.6.0');
+  assert.equal(SDK_VERSION, '0.1.0-preview.7.0');
+  assert.equal(NATIVE_RUNTIME_VERSION, '0.1.0-preview.7.0');
   assert.equal(readNative(f.native, f.target, ['libfixture.a']).receipt.sdkVersion, NATIVE_RUNTIME_VERSION);
   for (const oldVersion of ['0.1.0-preview.5', '0.1.0-preview.5.1', '0.1.0-preview.5.2', '0.1.0-preview.5.3', '0.1.0-preview.5.4', '0.1.0-preview.5.5', '0.1.0-preview.5.6']) {
     f.receipt.sdkVersion = oldVersion; f.save();
@@ -202,18 +202,20 @@ test('runtime preparation rejects an earlier distribution lock before download',
 
 
 // Wrapper archives are outputs, so they cannot appear in their own build inputs.
-test('reviewed lock binds exactly this SDK native slices without a wrapper dependency cycle', () => {
+test('historical lock preserves native slices and cannot satisfy the new SDK without a wrapper dependency cycle', () => {
   const manifest = JSON.parse(readFileSync(resolve(root, 'runtime-artifacts.lock.json')));
   const platform = 'android', architectures = ["arm64-v8a", "x86_64"];
-  assert.equal(manifest.runtimeVersion, SDK_VERSION);
+  assert.equal(manifest.runtimeVersion, '0.1.0-preview.6.0');
+  assert.notEqual(manifest.runtimeVersion, SDK_VERSION);
   assert.equal(manifest.abiVersion, 1);
-  assert.equal(manifest.source.releaseTag, `runtime-v${SDK_VERSION}`);
+  assert.equal(manifest.source.releaseTag, `runtime-v${manifest.runtimeVersion}`);
   assert.deepEqual(manifest.artifacts.map(item => item.arch).sort(), architectures);
   assert.ok(manifest.artifacts.every(item => item.component === 'runtime' && item.platform === platform));
   for (const arch of architectures) {
-    const selected = selectArtifact(manifest, {version: SDK_VERSION, abiVersion: 1, component: 'runtime', platform, arch});
+    const selected = selectArtifact(manifest, {version: manifest.runtimeVersion, abiVersion: 1, component: 'runtime', platform, arch});
     assert.equal(selected.arch, arch);
   }
+  assert.throws(() => selectArtifact(manifest, {version: SDK_VERSION, abiVersion: 1, component: 'runtime', platform, arch: architectures[0]}), {code: 'ERR_RUNTIME_MANIFEST'});
 });
 
 

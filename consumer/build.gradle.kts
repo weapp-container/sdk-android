@@ -14,4 +14,4 @@ android {
     testBuildType = "release"
     packaging { jniLibs.keepDebugSymbols += setOf("**/libweapp_container_sdk.so", "**/libc++_shared.so") }
 }
-dependencies { implementation("com.sonofmagic.weapp:weapp-container-android:0.1.0-preview.6.0") }
+dependencies { implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.0") }
