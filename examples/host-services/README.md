@@ -1,4 +1,8 @@
+<a id="local-host-account-and-reference-payment-integration"></a>
 # 本地宿主账号与 reference 支付接入
+
+**简体中文** · [English](README.en.md)
+
 
 此文件可以加入独立宿主的 debug target；依赖当前 SDK 模块，包含真实 HTTP 调用、
 原生授权提示和账号清理 hook。先启动私有核心仓库的 `demo-business-server.mjs`，

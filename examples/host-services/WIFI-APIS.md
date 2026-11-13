@@ -1,5 +1,8 @@
 # Android Wi-Fi
 
+**简体中文** · [English](WIFI-APIS.en.md)
+
+
 宿主显式 `AndroidNativeDeviceServices(..., enableWifi = true)`，或单独安装
 `AndroidWifiApis(activity, permissions)`。SDK 不打开全局 Wi-Fi radio，不执行
 `enableNetwork`、`disconnect` 或 `bindProcessToNetwork`。

@@ -1,27 +1,29 @@
-# Public preview release 0.1.0-preview.7.0
+# 公开预览发行 0.1.0-preview.7.0
 
-Status: source configuration merged; registry publication and platform acceptance remain pending. ABI stays 1. Do not claim completion until every registry version is anonymously downloadable and its real consumer passes.
+**简体中文** · [English](PUBLIC-RELEASE.en.md)
 
-Run from clean committed source. Historical tags, locks, ORIGIN and evidence are immutable. New builds use one clean core production commit. Never overwrite an existing tag, version, asset or checksum. A failed published version requires a new version.
+状态：源码配置已合入，注册源发布与平台验收仍待完成。ABI 保持为 1。只有每个注册源版本均可匿名下载、真实消费程序也通过后，才能报告发行完成。
 
-## Order
+从干净且已提交的源码运行。历史 tag、锁文件、ORIGIN 和证据保持不可变。新构建使用同一个干净的核心生产提交，不覆盖已有 tag、版本、资产或校验和；已发布版本失败时使用新版本。
 
-1. Core `public-native.yml` builds nine native targets from one commit, collects licenses, validates hashes and packages the runtime. Download `public-runtime` and run the existing runtime publisher with `--execute` only after its offline verification passes.
-2. Android, iOS and Desktop `build-public.yml` select that successful core run ID. Their source inventory and producer receipts bind the native input. Retain the original verified archive bytes.
-3. Publish Android to Central, iOS/desktop prereleases to GitHub, then import their HTTP/hash-pinned Podspecs into `weapp-container/Specs`. Submit to Trunk while it accepts submissions and record its actual outcome.
-4. Update current default runtime locks using the actual verified core manifest; preserve old locks under historical filenames. Pin iOS URLs/checksums with `--pin`, commit reviewed changes, and `--finalize` the original archives.
-5. Publish Contract, React Native, then Flutter platform interface, five platform packages, and main package. Validate public consumers from fresh directories without GitHub authentication. Record build, simulator and real device results independently.
+## 顺序
 
-## Authentication
+1. 核心 `public-native.yml` 从同一提交构建九个原生目标，收集许可、验证哈希并打包运行库。下载 `public-runtime`，仅在离线验证通过后，使用已有运行库发布器的 `--execute`。
+2. Android、iOS、Desktop 的 `build-public.yml` 选择该成功核心运行的 ID。源码清单与 producer 回执绑定原生输入，保留已验证归档的原始字节。
+3. 将 Android 发布到 Central，将 iOS/desktop prerelease 发布到 GitHub，再把 HTTP/哈希固定的 Podspec 导入 `weapp-container/Specs`。Trunk 仍接受投稿时提交，并记录实际结果。
+4. 使用实际已验证的核心 manifest 更新当前默认运行库锁，旧锁以历史文件名保留。用 `--pin` 固定 iOS URL/checksum，提交复核后的变化，再对原始归档执行 `--finalize`。
+5. 依次发布 Contract、React Native，再发布 Flutter platform interface、五个平台包和主包。从无 GitHub 认证的新目录验证公开消费程序，分别记录构建、模拟器与真机结果。
 
-First npm publication requires an npm user with publish access to `@weapp-container`, browser login/2FA and `--access public --tag preview`. Configure npm trusted publishing for `publish-npm.yml` after the first publication.
+## 认证
 
-First pub.dev publication requires human login for each new package; configure package-specific GitHub OIDC after creation. Maven Central needs verified `io.github.weapp-container`, Portal user-token credentials and a publicly discoverable PGP signing key. Set `MAVEN_CENTRAL_USERNAME`, `MAVEN_CENTRAL_PASSWORD`, `WEAPP_SIGNING_KEY`, and optional `WEAPP_SIGNING_PASSWORD` in the local process or repository secrets; never commit values. CocoaPods Trunk registration/email verification belongs to the account owner.
+首次 npm 发布需要对 `@weapp-container` 有发布权限的 npm 用户、浏览器登录/2FA，以及 `--access public --tag preview`。首次发布后，为 `publish-npm.yml` 配置 npm trusted publishing。
 
-## Acceptance
+首次 pub.dev 发布需要每个新包的人工登录，创建后配置包专属 GitHub OIDC。Maven Central 需要验证 `io.github.weapp-container`、Portal 用户 token 凭据及可公开发现的 PGP 签名公钥。在本地进程或仓库 secrets 中设置 `MAVEN_CENTRAL_USERNAME`、`MAVEN_CENTRAL_PASSWORD`、`WEAPP_SIGNING_KEY` 和可选的 `WEAPP_SIGNING_PASSWORD`，不提交其值。CocoaPods Trunk 注册和邮件验证由账号所有者完成。
 
-Verify every archive SHA-256/size, architecture, dynamic dependency and license. Exercise interrupted downloads, mismatched hash/version and offline cache without fallback. Run npm pack and installed exports/types, Flutter analyze/publish dry-run, Pod lint, SwiftPM consumer and Central validation. Real consumers must load, display, interact, exchange host messages, navigate and close with the authored test pack. CI software rendering does not prove hardware or device acceptance.
+## 验收
 
-## Central commands
+验证每个归档的 SHA-256/大小、架构、动态依赖和许可。覆盖下载中断、哈希/版本不匹配及无回退的离线缓存。执行 npm pack、安装后 exports/types、Flutter analyze/publish dry-run、Pod lint、SwiftPM consumer 和 Central validation。真实消费程序必须加载、显示、交互、交换宿主消息、导航并关闭自有测试 pack。CI 软件渲染不证明硬件或设备验收。
 
-`node tools/package-public.mjs --sdk artifacts/android --out artifacts/public` freezes the Maven installation. `node tools/publish-central.mjs --sdk artifacts/android --out artifacts/central --execute` signs its verified Maven bytes, builds the Central bundle, waits for validation and requests publication. If interrupted, `--resume artifacts/central/deployment.json` continues that deployment without another upload. Check the actual Central state and anonymous Maven coordinate before reporting success.
+## Central 命令
+
+`node tools/package-public.mjs --sdk artifacts/android --out artifacts/public` 冻结 Maven 安装。`node tools/publish-central.mjs --sdk artifacts/android --out artifacts/central --execute` 对已验证 Maven 字节签名、创建 Central bundle、等待校验并请求发布。中断后用 `--resume artifacts/central/deployment.json` 继续同一 deployment，不再次上传。报告成功前检查实际 Central 状态与可匿名访问的 Maven 坐标。

@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.0",
-  "sourceFilesSha256": "94c97ccdd98a522945f493ed423c32762f2432c4fcbbe6b729bdf248404d1106",
-  "review": "Align the Android user agent with the current Maven/runtime version and validate version coordination.",
+  "sourceFilesSha256": "6c7415e4371f1dabb30814e21ce3c47e1aa15ccb0f02dbdc60e083a9a8d20219",
+  "review": "Merge current public release and reviewed bilingual documentation",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -19,6 +19,12 @@
       "path": ".github/workflows/checks.yml",
       "sha256": "1c18982a507217a8bbac7e65279383e5df5c6460689d5d92ad3e3332658eff00",
       "size": 483,
+      "mode": "100644"
+    },
+    {
+      "path": ".github/workflows/documentation.yml",
+      "sha256": "6be53c9ba3b356899fdc53c29097b58e2a65d65bc74196d441efa29aa27487f1",
+      "size": 446,
       "mode": "100644"
     },
     {
@@ -46,15 +52,27 @@
       "mode": "100644"
     },
     {
+      "path": "CONTRACT.en.md",
+      "sha256": "2c3194c4b12e00dbed5d3c3de2d5830999980def647f59cf65211b48318bad8f",
+      "size": 13708,
+      "mode": "100644"
+    },
+    {
       "path": "CONTRACT.md",
-      "sha256": "dce2228bf7704101dbc0e6873a860dcb7a1883edf1a10e43f8742cd9b913f5db",
-      "size": 13457,
+      "sha256": "84d60eb04cdcaad598429c228f15d70bfe5712e431643d150b578252f3baab9c",
+      "size": 12906,
+      "mode": "100644"
+    },
+    {
+      "path": "HOST-SERVICES.en.md",
+      "sha256": "4a3695979576357ce16d973de09b9c1215652441a82958b89d2b5d6f96fdf7e2",
+      "size": 24577,
       "mode": "100644"
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "f88872064827fb9e0e04d6fe494b6d149aeb8534e22e54e1aa1e9da7c04f21af",
-      "size": 19673,
+      "sha256": "bebb0b7e672948f184cd68b985ada6f4cfe4872604d6aea96e9a8aa63631082a",
+      "size": 19656,
       "mode": "100644"
     },
     {
@@ -64,9 +82,15 @@
       "mode": "100644"
     },
     {
+      "path": "OPEN_SOURCE.en.md",
+      "sha256": "f2948c337b350a55e9cf7687542e9bdebb9b3281b4941830d1703b6adfec5e73",
+      "size": 1073,
+      "mode": "100644"
+    },
+    {
       "path": "OPEN_SOURCE.md",
-      "sha256": "1dee2538d2d740dce59b041c10fbb54f42ba523c3c87e546f883e62214309195",
-      "size": 987,
+      "sha256": "253d2545971cb8d03ebea4859913da305b00e0c902bdad63b5f643f32eaec77b",
+      "size": 1057,
       "mode": "100644"
     },
     {
@@ -76,21 +100,27 @@
       "mode": "100644"
     },
     {
+      "path": "PUBLIC-RELEASE.en.md",
+      "sha256": "7636577d967259ebc46e4e8893ef242e8cd2afbefbc40eede4c3c4f85d20764d",
+      "size": 3525,
+      "mode": "100644"
+    },
+    {
       "path": "PUBLIC-RELEASE.md",
-      "sha256": "0aaf32aec5bb9e711f628d0bbb687d68350ee3e0308b85b38c2a3f88fa8bd0ea",
-      "size": 3475,
+      "sha256": "5f461c3ae95014135c5e700815289f672b1fae43ff3dc55c498c0118d977e1d6",
+      "size": 3213,
       "mode": "100644"
     },
     {
       "path": "README.en.md",
-      "sha256": "fbfe9bd0384380129dc5265ac00cd60256ac35de9074d5aaa8343444ebd7cc22",
-      "size": 4905,
+      "sha256": "3bc0b511189a69e4f70a529faaeec96d5b6cc6055e0b9f6a1d972558c395aaaa",
+      "size": 14610,
       "mode": "100644"
     },
     {
       "path": "README.md",
-      "sha256": "0fa8b89e03b401d38f38f202c92b2777549e0ff3384eb7b57b43cec244390bd9",
-      "size": 4577,
+      "sha256": "514eada10655fd5fada3aa430c0043a426a16c10fae08d118efa77915fca6b31",
+      "size": 12422,
       "mode": "100644"
     },
     {
@@ -154,15 +184,33 @@
       "mode": "100644"
     },
     {
+      "path": "docs/EMBEDDING.en.md",
+      "sha256": "ff7815305d72f5d8fa7e0d97e3762d8f6c13953ddb100fd9234acead2b9296a4",
+      "size": 7599,
+      "mode": "100644"
+    },
+    {
       "path": "docs/EMBEDDING.md",
-      "sha256": "b7728e72f98944f7056f6076c42f825e4ad78334fe2c0bce522d4073e3ad7fc1",
-      "size": 7449,
+      "sha256": "30d1b1d428cd87749ef98a2e916d17a442e36a720c9104fe653566b0c0cbab77",
+      "size": 7206,
+      "mode": "100644"
+    },
+    {
+      "path": "documentation.json",
+      "sha256": "ebfb37164ec39a5492673a973441195ffcd48392859cae272fb8d7296baa040d",
+      "size": 6342,
+      "mode": "100644"
+    },
+    {
+      "path": "examples/host-services/NFC-APIS.en.md",
+      "sha256": "0623b4d213f1c740267f3813f8d8916755d31e7042d9e1d877e2310ca6f7a3cb",
+      "size": 2653,
       "mode": "100644"
     },
     {
       "path": "examples/host-services/NFC-APIS.md",
-      "sha256": "be98143073a181d7798cdeeac5d7e0520dd35587cb2c87d18b590e805ee25f00",
-      "size": 1749,
+      "sha256": "fb6a0131928593c6ecd36662ce9c47fc4468d474db5b7dffac47bc84f22b0aeb",
+      "size": 1797,
       "mode": "100644"
     },
     {
@@ -172,9 +220,15 @@
       "mode": "100644"
     },
     {
+      "path": "examples/host-services/README.en.md",
+      "sha256": "10abd6a09ee246ddb6a77a627af61098c320fcd14467bc1daf6b9b1b681b5203",
+      "size": 3545,
+      "mode": "100644"
+    },
+    {
       "path": "examples/host-services/README.md",
-      "sha256": "74706f323012a138a30a5c4b8a6198065cf924492c689e176bb32ecb451f1d17",
-      "size": 2857,
+      "sha256": "c534aad54b6b85a055ec810a30c2d25b4a6627f41c620bdc064bf72b873f0286",
+      "size": 2969,
       "mode": "100644"
     },
     {
@@ -184,9 +238,15 @@
       "mode": "100644"
     },
     {
+      "path": "examples/host-services/WIFI-APIS.en.md",
+      "sha256": "76ffc0bcf607e2414af6a2c538f2b103933e5e200e26e3da8478b9d048667774",
+      "size": 4436,
+      "mode": "100644"
+    },
+    {
       "path": "examples/host-services/WIFI-APIS.md",
-      "sha256": "ef89cdeab39e29ffae6bcd9bb8aa1b43abb93b413de74fb3d1d7eda1b625a231",
-      "size": 3702,
+      "sha256": "004c03cf22356dd69287c60932cb5bf99934b88e273c41b32278dae57f5b9259",
+      "size": 3751,
       "mode": "100644"
     },
     {
@@ -419,8 +479,8 @@
     },
     {
       "path": "package.json",
-      "sha256": "d1c9553f12ff2a83d6d18f0206c89026e09787caa5ae86bd3ccb9a919068a23a",
-      "size": 845,
+      "sha256": "d23df19574a7abc14b97f949ebd0d9f7c0f34fe76f20f89fe917e31971ab0ed9",
+      "size": 947,
       "mode": "100644"
     },
     {
@@ -643,6 +703,48 @@
       "path": "tools/distribution-identity.mjs",
       "sha256": "2c4ee0d63bc96c2dace3184833f107b3c35dc87647886b6997896ebf1841386d",
       "size": 2127,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/README.en.md",
+      "sha256": "0771ea3d888cddc15444f452964da24b74e517aefd1f162d1de2af965f19d7fa",
+      "size": 2742,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/README.md",
+      "sha256": "6c0d12dd12a6cd4a1076e912f2a09d959772638769da314e76d1708cc7c5a64e",
+      "size": 2435,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check-content.mjs",
+      "sha256": "d37144b18bf7d42d181b08a476afcc1f5dea9425e6b4993f03aabad14033eb70",
+      "size": 4110,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check-content.test.mjs",
+      "sha256": "60f2d77ab72a2413798d8750f8e538d3b3dd0424c7037298162312cab5cce245",
+      "size": 2742,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check.mjs",
+      "sha256": "0fbf9dbed271e30d858f626f60826a32ce365e6a14c5615221044379e2b05173",
+      "size": 9624,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/check.test.mjs",
+      "sha256": "1a1ff09d21f0e73325d764637943ce9fcdcbbaf2bd1ea1a67ed5412bd7ef8cf8",
+      "size": 5475,
+      "mode": "100644"
+    },
+    {
+      "path": "tools/documentation/review.mjs",
+      "sha256": "fe32de1c2483099eccc4ef1734b576a2a7368f873905af75482bc36ac856a9e2",
+      "size": 992,
       "mode": "100644"
     },
     {
