@@ -68,8 +68,8 @@
         "repository": "weapp-container/sdk-android",
         "path": "README.md"
       },
-      "reviewedChineseSummary": "复核候选源码7.1与已公开7.0下载和锁的区别，保留当前安装状态",
-      "reviewedChineseSha256": "5d87fc57e8b5610219d2ae0fab155b81c519f8f1cbdc15abdd83de8e7c8c7490",
+      "reviewedChineseSummary": "Android SDK `.7.1` candidate, published runtime binding, and pending Maven Central release",
+      "reviewedChineseSha256": "2ff840a8b76d8e610194f4640b7db41615594726e222f7458404f98f4b41a0d6",
       "legacyHeadingIds": [
         "1-获取运行库",
         "2-构建-aar-与-maven-仓库",
@@ -166,8 +166,8 @@
         "repository": "weapp-container/sdk-android",
         "path": "PUBLIC-RELEASE.md"
       },
-      "reviewedChineseSummary": "维护者发行顺序、认证、不可变资产与平台独立验收条件；不会自动发布或修改历史发行物。",
-      "reviewedChineseSha256": "5f461c3ae95014135c5e700815289f672b1fae43ff3dc55c498c0118d977e1d6",
+      "reviewedChineseSummary": "Android `.7.1` publication workflow, Central credentials, and registry acceptance",
+      "reviewedChineseSha256": "976e3e7cd0399040015ebf641fe8de35e688213feb2fe450c4578a7456868ca2",
       "legacyHeadingIds": []
     }
   ],
