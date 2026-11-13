@@ -5,15 +5,15 @@
 <a id="public-distribution-candidate-preview7"></a>
 ## 公开发行候选：preview.7
 
-当前核心构建器与本页源码示例均使用 preview.7。核心运行库、iOS、Desktop 及公开 CocoaPods Specs 已提供下载；npm、Maven Central 和 pub.dev 尚未全部发布。使用安装命令前先核对[发布状态](https://github.com/weapp-container/weapp-container/blob/main/docs/public-sdk-release.md)，不要混用不同版本的包装层与运行库。源码公开、包发布、编译通过和设备验收分别记录。
+当前 SDK 源码是 `0.1.0-preview.7.1` 候选，核心运行库 `.7.1` 已发布；Android Maven 包尚未发布。iOS、Desktop 与 CocoaPods `.7.0` 入口仍可用，`.7.1` 尚待发布。使用安装命令前先核对[发布状态](https://github.com/weapp-container/weapp-container/blob/main/docs/public-sdk-release.md)，不要混用不同版本的包装层与运行库。源码公开、包发布、编译通过和设备验收分别记录。
 
-首次公开发布正在准备；安装命令须在对应注册源出现本版本后使用。历史私有归档及其锁文件保持原样。
+Android `.7.1` Maven 坐标在 Central 发布并完成匿名消费验证后才可安装。历史私有归档及其锁文件保持原样。
 
-版本 `0.1.0-preview.7.0`；Android API 26+，arm64-v8a / x86_64；Java 17。配置 Maven Central 后直接依赖公开坐标：
+版本 `0.1.0-preview.7.1`；Android API 26+，arm64-v8a / x86_64；Java 17。配置 Maven Central 后直接依赖公开坐标：
 
 ```kotlin
 repositories { google(); mavenCentral() }
-dependencies { implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.0") }
+dependencies { implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.1") }
 ```
 
 AAR 包含 JNI 接入层、两种 ABI 的运行库和第三方许可。普通应用安装无需 Node.js、Rust 或私有仓库授权；Java/Kotlin 包名保持 `com.sonofmagic.weapp.container.sdk`。
@@ -33,7 +33,7 @@ git checkout ca8c21a4d4a075b7180761875287bf9c7abaee53
 
 在 Android 应用中嵌入小程序页面。SDK 提供 Kotlin 会话、原生 `TextureView`、宿主消息通道和本地持久化，使用 QuickJS 执行 JavaScript、Skia GLES 渲染页面。
 
-已复核源码示例版本：**0.1.0-preview.7.0**。SDK 封装源码采用 [Apache-2.0](LICENSE)；运行时源码在主仓库按 Apache-2.0 提供。本仓库包含 SDK 包装层源码，运行库单独构建或安装。
+已复核源码示例版本：**0.1.0-preview.7.1**。SDK 封装源码采用 [Apache-2.0](LICENSE)；运行时源码在主仓库按 Apache-2.0 提供。本仓库包含 SDK 包装层源码，运行库单独构建或安装。
 
 <a id="start-from-source-code"></a>
 ## 从当前源码开始
@@ -104,7 +104,7 @@ android {
     }
 }
 dependencies {
-    implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.0")
+    implementation("io.github.weapp-container:weapp-container-android:0.1.0-preview.7.1")
 }
 ```
 
@@ -220,7 +220,7 @@ node tools/prepare-runtime.mjs
 node tools/prepare-runtime.mjs --artifact-dir /absolute/runtime-archives
 ```
 
-工具按 [当前公开锁](runtime-artifacts.0.1.0-preview.7.0.lock.json) 校验 **0.1.0-preview.7.0**、ABI 1、架构、大小和 SHA-256，安装到 `.runtime/install/native` 和 `.runtime/install/licenses`。缺少归档、无下载权限或校验不符时会失败；已有安装在失败时保留。锁文件中的 pin 不代表运行库可公开下载。
+工具按 [当前公开锁](runtime-artifacts.0.1.0-preview.7.1.lock.json) 校验 **0.1.0-preview.7.1**、ABI 1、架构、大小和 SHA-256，安装到 `.runtime/install/native` 和 `.runtime/install/licenses`。缺少归档、无下载权限或校验不符时会失败；已有安装在失败时保留。锁文件中的 pin 不代表运行库可公开下载。
 
 自定义归档清单使用 `--manifest /absolute/reviewed-lock.json`。慢速网络可通过 `WEAPP_CONTAINER_RUNTIME_TIMEOUT_MS` 调整下载超时，范围为 `1`–`3600000` 毫秒，默认 15 分钟。
 
@@ -231,4 +231,4 @@ node tools/prepare-runtime.mjs --artifact-dir /absolute/runtime-archives
 node tools/build.mjs --native-root .runtime/install/native --licenses-root .runtime/install/licenses --pack /absolute/verified-portable-pack
 ```
 
-源码候选版 `0.1.0-preview.7.1` 用于核心运行库草稿自动化。公开下载及不可变锁仍指向 `0.1.0-preview.7.0`；本次源码更新不代表新 SDK 包已发布。
+源码候选版 `0.1.0-preview.7.1` 用于核心运行库草稿自动化。公开下载及不可变锁仍指向 `0.1.0-preview.7.1`；本次源码更新不代表新 SDK 包已发布。

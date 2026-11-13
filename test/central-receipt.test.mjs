@@ -9,7 +9,7 @@ import { resumeDeployment } from '../tools/central-receipt.mjs';
 test('Central resume preserves identity and refuses changed bundle, version or source', t => {
   const root = mkdtempSync(join(tmpdir(), 'weapp-central-receipt-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
-  const version = '0.1.0-preview.7.0';
+  const version = '0.1.0-preview.7.1';
   writeFileSync(join(root, '.gitignore'), 'artifacts/\n');
   writeFileSync(join(root, 'package.json'), JSON.stringify({ version }));
   run('git', ['init', '-q'], root); run('git', ['add', '.'], root);
