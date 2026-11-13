@@ -1,6 +1,6 @@
 plugins { id("com.android.library"); kotlin("android"); `maven-publish`; id("org.jetbrains.dokka") }
 group = "io.github.weapp-container"
-version = "0.1.0-preview.7.0"
+version = "0.1.0-preview.7.1"
 dependencies { implementation("com.squareup.okhttp3:okhttp:4.12.0"); implementation("com.google.zxing:core:3.5.3") }
 val nativeRoot = providers.gradleProperty("weappSdkNativeDir").map { rootProject.file(it) }
 val licensesRoot = providers.gradleProperty("weappSdkLicensesDir").map { rootProject.file(it) }
