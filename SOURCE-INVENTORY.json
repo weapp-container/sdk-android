@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
-  "sdkVersion": "0.1.0-preview.7.0",
-  "sourceFilesSha256": "62d3caeb3543bf268311358ee31011dc1bed4bc8f1a38f41c24a7b7aba8c4d7e",
-  "review": "Align integration documentation with the current public runtime lock; preserve historical lock bytes.",
+  "sdkVersion": "0.1.0-preview.7.1",
+  "sourceFilesSha256": "8f0d77b25e4155a05096d49bfd802dc4881a3931ef59d0e4afa0760c140683dd",
+  "review": "Prepare the preview.7.1 runtime draft candidate; retain immutable public preview.7.0 pins and bind generated iOS SwiftPM to the local XCFramework.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -113,14 +113,14 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "b0490cc540ef3c27a7b20236e3ea33220be545be993cddfc4b198317a766503e",
-      "size": 14629,
+      "sha256": "39b24eb515cfaf464646d5fc5630f8c5de3e94fb9a193b2d12f030333ff752d0",
+      "size": 14842,
       "mode": "100644"
     },
     {
       "path": "README.md",
-      "sha256": "a2594df93d16b1a5885df63b71346538e194a6cf9c688d5c6a1bbd9c16f21bc3",
-      "size": 12433,
+      "sha256": "5d87fc57e8b5610219d2ae0fab155b81c519f8f1cbdc15abdd83de8e7c8c7490",
+      "size": 12619,
       "mode": "100644"
     },
     {
@@ -137,7 +137,7 @@
     },
     {
       "path": "consumer/build.gradle.kts",
-      "sha256": "331492b1a6370a805feb79a93bd8b7333bf4b5620c242bdfe82f6518eefa47ac",
+      "sha256": "51bf159e65bb8b7f1651b36e05c9c4fee1f228796b92b554471db01e30af76f7",
       "size": 1076,
       "mode": "100644"
     },
@@ -197,8 +197,8 @@
     },
     {
       "path": "documentation.json",
-      "sha256": "b04cc08555e4c9d056775ab58ed913f1db0a3c905566ebe8fede184e16b9d741",
-      "size": 6398,
+      "sha256": "398da0c70a278f6ecf07a4184df43f7e08de877cd74c834fca45db213e151a1a",
+      "size": 6237,
       "mode": "100644"
     },
     {
@@ -263,7 +263,7 @@
     },
     {
       "path": "library/build.gradle.kts",
-      "sha256": "202e706810ef78b87bebb5ff685d6532c2d3cf9502954f887098a92804ff03a5",
+      "sha256": "8a9364ec5fb5ccade3bcd8736db2a367d3db8cff79b721ba985f353310f699eb",
       "size": 5152,
       "mode": "100644"
     },
@@ -449,7 +449,7 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
-      "sha256": "9d67374c6ad8493777be38b32ca44a34f2959d5192aeb5e5e2a519dcf817c6f2",
+      "sha256": "3a19445c06a7f47cff08fe818bf3afa47fb6053542a26308d81ee96f5ea43908",
       "size": 52458,
       "mode": "100644"
     },
@@ -479,7 +479,7 @@
     },
     {
       "path": "package.json",
-      "sha256": "d23df19574a7abc14b97f949ebd0d9f7c0f34fe76f20f89fe917e31971ab0ed9",
+      "sha256": "35799c1407f2cf4e45d96c87b6abec2c17dfbd5fbfbd3913d9739ac6e169c7da",
       "size": 947,
       "mode": "100644"
     },
@@ -557,8 +557,8 @@
     },
     {
       "path": "test/current-runtime-lock.test.mjs",
-      "sha256": "9543ee092383efa3ab032bae7def51b5cc608e9f388c6203edf78bced9a066f6",
-      "size": 2086,
+      "sha256": "04f53513dc2db31adafdac2b5b398faa055ea7b470b35927274e37a165015a9c",
+      "size": 2170,
       "mode": "100644"
     },
     {
@@ -635,8 +635,8 @@
     },
     {
       "path": "test/native-input.test.mjs",
-      "sha256": "bde5c50c0608de2c24cfd40d5bddab1e67d59cd5fcdeff21229434e26dae5777",
-      "size": 17111,
+      "sha256": "67580e5a2cdbeab74b2a7ca516acc73fc2fb31f8c5610d02b5beac2f8cc0ad6f",
+      "size": 17182,
       "mode": "100644"
     },
     {
@@ -767,13 +767,13 @@
     },
     {
       "path": "tools/identity-refresh-probe.mjs",
-      "sha256": "2ba4c6b461372d52b3997497e5e473d69eab65919007528e39a51e922878cc7b",
+      "sha256": "24778252ac2d15ec9b335bf6437bb9490be0c8399dcf97386bf869e5c77d131a",
       "size": 13133,
       "mode": "100644"
     },
     {
       "path": "tools/native-input.mjs",
-      "sha256": "837888ddf6d2a5b922a0c6d3fe4a3044ead8e27ecf081c664b5016ee3c26f185",
+      "sha256": "b367aacbbc21989c91e07f68536cc45cf14b92b6f48a14e4e70ac5d77fc623a2",
       "size": 12573,
       "mode": "100644"
     },

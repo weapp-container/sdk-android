@@ -38,7 +38,7 @@ try {
   report.borrowedDevice = { serial, created: false, cleanup: 'retained without changing global device settings' };
   report.environment = { node: process.versions.node, androidRelease: device(['shell', 'getprop', 'ro.build.version.release']).trim(), androidApi: device(['shell', 'getprop', 'ro.build.version.sdk']).trim(), fingerprint: device(['shell', 'getprop', 'ro.build.fingerprint']).trim(), abi: device(['shell', 'getprop', 'ro.product.cpu.abi']).trim() };
   const nativeRoot = resolve(native), receipt = JSON.parse(readFileSync(join(nativeRoot, 'build.json')));
-  if (receipt.status !== 'built' || receipt.target !== 'aarch64-linux-android' || receipt.sdkVersion !== '0.1.0-preview.7.0') throw Error('An explicit matching successful arm64 native producer receipt is required');
+  if (receipt.status !== 'built' || receipt.target !== 'aarch64-linux-android' || receipt.sdkVersion !== '0.1.0-preview.7.1') throw Error('An explicit matching successful arm64 native producer receipt is required');
   for (const name of ['libweapp_container_sdk.so', 'libc++_shared.so', 'weapp_container_sdk.h']) {
     const artifact = receipt.artifacts.find(artifact => artifact.file === name);
     if (!artifact || hash(join(nativeRoot, name)) !== artifact.sha256) throw Error(`Native producer input mismatch: ${name}`);

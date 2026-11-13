@@ -228,3 +228,5 @@ After archive installation, a packaged layer can be built from an independent SD
 ```sh
 node tools/build.mjs --native-root .runtime/install/native --licenses-root .runtime/install/licenses --pack /absolute/verified-portable-pack
 ```
+
+Source candidate `0.1.0-preview.7.1` is prepared for core runtime draft automation. Public downloads and immutable locks still refer to `0.1.0-preview.7.0`; this source update does not publish a new SDK package.
