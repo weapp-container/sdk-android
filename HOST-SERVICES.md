@@ -174,9 +174,11 @@ ACK 必须等待此前已启动的 future 完成；取消或忽略旧结果不�
 
 `AndroidAppPayments(activity, backend, wechatAppId)` 注册 `weappContainer.payment.request`，只接收服务端 `orderId`，拒绝
 JSAPI 签名冒充 APP Pay。标准 `wx.requestPayment` 通过 `installWxRequestPayment(session, channel)` 单独安装，
-由宿主提供 `AndroidNativeWxPayChannel` 将运行时校验过的 JSAPI 字段交给官方 SDK。宿主显式引入官方微信/支付宝 Android SDK，并配置 Manifest、
+由宿主提供 `AndroidNativeWxPayChannel` 将运行时校验过的 JSAPI 字段交给官方 SDK。
+需要直接绑定官方微信 SDK 时可使用 `AndroidWechatWxPayChannel(activity, appId, partnerId)`；
+它只接受 `MD5` 和 `prepay_id=`，商户 ID 与应用 ID 保留在宿主配置中。宿主显式引入官方微信/支付宝 Android SDK，并配置 Manifest、
 应用 ID、回调 Activity 和混淆规则。微信回调从官方 WXApi.handleIntent 的
-IWXAPIEventHandler 传给 `onWechatPayResponse`。官方回调之后仍须后端验签确认 paid
+IWXAPIEventHandler 传给 `onWechatPayResponse`，该入口同时结算 APP Pay 和标准 JSAPI channel。官方回调之后仍须后端验签确认 paid
 才向小程序报告成功。取消等待不会关闭订单或退款；旧支付回调不会分派给新账号。
 
 实际设备权限、蓝牙外设、相机画面、媒体帧、账号切换和真实商户交易仍须以当前

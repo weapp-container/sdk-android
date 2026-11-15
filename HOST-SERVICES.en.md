@@ -176,9 +176,10 @@ Compile run cancellation, late finalization, failed retry and shutdown barrier t
 
 `AndroidAppPayments(activity, backend, wechatAppId)` registers `weappContainer.payment.request` and only accepts a server-owned `orderId`, rejecting
 JSAPI signatures from entering APP Pay. Install standard `wx.requestPayment` separately with `installWxRequestPayment(session, channel)`;
-the host supplies `AndroidNativeWxPayChannel` to map validated JSAPI fields to its official SDK. The host explicitly integrates the official WeChat/Alipay Android SDK and configures Manifest,
-Application ID, callback activity and obfuscation rules. WeChat callback from official WXApi.handleIntent
-IWXAPIEventHandler passed to `onWechatPayResponse`. After the official callback, back-end verification is still required to confirm paid.
+the host supplies `AndroidNativeWxPayChannel` to map validated JSAPI fields to its official SDK. Hosts that need the built-in official bridge can use
+`AndroidWechatWxPayChannel(activity, appId, partnerId)`; it accepts only `MD5` and `prepay_id=` values, while merchant and app IDs remain host configuration. The host explicitly integrates the official WeChat/Alipay Android SDK and configures Manifest,
+Application ID, callback activity and obfuscation rules. WeChat callbacks from the official WXApi.handleIntent
+`IWXAPIEventHandler` are passed to `onWechatPayResponse`, which settles both APP Pay and the standard JSAPI channel. After the official callback, back-end verification is still required to confirm paid.
 Report success to the mini-program. Canceling the wait will not close the order or refund; the old payment callback will not be assigned to the new account.
 
 Actual device permissions, Bluetooth peripherals, camera images, media frames, account switching and real merchant transactions must still be based on the current

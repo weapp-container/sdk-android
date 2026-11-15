@@ -20,6 +20,62 @@ interface AndroidNativeWxPayChannel {
     fun pay(options: JSONObject, call: HostCall, complete: (Result<Unit>) -> Unit)
 }
 
+/**
+ * Official WeChat SDK bridge for hosts whose backend issues a native PayReq
+ * compatible with the validated JSAPI fields. The partner ID stays in the
+ * host; it is never accepted from the guest payload.
+ */
+class AndroidWechatWxPayChannel(
+    private val activity: Activity,
+    private val appId: String,
+    private val partnerId: String,
+) : AndroidNativeWxPayChannel {
+    override val isAvailable: Boolean
+        get() = appId.isNotBlank() && partnerId.isNotBlank() &&
+            runCatching {
+                Class.forName("com.tencent.mm.opensdk.openapi.WXAPIFactory")
+                Class.forName("com.tencent.mm.opensdk.modelpay.PayReq")
+            }.isSuccess
+
+    override fun pay(options: JSONObject, call: HostCall, complete: (Result<Unit>) -> Unit) {
+        try {
+            require(options.optString("signType") == "MD5") {
+                "Official Android WeChat PayReq requires signType MD5"
+            }
+            val packageValue = options.getString("package")
+            require(packageValue.startsWith("prepay_id=") && packageValue.length > "prepay_id=".length) {
+                "wx.requestPayment package must contain a prepay_id"
+            }
+            val factory = Class.forName("com.tencent.mm.opensdk.openapi.WXAPIFactory")
+            val api = factory.getMethod(
+                "createWXAPI",
+                Context::class.java,
+                String::class.java,
+                Boolean::class.javaPrimitiveType,
+            ).invoke(null, activity, appId, true)
+            val apiType = Class.forName("com.tencent.mm.opensdk.openapi.IWXAPI")
+            check(apiType.getMethod("registerApp", String::class.java).invoke(api, appId) == true) {
+                "WeChat application registration failed"
+            }
+            val requestType = Class.forName("com.tencent.mm.opensdk.modelpay.PayReq")
+            val request = requestType.getConstructor().newInstance()
+            requestType.getField("appId").set(request, appId)
+            requestType.getField("partnerId").set(request, partnerId)
+            requestType.getField("prepayId").set(request, packageValue.removePrefix("prepay_id="))
+            requestType.getField("packageValue").set(request, "Sign=WXPay")
+            requestType.getField("nonceStr").set(request, options.getString("nonceStr"))
+            requestType.getField("timeStamp").set(request, options.getString("timeStamp"))
+            requestType.getField("sign").set(request, options.getString("paySign"))
+            check(apiType.getMethod("sendReq", Class.forName("com.tencent.mm.opensdk.modelbase.BaseReq"))
+                .invoke(api, request) == true) { "WeChat rejected JSAPI payment launch" }
+            // AndroidAppPayments owns the process-wide response lease and
+            // settles this call from onWechatPayResponse.
+        } catch (error: Throwable) {
+            complete(Result.failure(error))
+        }
+    }
+}
+
 private fun validatedWxPaymentOptions(payload: Any?): JSONObject {
     val input = payload as? JSONObject ?: throw IllegalArgumentException("wx.requestPayment options are required")
     val fields = listOf("timeStamp", "nonceStr", "package", "signType", "paySign")
@@ -169,7 +225,7 @@ class AndroidAppPayments(
     /** Call ONLY from the host's official WXApi.handleIntent / WXPayEntryActivity PayResp delegate. */
     fun onWechatPayResponse(errCode: Int, errStr: String?) {
         check(Looper.myLooper() == Looper.getMainLooper())
-        val entry = pending?.takeIf { it.channel == "wechat" } ?: return
+        val entry = pending?.takeIf { it.channel == "wechat" || it.channel == "wx-jsapi" } ?: return
         pending = null; entry.result(errCode, errStr ?: "")
     }
     private fun complete(reply: HostReply, orderId: String) { reply.resolve(JSONObject().put("errMsg", "requestPayment:ok").put("orderId", orderId).put("serverConfirmed", true)) }

@@ -37,8 +37,8 @@
         "repository": "weapp-container/sdk-android",
         "path": "HOST-SERVICES.md"
       },
-      "reviewedChineseSummary": "Android 宿主能力；开发闭环验证",
-      "reviewedChineseSha256": "bebb0b7e672948f184cd68b985ada6f4cfe4872604d6aea96e9a8aa63631082a",
+      "reviewedChineseSummary": "Android 宿主能力；账户、原生设备服务、独立 APP Pay 与标准 JSAPI 支付 channel；开发闭环验证",
+      "reviewedChineseSha256": "e0bbcdfe9b3b0fed7a53bb8067117ffc9fd9b57f39c74856b265d31f3e99f8df",
       "legacyHeadingIds": [
         "android-宿主能力",
         "开发闭环验证"
