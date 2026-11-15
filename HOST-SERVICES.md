@@ -172,8 +172,9 @@ ACK 必须等待此前已启动的 future 完成；取消或忽略旧结果不�
 可用 `node tools/test-account-cleanup.mjs --kotlin-lib <compiler-lib-directory>`
 编译运行取消、迟到终结、失败重试和关闭屏障测试。
 
-`AndroidAppPayments(activity, backend, wechatAppId)` 同时注册 `wx.requestPayment` 与 `weappContainer.payment.request`，只接收服务端 `orderId`，拒绝
-JSAPI 签名冒充 APP Pay。宿主显式引入官方微信/支付宝 Android SDK，并配置 Manifest、
+`AndroidAppPayments(activity, backend, wechatAppId)` 注册 `weappContainer.payment.request`，只接收服务端 `orderId`，拒绝
+JSAPI 签名冒充 APP Pay。标准 `wx.requestPayment` 通过 `installWxRequestPayment(session, channel)` 单独安装，
+由宿主提供 `AndroidNativeWxPayChannel` 将运行时校验过的 JSAPI 字段交给官方 SDK。宿主显式引入官方微信/支付宝 Android SDK，并配置 Manifest、
 应用 ID、回调 Activity 和混淆规则。微信回调从官方 WXApi.handleIntent 的
 IWXAPIEventHandler 传给 `onWechatPayResponse`。官方回调之后仍须后端验签确认 paid
 才向小程序报告成功。取消等待不会关闭订单或退款；旧支付回调不会分派给新账号。

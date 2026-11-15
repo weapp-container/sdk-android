@@ -174,8 +174,9 @@ The host should not complete the hook future until the exact device, file, and b
 Available `node tools/test-account-cleanup.mjs --kotlin-lib <compiler-lib-directory>`
 Compile run cancellation, late finalization, failed retry and shutdown barrier tests.
 
-`AndroidAppPayments(activity, backend, wechatAppId)` registers `wx.requestPayment` and `weappContainer.payment.request` at the same time, only accepts `orderId` from the server, rejects
-JSAPI signature impersonates APP Pay. the host explicitly integrates the official WeChat/Alipay Android SDK, and configure Manifest,
+`AndroidAppPayments(activity, backend, wechatAppId)` registers `weappContainer.payment.request` and only accepts a server-owned `orderId`, rejecting
+JSAPI signatures from entering APP Pay. Install standard `wx.requestPayment` separately with `installWxRequestPayment(session, channel)`;
+the host supplies `AndroidNativeWxPayChannel` to map validated JSAPI fields to its official SDK. The host explicitly integrates the official WeChat/Alipay Android SDK and configures Manifest,
 Application ID, callback activity and obfuscation rules. WeChat callback from official WXApi.handleIntent
 IWXAPIEventHandler passed to `onWechatPayResponse`. After the official callback, back-end verification is still required to confirm paid.
 Report success to the mini-program. Canceling the wait will not close the order or refund; the old payment callback will not be assigned to the new account.
