@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.1",
-  "sourceFilesSha256": "b79cc7d689768adcb1f160f095efcacf3e5ea112170e668da16c6f13e7b3486f",
-  "review": "Review separate backend-order and standard JSAPI payment host boundaries.",
+  "sourceFilesSha256": "5d877061defb06ebd9e62a85c41980d9b03b936f0af23885d5cde0a226028b2a",
+  "review": "Review Android session support for guest SDK compatibility profiles.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -71,14 +71,14 @@
     },
     {
       "path": "HOST-SERVICES.en.md",
-      "sha256": "75c84651bdaeb3a7afbb700f21e3b229dea3727a8fff1dfb1a2802593d8c22ea",
-      "size": 24737,
+      "sha256": "0f7922a1344afc12b546cec2bbe75f85bcf09afbb758b1f615b1f932c491a62c",
+      "size": 25018,
       "mode": "100644"
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "445ce147d7c26637eb4920d12d033e9884d75f989a00d9c456df9a330e3b6aa0",
-      "size": 19820,
+      "sha256": "e0bbcdfe9b3b0fed7a53bb8067117ffc9fd9b57f39c74856b265d31f3e99f8df",
+      "size": 20072,
       "mode": "100644"
     },
     {
@@ -203,8 +203,8 @@
     },
     {
       "path": "documentation.json",
-      "sha256": "685ba3672e1b3656847e350629d32d0a8cc70e20759a6b0259abe69320d3e447",
-      "size": 6201,
+      "sha256": "4a63723e4cfb77e2f145b7868795268b9f96b2026513284119cefacd7afad9f6",
+      "size": 6279,
       "mode": "100644"
     },
     {
@@ -317,8 +317,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/AndroidAppPayments.kt",
-      "sha256": "2da0af2e8ff784f246db23d2a0295caeffb0ef1f14cbf7778938e01ce87ed105",
-      "size": 12010,
+      "sha256": "bf8fb7dd3ff346c57e4d05666fc5d8e332f49031d0af3b2d7c4d1071c4626fe1",
+      "size": 14966,
       "mode": "100644"
     },
     {
@@ -455,8 +455,8 @@
     },
     {
       "path": "library/src/main/java/com/sonofmagic/weapp/container/sdk/WeappContainerSession.kt",
-      "sha256": "3a19445c06a7f47cff08fe818bf3afa47fb6053542a26308d81ee96f5ea43908",
-      "size": 52458,
+      "sha256": "b05e9e36db753a9b0d9f356499e3b8f8c61d845c218821b0fc8450d403237fe8",
+      "size": 52702,
       "mode": "100644"
     },
     {
