@@ -1,0 +1,15 @@
+import { existsSync, mkdirSync, readFileSync } from 'node:fs';
+import { dirname, join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { assetEntry, cleanSource, contained, run, sha256, versionOf, writeRelease } from './public-release.mjs';
+const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
+const option = name => { const i = process.argv.indexOf(name); if (i < 0 || !process.argv[i + 1]) throw Error(`Supply ${name}`); return resolve(process.argv[i + 1]); };
+const sdk = option('--sdk'), out = option('--out');
+const receipt = JSON.parse(readFileSync(join(sdk, 'distribution.json')));
+if (receipt.status !== 'passed' || receipt.sdkVersion !== versionOf(root) || receipt.sourceDirty !== false || receipt.sourceCommit !== cleanSource(root)) throw Error('A clean consumer-verified Android SDK is required');
+if (existsSync(out)) throw Error('Use a new public output directory');
+for (const entry of receipt.mavenArtifacts) if (sha256(readFileSync(contained(join(sdk, 'maven'), entry.file))) !== entry.sha256) throw Error('Maven member changed');
+mkdirSync(out, { recursive: true });
+const fileName = `WeappContainerAndroid-${versionOf(root)}-maven.zip`;
+run('python3', ['-c', 'import pathlib,sys,zipfile; r=pathlib.Path(sys.argv[1]); z=zipfile.ZipFile(sys.argv[2],"w",zipfile.ZIP_DEFLATED); [z.write(p,p.relative_to(r).as_posix()) for p in sorted(r.rglob("*")) if p.is_file()]; z.close()', join(sdk, 'maven'), join(out, fileName)], root);
+writeRelease(root, out, 'weapp-container/sdk-android', [assetEntry(out, fileName, { component: 'maven-installation', coordinate: `io.github.weapp-container:weapp-container-android:${versionOf(root)}` })]);

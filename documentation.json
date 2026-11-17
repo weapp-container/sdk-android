@@ -1,0 +1,136 @@
+{
+  "schemaVersion": 1,
+  "repository": "weapp-container/sdk-android",
+  "defaultLocale": "zh-CN",
+  "locales": [
+    "zh-CN",
+    "en"
+  ],
+  "pages": [
+    {
+      "id": "CONTRACT",
+      "zh": "CONTRACT.md",
+      "en": "CONTRACT.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "CONTRACT.md"
+      },
+      "reviewedChineseSummary": "SDK 协议 v1",
+      "reviewedChineseSha256": "84d60eb04cdcaad598429c228f15d70bfe5712e431643d150b578252f3baab9c",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "HOST-SERVICES",
+      "zh": "HOST-SERVICES.md",
+      "en": "HOST-SERVICES.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "HOST-SERVICES.md"
+      },
+      "reviewedChineseSummary": "Android 宿主能力",
+      "reviewedChineseSha256": "4748c85ea97b1c75d8b912726978597aedb382aa15dc69a8894cb8b666d9e58c",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "OPEN_SOURCE",
+      "zh": "OPEN_SOURCE.md",
+      "en": "OPEN_SOURCE.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "OPEN_SOURCE.md"
+      },
+      "reviewedChineseSummary": "开源运行时集成",
+      "reviewedChineseSha256": "253d2545971cb8d03ebea4859913da305b00e0c902bdad63b5f643f32eaec77b",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "PUBLIC-RELEASE",
+      "zh": "PUBLIC-RELEASE.md",
+      "en": "PUBLIC-RELEASE.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "PUBLIC-RELEASE.md"
+      },
+      "reviewedChineseSummary": "公开预览发行 0.1.0-preview.7.1",
+      "reviewedChineseSha256": "976e3e7cd0399040015ebf641fe8de35e688213feb2fe450c4578a7456868ca2",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "README",
+      "zh": "README.md",
+      "en": "README.en.md",
+      "section": "overview",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "README.md"
+      },
+      "reviewedChineseSummary": "Weapp Container Android SDK",
+      "reviewedChineseSha256": "75e4bc6c6ed31d6d568dcf2e4af5e88f3691b69fdc11cf5f5e4474e610eb57f4",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "docs/EMBEDDING",
+      "zh": "docs/EMBEDDING.md",
+      "en": "docs/EMBEDDING.en.md",
+      "section": "architecture",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "docs/EMBEDDING.md"
+      },
+      "reviewedChineseSummary": "Android SDK 预览",
+      "reviewedChineseSha256": "30d1b1d428cd87749ef98a2e916d17a442e36a720c9104fe653566b0c0cbab77",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "examples/host-services/NFC-APIS",
+      "zh": "examples/host-services/NFC-APIS.md",
+      "en": "examples/host-services/NFC-APIS.en.md",
+      "section": "examples",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "examples/host-services/NFC-APIS.md"
+      },
+      "reviewedChineseSummary": "Android NFC",
+      "reviewedChineseSha256": "7141edcb3cb1ade562940d3aa5f2a5e1570dd9110fbed794d46bc5a6fb835d4b",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "examples/host-services/WIFI-APIS",
+      "zh": "examples/host-services/WIFI-APIS.md",
+      "en": "examples/host-services/WIFI-APIS.en.md",
+      "section": "examples",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "examples/host-services/WIFI-APIS.md"
+      },
+      "reviewedChineseSummary": "Android Wi-Fi",
+      "reviewedChineseSha256": "e3a0065e871e1e657590fff6fd7f9f88523b6b43cdfdcdc3a714ed1258413b8f",
+      "legacyHeadingIds": []
+    },
+    {
+      "id": "tools/documentation/README",
+      "zh": "tools/documentation/README.md",
+      "en": "tools/documentation/README.en.md",
+      "section": "tools",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "tools/documentation/README.md"
+      },
+      "reviewedChineseSummary": "双语文档维护",
+      "reviewedChineseSha256": "6c0d12dd12a6cd4a1076e912f2a09d959772638769da314e76d1708cc7c5a64e",
+      "legacyHeadingIds": []
+    }
+  ],
+  "excluded": [
+    {
+      "path": "THIRD-PARTY-NOTICES.md",
+      "reason": "unpaired fixture or third-party notice",
+      "sha256": "2ce2165d822a5569d069e8b9fabee25fffc9f89941086aa0a7848ecff6302ad9"
+    }
+  ],
+  "assets": []
+}

@@ -1,0 +1,21 @@
+{
+  "name": "@weapp-container/sdk-android-tools",
+  "version": "0.1.0-preview.7.1",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "homepage": "https://github.com/weapp-container/sdk-android",
+  "engines": {
+    "node": ">=24"
+  },
+  "weappContainerPlatform": "android",
+  "scripts": {
+    "runtime:prepare": "node tools/prepare-runtime.mjs",
+    "build": "node tools/build.mjs",
+    "test": "node --test test/*.test.mjs",
+    "test:account-cleanup": "node tools/test-account-cleanup.mjs",
+    "check:origin": "node tools/check-origin.mjs",
+    "release:central": "node tools/publish-central.mjs",
+    "docs:check": "node tools/documentation/check.mjs && node tools/documentation/check-content.mjs"
+  }
+}
