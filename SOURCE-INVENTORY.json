@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.1",
-  "sourceFilesSha256": "c0fa83c6cac2adf62ceb2830fc08a83fa9a95ab21c9aac5673e580fda1c45809",
-  "review": "Review generic host capability adapters and lifecycle boundaries.",
+  "sourceFilesSha256": "2937720c3af6cbd9b4995bbe3d1c17b680851d6df8bf82832de7689927da9f19",
+  "review": "Upgrade Android Gradle plugin and pinned Gradle toolchain for API 36 builds",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -71,14 +71,14 @@
     },
     {
       "path": "HOST-SERVICES.en.md",
-      "sha256": "21c52e5e995a57e588a31d0508a2a4e42a155c684b68cc9432f29d63c787769d",
-      "size": 2164,
+      "sha256": "19f5884d594518500fce06604407b374b665f122c9bdd4ee7ce34ffe96aacd9c",
+      "size": 2133,
       "mode": "100644"
     },
     {
       "path": "HOST-SERVICES.md",
-      "sha256": "919aaf4472b69dd8d31e55978b73eacf6d5bf04447234001d72bdfc3ac5253f8",
-      "size": 1805,
+      "sha256": "4748c85ea97b1c75d8b912726978597aedb382aa15dc69a8894cb8b666d9e58c",
+      "size": 1792,
       "mode": "100644"
     },
     {
@@ -119,14 +119,14 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "d09ff5ba018876fa8d944887da524f9def33752a5782b631255afcd11c11a69c",
-      "size": 14884,
+      "sha256": "9501cd79cc7dff8d579fe9287f9c8ed9f815e547a74c0274d3a1cc11a031e50b",
+      "size": 14885,
       "mode": "100644"
     },
     {
       "path": "README.md",
-      "sha256": "75e4bc6c6ed31d6d568dcf2e4af5e88f3691b69fdc11cf5f5e4474e610eb57f4",
-      "size": 12612,
+      "sha256": "8b9a9c2d380eada8b25f1a00ea59e371df6c9eacf1e36786c2a878eab0431b41",
+      "size": 12613,
       "mode": "100644"
     },
     {
@@ -137,14 +137,14 @@
     },
     {
       "path": "build.gradle.kts",
-      "sha256": "876fe32c8d0f36d63b1f677e0e09bc50f3d4d254dd9389fede7c11e9ba505915",
-      "size": 179,
+      "sha256": "5351d7b25656ef35d5fdf4a3c83169213d31e0fc49f46c16baaacf3e2560388a",
+      "size": 180,
       "mode": "100644"
     },
     {
       "path": "consumer/build.gradle.kts",
-      "sha256": "51bf159e65bb8b7f1651b36e05c9c4fee1f228796b92b554471db01e30af76f7",
-      "size": 1076,
+      "sha256": "49798aa64ccf4c0f5ac267c38460d6b97c5bb36b5a4a21e81d1d8e843f15cab8",
+      "size": 1077,
       "mode": "100644"
     },
     {
@@ -203,8 +203,8 @@
     },
     {
       "path": "documentation.json",
-      "sha256": "4205ef97335682dbd176f4fc318a707574ea0270b2dfdf4bca0dcc39ea9defab",
-      "size": 6220,
+      "sha256": "7611ac7ded6dbf633bdc736d1ec1cee98e0fb5a9232bdc9f9615183ee6917cd3",
+      "size": 4472,
       "mode": "100644"
     },
     {
@@ -557,8 +557,8 @@
     },
     {
       "path": "tools/build.mjs",
-      "sha256": "a085cb29903f51f807bbced97313e49191703ebfea9857fbdc8e4feac9a6e6ff",
-      "size": 9603,
+      "sha256": "f9587f84332a39a1cfa7266a9d884c1952888b4512e8eeb979b43f7a5627b4e5",
+      "size": 9605,
       "mode": "100644"
     },
     {
@@ -641,8 +641,8 @@
     },
     {
       "path": "tools/gles-recovery.mjs",
-      "sha256": "d08ca0052146c080af202adb7110e82b18f0d37635a1d2990adfd07c1b94c0e3",
-      "size": 4924,
+      "sha256": "7d7828a46318dd5e682a3a172acb1dde2f02f3e960c67a7411bff27e56e353c6",
+      "size": 4926,
       "mode": "100644"
     },
     {

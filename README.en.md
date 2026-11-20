@@ -59,7 +59,7 @@ The following retains the installation, view, and lifecycle instructions for the
 |--------|-------------|
 | Application System | Android API 26+ |
 | Native Architecture | `arm64-v8a`, `x86_64` |
-| Build Tools | Node.js 24+, Python 3, JDK 17+, Gradle 8.9 |
+| Build Tools | Node.js 24+, Python 3, JDK 17+, Gradle 8.13 |
 | Android Toolchain | SDK / Build Tools 36, NDK `27.1.12297006`, CMake `3.22.1` |
 
 Configure `ANDROID_HOME`; use `ANDROID_NDK_HOME` and `GRADLE` to specify tool paths. Link the application to the built runtime library; only the runtime library build process requires Rust and core source code.

@@ -29,8 +29,8 @@ function run(command, argv, cwd=root) {
 }
 function findGradle() {
   if(process.env.GRADLE) return process.env.GRADLE;
-  const dist=join(os.homedir(), '.gradle/wrapper/dists/gradle-8.9-bin');
-  if(existsSync(dist)) for(const entry of readdirSync(dist)) { const bin=join(dist,entry,'gradle-8.9/bin/gradle'); if(existsSync(bin)) return bin; }
+  const dist=join(os.homedir(), '.gradle/wrapper/dists/gradle-8.13-bin');
+  if(existsSync(dist)) for(const entry of readdirSync(dist)) { const bin=join(dist,entry,'gradle-8.13/bin/gradle'); if(existsSync(bin)) return bin; }
   return 'gradle';
 }
 const gradle=findGradle();

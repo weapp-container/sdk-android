@@ -59,7 +59,7 @@ node sdk/contract/fixtures/make-acceptance-pack.mjs --out artifacts/hello-pack
 | --- | --- |
 | 应用系统 | Android API 26+ |
 | 原生架构 | `arm64-v8a`、`x86_64` |
-| 构建工具 | Node.js 24+、Python 3、JDK 17+、Gradle 8.9 |
+| 构建工具 | Node.js 24+、Python 3、JDK 17+、Gradle 8.13 |
 | Android 工具链 | SDK / Build Tools 36、NDK `27.1.12297006`、CMake `3.22.1` |
 
 配置 `ANDROID_HOME`；可用 `ANDROID_NDK_HOME` 和 `GRADLE` 指定工具路径。应用链接构建后的运行库；只有运行库构建过程需要 Rust 和核心源码。

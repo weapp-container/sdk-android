@@ -26,8 +26,8 @@ const packageName='com.sonofmagic.weapp.container.sdk.test';
 let result={schemaVersion:1,status:'failed',serial,cleanupErrors,targetKind:serial.startsWith('emulator-')?'emulator':'physical-device'};
 try {
  if(!args.includes('--skip-build')){
-  const dist=join(os.homedir(),'.gradle/wrapper/dists/gradle-8.9-bin');
-  const gradle=process.env.GRADLE||readdirSync(dist).map(name=>join(dist,name,'gradle-8.9/bin/gradle')).find(existsSync);
+  const dist=join(os.homedir(),'.gradle/wrapper/dists/gradle-8.13-bin');
+  const gradle=process.env.GRADLE||readdirSync(dist).map(name=>join(dist,name,'gradle-8.13/bin/gradle')).find(existsSync);
   const native=requireNativeRoot(args);const licenses=resolve(option('--licenses-root',join(native,'..','licenses')));
   for(const target of ['aarch64-linux-android','x86_64-linux-android']){readNative(native,target,['libweapp_container_sdk.so','libc++_shared.so']);readNotices(native,licenses,target);}
   copyPack(option('--pack'),join(root,'library/build/generated/recoveryAssets/portable-pack'));
