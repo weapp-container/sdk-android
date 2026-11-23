@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.1",
-  "sourceFilesSha256": "3729f3fa8aa4c5d6ff4d1e6a98d93abdb880505209aee80c80f4ea35d4937a82",
-  "review": "Use the Gradle version required by the pinned Android Gradle plugin.",
+  "sourceFilesSha256": "d9b7caaad8610b43a12565d4fa1ed2f4c51a06b2b6dc538ebb0131da69643309",
+  "review": "Use the published Gradle version required by the pinned Android Gradle plugin.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -11,8 +11,8 @@
   "files": [
     {
       "path": ".github/workflows/build-public.yml",
-      "sha256": "1d633fcef80807e218217bc8598756c14f7cdb6dde1321971fc904b8b7e30291",
-      "size": 1841,
+      "sha256": "91696a8f94dc85eee68780763f7f350692856d4a57a064b4ae46b34b4d32e972",
+      "size": 1839,
       "mode": "100644"
     },
     {
