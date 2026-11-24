@@ -68,9 +68,22 @@
         "repository": "weapp-container/sdk-android",
         "path": "README.md"
       },
-      "reviewedChineseSummary": "Weapp Container Android SDK",
-      "reviewedChineseSha256": "75e4bc6c6ed31d6d568dcf2e4af5e88f3691b69fdc11cf5f5e4474e610eb57f4",
+      "reviewedChineseSummary": "Android SDK 与公开发行说明",
+      "reviewedChineseSha256": "15cddffe8dc088243b0cf8c858ad8333a6e70725296a30b7dab434014636ea1d",
       "legacyHeadingIds": []
+    },
+    {
+      "id": "consumer/README",
+      "zh": "consumer/README.md",
+      "en": "consumer/README.en.md",
+      "section": "examples",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "consumer/README.md"
+      },
+      "reviewedChineseSummary": "Android consumer 示例应用",
+      "legacyHeadingIds": [],
+      "reviewedChineseSha256": "9b13513c3e1253f85119fcc3526fec6e1e52660e20651d17190a615c93c86344"
     },
     {
       "id": "docs/EMBEDDING",
@@ -99,6 +112,19 @@
       "legacyHeadingIds": []
     },
     {
+      "id": "examples/host-services/README",
+      "zh": "examples/host-services/README.md",
+      "en": "examples/host-services/README.en.md",
+      "section": "examples",
+      "source": {
+        "repository": "weapp-container/sdk-android",
+        "path": "examples/host-services/README.md"
+      },
+      "reviewedChineseSummary": "Android 宿主服务示例",
+      "legacyHeadingIds": [],
+      "reviewedChineseSha256": "4ac87850283f8d71cbff257af24b801c96916a88eacf8bce897992b4ebc6bf2a"
+    },
+    {
       "id": "examples/host-services/WIFI-APIS",
       "zh": "examples/host-services/WIFI-APIS.md",
       "en": "examples/host-services/WIFI-APIS.en.md",
@@ -107,8 +133,8 @@
         "repository": "weapp-container/sdk-android",
         "path": "examples/host-services/WIFI-APIS.md"
       },
-      "reviewedChineseSummary": "Android Wi-Fi",
-      "reviewedChineseSha256": "e3a0065e871e1e657590fff6fd7f9f88523b6b43cdfdcdc3a714ed1258413b8f",
+      "reviewedChineseSummary": "Android WiFi 宿主 API",
+      "reviewedChineseSha256": "f930b7611640fe8cdf0caa4060decba0bef8875b3a9c58549d9e999e92926cb8",
       "legacyHeadingIds": []
     },
     {

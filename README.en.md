@@ -5,9 +5,7 @@
 <a id="公开发行候选preview7"></a>
 ## Public distribution candidate: preview.7
 
-This SDK source is the `0.1.0-preview.7.1` candidate, and the `.7.1` core runtime is published; the Android Maven package is not published yet. The iOS, Desktop and CocoaPods `.7.0` entries remain available, while `.7.1` is pending. Check the [release status](https://github.com/weapp-container/weapp-container/blob/main/docs/public-sdk-release.en.md) before using installation commands. Match wrapper and runtime versions. Source availability, package publication, compilation and device acceptance are recorded separately.
-
-The Android `.7.1` Maven coordinate can be installed after Central publication and anonymous consumer verification. Historical private archives and locks retain their original identities.
+`0.1.0-preview.7.1` is published to Maven Central and can be installed with the coordinate below. It remains a prerelease, with no stable version available. Source, package publication, compilation and device acceptance are recorded separately in the [SDK release status](https://github.com/weapp-container/weapp-container/blob/main/docs/public-sdk-release.en.md).
 
 Version `0.1.0-preview.7.1` requires Android API 26+, arm64-v8a / x86_64 and Java 17. Resolve the public coordinate from Maven Central:
 
@@ -38,7 +36,7 @@ Reviewed source example version: **0.1.0-preview.7.1**. The SDK wrapper source i
 <a id="从当前源码开始"></a>
 ## Start from Source Code
 
-For initial integration, prefer using the public core repository and its fixed SDK commit—no download token is required for historical archives:
+For initial integration, use the public core repository and its pinned SDK commit. This source-build path does not require access to historical binary archives:
 
 ```sh
 git clone --recurse-submodules https://github.com/weapp-container/weapp-container.git
@@ -67,18 +65,20 @@ Configure `ANDROID_HOME`; use `ANDROID_NDK_HOME` and `GRADLE` to specify tool pa
 <a id="1-获取运行库"></a>
 ## 1. Obtain the Runtime Library
 
-Execute the following command in the root directory of a clean checkout of the public core repository:
+From the public core repository root, build both Android runtime targets and their dependency notices using the [source build guide](https://github.com/weapp-container/weapp-container/blob/main/docs/sdk-source-build.en.md), then run:
 
 ```sh
-pnpm sdk:build:android -- --pack artifacts/hello-pack
+node sdk/android/tools/build.mjs --native-root artifacts/sdk/native \
+  --licenses-root artifacts/sdk/licenses --pack artifacts/hello-pack \
+  --out artifacts/sdk/android
 ```
 
-This command builds the runtime library, collects notices, and invokes the fixed SDK wrapper to generate the integration package. Output is generated at `artifacts/sdk/android/`. Full toolchain and input validation are detailed in the [source build guide](https://github.com/weapp-container/weapp-container/blob/main/docs/sdk-source-build.en.md). Historical archive installation is an optional compatibility path mentioned at the end.
+This command invokes the fixed SDK wrapper to generate the AAR, local Maven repository, and independent consumer. Output is generated at `artifacts/sdk/android/`. Historical archive installation is an optional compatibility path mentioned at the end.
 
 <a id="2-构建-aar-与-maven-仓库"></a>
 ## 2. Build AAR and Maven Repository
 
-The source build above produces the release AAR, local `maven/` repository, standalone R8 consumer, and verification report in `artifacts/sdk/android/`. The `--pack` argument supplies the verified portable pack used by that consumer. Wrapper-only build commands for a standalone SDK checkout are in the historical archive section.
+The wrapper build above produces the release AAR, local `maven/` repository, standalone R8 consumer, and verification report in `artifacts/sdk/android/`. The `--pack` argument supplies the verified portable pack used by that consumer. Wrapper-only build commands for a standalone SDK checkout are in the historical archive section.
 
 Add the generated repository to your application's `settings.gradle.kts`, adjusting the path as needed:
 
@@ -143,6 +143,17 @@ fun mountContainer(context: Context, parent: ViewGroup): WeappContainerSession {
 
 `PackSource.Directory(File(...))` can load a locally downloaded and unpacked directory from the host. `LoadOptions(route = "pages/detail/index", options = JSONObject())` can pass an initial route and launch parameters. The first load waits for the View's actual layout and window information; after attaching the View to the window, it waits for loading to complete.
 
+### Run the Android example application
+
+The build command in section 1 copies the portable pack into the independent consumer and builds installable APKs. With an emulator or device already running, launch the example manually:
+
+```sh
+adb -s <serial> install -t artifacts/sdk/android/consumer/build/outputs/apk/release/*.apk
+adb -s <serial> shell am start -n com.sonofmagic.weapp.container.sdkconsumer/com.sonofmagic.weapp.container.consumer.ConsumerActivity
+```
+
+The controls at the top of the example call the current session directly. `Reload` replaces the pack, `Detail` / `Back` exercise native navigation, `Echo` sends a host message, `Store` writes the sample value, `Flush` waits for persistence, `Read` reads the reply, `Pause` / `Resume` update foreground state, `Close` retires the View before closing the session, and `Reopen` creates a new session with the same storage key. The status line shows the latest event or operation result. The consumer uses a test signature and is intended for development and acceptance checks.
+
 <a id="4-通信与导航"></a>
 ## 4. Communication and Navigation
 
@@ -182,9 +193,15 @@ node tools/device-smoke.mjs --serial YOUR_ALREADY_RUNNING_TARGET
 
 `npm test` validates the input contract of the wrapper layer. Device testing requires building the consumer and explicitly specifying a running device; the tool only installs and cleans the test application. The build report does not indicate successful device, GPU, or performance validation. Actual runtime results must be independently verified against the specific runtime library.
 
+```sh
+node tools/device-smoke.mjs --serial <serial> --artifacts /absolute/path/to/artifacts/sdk/android --out /absolute/path/to/validation/android-device
+```
+
+Device acceptance clicks the example application's navigation, messaging, storage, lifecycle, reload and close/reopen controls before covering touch, rendering, networking, persistence and session isolation. Results apply only to the runtime, target kind and SDK version recorded in the receipt.
+
 - [Embedding, Window Size, Touch, and Lifecycle](docs/EMBEDDING.en.md)
 - [Host Services: Device Capabilities, Extension Registration, and Permissions](HOST-SERVICES.en.md)
-- [Host Service Integration Example](examples/host-services/README.en.md)
+- [Host Service API Guides](examples/host-services/README.en.md)
 - [Cross-end Session Contract](CONTRACT.en.md)
 - [Source File List](SOURCE-INVENTORY.json) and [Historical Export Records](ORIGIN.json)
 The runtime capabilities depend on the accompanying runtime libraries and their distribution strategy; `restricted-showcase` permits only demonstration packages and APIs authorized at compile time, and no capabilities can be re-enabled via host configuration. Support for native input methods, accessibility, and complex gestures is detailed in the embedded documentation. When distributing applications, retain SDK `LICENSE`, runtime library `RUNTIME-LICENSE`, and third-party declarations.

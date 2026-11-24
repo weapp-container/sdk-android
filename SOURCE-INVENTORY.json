@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.1",
-  "sourceFilesSha256": "d9b7caaad8610b43a12565d4fa1ed2f4c51a06b2b6dc538ebb0131da69643309",
-  "review": "Use the published Gradle version required by the pinned Android Gradle plugin.",
+  "sourceFilesSha256": "01866da8b23ff4a5df2f14d9250e807d974d1b9a654aea8ad59f48a688746deb",
+  "review": "Add runnable Android consumer and current release documentation",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -119,14 +119,14 @@
     },
     {
       "path": "README.en.md",
-      "sha256": "9501cd79cc7dff8d579fe9287f9c8ed9f815e547a74c0274d3a1cc11a031e50b",
-      "size": 14885,
+      "sha256": "5467078583b12cd303663e638ffb67696de900e92165a683edd3283f55296e7e",
+      "size": 16102,
       "mode": "100644"
     },
     {
       "path": "README.md",
-      "sha256": "8b9a9c2d380eada8b25f1a00ea59e371df6c9eacf1e36786c2a878eab0431b41",
-      "size": 12613,
+      "sha256": "15cddffe8dc088243b0cf8c858ad8333a6e70725296a30b7dab434014636ea1d",
+      "size": 13743,
       "mode": "100644"
     },
     {
@@ -139,6 +139,18 @@
       "path": "build.gradle.kts",
       "sha256": "5351d7b25656ef35d5fdf4a3c83169213d31e0fc49f46c16baaacf3e2560388a",
       "size": 180,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/README.en.md",
+      "sha256": "094c74bada2f5620b71d546d80cb004954a79fa885308c29a6b90044ca215ca1",
+      "size": 2500,
+      "mode": "100644"
+    },
+    {
+      "path": "consumer/README.md",
+      "sha256": "9b13513c3e1253f85119fcc3526fec6e1e52660e20651d17190a615c93c86344",
+      "size": 2310,
       "mode": "100644"
     },
     {
@@ -173,20 +185,20 @@
     },
     {
       "path": "consumer/src/androidTest/java/com/sonofmagic/weapp/container/consumer/SdkInstrumentation.kt",
-      "sha256": "f4c8b5ea78a2396872af9587259b439256ffb69f10fdaf912862b9c40124d920",
-      "size": 14379,
+      "sha256": "d42d3eeb56593a03d41b73ed3bdd44e7416ebed54e8f696518ff065cdb9832c4",
+      "size": 17265,
       "mode": "100644"
     },
     {
       "path": "consumer/src/main/AndroidManifest.xml",
-      "sha256": "0d2d2c56d9436be7d5d6529783a334a9d89adec999ba9b9ea8d607ae709bec43",
-      "size": 585,
+      "sha256": "f6688c9cf84afc122efe807f08ef4f03caafba2d1d8977050d38efcb6805fe2c",
+      "size": 592,
       "mode": "100644"
     },
     {
       "path": "consumer/src/main/java/com/sonofmagic/weapp/container/consumer/ConsumerActivity.kt",
-      "sha256": "e3ff6a67d358744ec2d4b001ed81c88d63e666528d0e4a1b56b678dd31c8db5a",
-      "size": 2372,
+      "sha256": "158fac64028f612cbfe5933a487966aaa4e5e0847b0882ba16a67e7b36dd122e",
+      "size": 9727,
       "mode": "100644"
     },
     {
@@ -203,8 +215,8 @@
     },
     {
       "path": "documentation.json",
-      "sha256": "7611ac7ded6dbf633bdc736d1ec1cee98e0fb5a9232bdc9f9615183ee6917cd3",
-      "size": 4472,
+      "sha256": "812902eb42562500664aaeb4c36944b04b43951c41863610f4793523a34cf629",
+      "size": 5449,
       "mode": "100644"
     },
     {
@@ -220,15 +232,27 @@
       "mode": "100644"
     },
     {
+      "path": "examples/host-services/README.en.md",
+      "sha256": "b15d0536296a6af3c9b5172fcdda061cec3a8418ba288b8397536887c9f60b90",
+      "size": 1067,
+      "mode": "100644"
+    },
+    {
+      "path": "examples/host-services/README.md",
+      "sha256": "4ac87850283f8d71cbff257af24b801c96916a88eacf8bce897992b4ebc6bf2a",
+      "size": 902,
+      "mode": "100644"
+    },
+    {
       "path": "examples/host-services/WIFI-APIS.en.md",
-      "sha256": "167ea149c66d5862503fb7bc9c711b7a1431e4c7ec5c4d99b61550ac5b1b7398",
-      "size": 4358,
+      "sha256": "e7a4c7fd2207926a27e1eea17ff9c994306fe9b2af11fcc9574e98316585110b",
+      "size": 4460,
       "mode": "100644"
     },
     {
       "path": "examples/host-services/WIFI-APIS.md",
-      "sha256": "e3a0065e871e1e657590fff6fd7f9f88523b6b43cdfdcdc3a714ed1258413b8f",
-      "size": 3672,
+      "sha256": "f930b7611640fe8cdf0caa4060decba0bef8875b3a9c58549d9e999e92926cb8",
+      "size": 3688,
       "mode": "100644"
     },
     {

@@ -39,6 +39,30 @@ class SdkInstrumentation : Instrumentation() {
             val capability = a.container.capabilities().await()
             check(capability.getJSONObject("build").getBoolean("gles")); check(capability.getJSONObject("runtime").getBoolean("gpuSurface"))
             checks += "real-initial-viewport-and-display; untouched-host-insets; direct-GLES"
+            check(a.actionButtons.keys.containsAll(listOf("Reload", "Detail", "Back", "Echo", "Store", "Flush", "Read", "Pause", "Resume", "Close", "Reopen")))
+            clickAction(a, "Detail")
+            until { a.container.state().await().getJSONObject("page").getString("route") == "pages/detail/index" }
+            clickAction(a, "Back")
+            until { a.container.state().await().getJSONObject("page").getString("route") == "pages/home/index" }
+            val actionEchoStart = a.events.size
+            clickAction(a, "Echo")
+            until { messageFrom(a, "echo", actionEchoStart)?.optString("value") == "hello from Android" }
+            val actionStoreStart = a.events.size
+            clickAction(a, "Store")
+            until { messageFrom(a, "stored", actionStoreStart) != null }
+            clickAction(a, "Flush")
+            until { statusText(a) == "flushing storage complete" }
+            val actionReadStart = a.events.size
+            clickAction(a, "Read")
+            until { messageFrom(a, "storedValue", actionReadStart)?.optString("value") == "android-reference" }
+            clickAction(a, "Pause")
+            until { statusText(a) == "pausing complete" }
+            clickAction(a, "Resume")
+            until { statusText(a) == "resuming complete" }
+            val actionGeneration = a.container.state().await().getLong("generation")
+            clickAction(a, "Reload")
+            until { a.container.state().await().getLong("generation") == actionGeneration + 1 }
+            checks += "reference-app-navigation-message-storage-lifecycle-and-reload-controls"
             sendStatus(0, Bundle().apply { putString("sdkStage", "first-frame") })
             SystemClock.sleep(500)
             var exclusive = false
@@ -125,6 +149,13 @@ class SdkInstrumentation : Instrumentation() {
             a.container.load(PackSource.Asset("portable-pack")).await()
             check(a.container.state().await().getLong("generation") == generation + 1)
             checks += "successful-reload"
+            clickAction(a, "Close")
+            until { a.sessionClosed }
+            clickAction(a, "Reopen")
+            a.loaded.await()
+            until { a.container.state().await().getBoolean("inputEnabled") }
+            check(a.container.state().await().getLong("generation") == 1L)
+            checks += "reference-app-close-and-reopen-controls"
             lateinit var second: WeappContainerSession
             lateinit var secondView: WeappContainerView
             runOnMainSync {
@@ -199,5 +230,26 @@ class SdkInstrumentation : Instrumentation() {
         var value: JSONObject? = null
         until { value = activity.events.asSequence().filter { it.optString("type") == "message" }.mapNotNull { it.optJSONObject("message") }.firstOrNull { it.optString("kind") == kind }; value != null }
         return checkNotNull(value)
+    }
+    private fun messageFrom(activity: ConsumerActivity, kind: String, start: Int): JSONObject? = activity.events
+        .drop(start)
+        .asSequence()
+        .filter { it.optString("type") == "message" }
+        .mapNotNull { it.optJSONObject("message") }
+        .firstOrNull { it.optString("kind") == kind }
+
+    private fun clickAction(activity: ConsumerActivity, label: String) {
+        runOnMainSync {
+            val button = checkNotNull(activity.actionButtons[label]) { "Missing reference action $label" }
+            check(button.isEnabled) { "Reference action $label is disabled" }
+            button.performClick()
+        }
+        waitForIdleSync()
+    }
+
+    private fun statusText(activity: ConsumerActivity): String {
+        var value = ""
+        runOnMainSync { value = activity.root.findViewWithTag<android.widget.TextView>("sdk-status")?.text?.toString().orEmpty() }
+        return value
     }
 }
