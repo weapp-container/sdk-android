@@ -3,7 +3,12 @@ import assert from 'node:assert/strict';
 import { mkdtempSync, mkdirSync, writeFileSync, rmSync, symlinkSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { assetEntry, readRelease, releaseUrl, run, writeRelease, publishRelease } from '../tools/public-release.mjs';
+import { assetEntry, readRelease, releasePublication, releaseUrl, run, writeRelease, publishRelease } from '../tools/public-release.mjs';
+test('release version selects a stable or preview GitHub channel', () => {
+  assert.deepEqual(releasePublication('0.1.0'), { preview: false, prerelease: false, latest: true, channel: 'stable' });
+  assert.deepEqual(releasePublication('0.1.0-preview.7.1'), { preview: true, prerelease: true, latest: false, channel: 'preview' });
+  assert.throws(() => releasePublication('preview'), /Invalid SDK release version/);
+});
 function fixture(t) {
   const root = mkdtempSync(join(tmpdir(), 'weapp-public-release-'));
   t.after(() => rmSync(root, { recursive: true, force: true }));
