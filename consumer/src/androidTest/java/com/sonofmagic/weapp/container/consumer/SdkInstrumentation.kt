@@ -46,7 +46,14 @@ class SdkInstrumentation : Instrumentation() {
             until { a.container.state().await().getJSONObject("page").getString("route") == "pages/home/index" }
             val actionEchoStart = a.events.size
             clickAction(a, "Echo")
-            until { messageFrom(a, "echo", actionEchoStart)?.optString("value") == "hello from Android" }
+            try {
+                until { messageFrom(a, "echo", actionEchoStart)?.optString("value") == "hello from Android" }
+            } catch (error: IllegalStateException) {
+                throw AssertionError(
+                    "Echo action did not complete; status=${statusText(a)}; recentEvents=${a.events.takeLast(12)}",
+                    error,
+                )
+            }
             val actionStoreStart = a.events.size
             clickAction(a, "Store")
             until { messageFrom(a, "stored", actionStoreStart) != null }
@@ -56,9 +63,20 @@ class SdkInstrumentation : Instrumentation() {
             clickAction(a, "Read")
             until { messageFrom(a, "storedValue", actionReadStart)?.optString("value") == "android-reference" }
             clickAction(a, "Pause")
-            until { statusText(a) == "pausing complete" }
+            until { !a.container.state().await().getBoolean("foreground") }
             clickAction(a, "Resume")
-            until { statusText(a) == "resuming complete" }
+            var resumedState: JSONObject? = null
+            try {
+                until {
+                    resumedState = a.container.state().await()
+                    resumedState!!.getBoolean("foreground")
+                }
+            } catch (error: IllegalStateException) {
+                throw AssertionError(
+                    "Resume action did not restore foreground; status=${statusText(a)}; state=$resumedState; recentEvents=${a.events.takeLast(12)}",
+                    error,
+                )
+            }
             val actionGeneration = a.container.state().await().getLong("generation")
             clickAction(a, "Reload")
             until { a.container.state().await().getLong("generation") == actionGeneration + 1 }
@@ -88,8 +106,11 @@ class SdkInstrumentation : Instrumentation() {
             check(a.container.state().await().getJSONObject("page").getString("route") == "pages/home/index")
             checks += "native-navigate-and-back"
             val emoji = "中文 🧊 \u0000 emoji"
+            val directEchoStart = a.events.size
+            val echoCallsBefore = a.echoCalls
             a.container.sendMessage(JSONObject().put("op", "echo").put("value", emoji)).await()
-            check(untilMessage(a, "echo").getString("value") == emoji && a.echoCalls == 1)
+            until { messageFrom(a, "echo", directEchoStart)?.optString("value") == emoji }
+            check(a.echoCalls == echoCallsBefore + 1)
             checks += "async-business-call-and-UTF8-message"
             a.container.sendMessage(JSONObject().put("op", "hang")).await()
             untilMessage(a, "timeout"); until { a.cancelledCalls == 1 }

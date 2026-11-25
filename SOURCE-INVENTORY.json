@@ -1,8 +1,8 @@
 {
   "schemaVersion": 2,
   "sdkVersion": "0.1.0-preview.7.1",
-  "sourceFilesSha256": "5bf0147602a971976284a10f0e9e723d8152ac2b8a29b5d9c52851c4c4bc0a69",
-  "review": "Record stable and preview publication channel behavior in the release tooling",
+  "sourceFilesSha256": "7e86f14a3bf906e638fd6059c504ec102b7e3c923b87220ce5080494369e7923",
+  "review": "Make reference consumer message timeouts API 26-compatible, cancel timers on completion, clean up pending waits on Activity destruction, and verify foreground transitions and Echo request matching in instrumentation.",
   "scope": "Current reviewed SDK wrapper source bytes only; this inventory is not build, artifact, device or parity acceptance evidence.",
   "historicalOrigin": {
     "path": "ORIGIN.json",
@@ -185,8 +185,8 @@
     },
     {
       "path": "consumer/src/androidTest/java/com/sonofmagic/weapp/container/consumer/SdkInstrumentation.kt",
-      "sha256": "d42d3eeb56593a03d41b73ed3bdd44e7416ebed54e8f696518ff065cdb9832c4",
-      "size": 17265,
+      "sha256": "4bf8c384bf590a6364ea77e639d78fc7994e89fa544db4730081cc9529c0f4dd",
+      "size": 18191,
       "mode": "100644"
     },
     {
@@ -197,8 +197,8 @@
     },
     {
       "path": "consumer/src/main/java/com/sonofmagic/weapp/container/consumer/ConsumerActivity.kt",
-      "sha256": "158fac64028f612cbfe5933a487966aaa4e5e0847b0882ba16a67e7b36dd122e",
-      "size": 9727,
+      "sha256": "33a6b3e3cd10337d81ec7ad51ae96c9eabeae38f4dfeed4868621aaaeaac3910",
+      "size": 10648,
       "mode": "100644"
     },
     {

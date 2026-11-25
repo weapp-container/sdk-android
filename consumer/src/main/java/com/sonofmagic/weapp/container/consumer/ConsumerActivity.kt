@@ -2,6 +2,8 @@ package com.sonofmagic.weapp.container.consumer
 
 import android.app.Activity
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.widget.HorizontalScrollView
 import android.view.View
 import android.widget.Button
@@ -34,7 +36,13 @@ class ConsumerActivity : Activity() {
     var echoCalls = 0
     var cancelledCalls = 0
     val actionButtons = mutableMapOf<String, Button>()
-    private val pendingMessages = ConcurrentHashMap<String, CompletableFuture<JSONObject>>()
+    private data class PendingMessage(
+        val response: CompletableFuture<JSONObject>,
+        val timeout: Runnable,
+    )
+
+    private val mainHandler = Handler(Looper.getMainLooper())
+    private val pendingMessages = ConcurrentHashMap<String, PendingMessage>()
 
     private lateinit var status: TextView
     private var foreground = true
@@ -141,21 +149,30 @@ class ConsumerActivity : Activity() {
 
     private fun sendAndAwait(payload: JSONObject, responseKind: String): CompletableFuture<JSONObject> {
         val response = CompletableFuture<JSONObject>()
-        if (pendingMessages.putIfAbsent(responseKind, response) != null) {
+        lateinit var pending: PendingMessage
+        val timeout = Runnable {
+            failMessage(responseKind, pending, TimeoutException("Timed out waiting for $responseKind"))
+        }
+        pending = PendingMessage(response, timeout)
+        if (pendingMessages.putIfAbsent(responseKind, pending) != null) {
             return CompletableFuture.failedFuture(IllegalStateException("Already waiting for $responseKind"))
         }
-        fun fail(error: Throwable) {
-            if (pendingMessages.remove(responseKind, response)) response.completeExceptionally(error)
-        }
-        CompletableFuture.delayedExecutor(15, TimeUnit.SECONDS).execute {
-            fail(TimeoutException("Timed out waiting for $responseKind"))
-        }
+        mainHandler.postDelayed(timeout, TimeUnit.SECONDS.toMillis(15))
         try {
-            container.sendMessage(payload).whenComplete { _, error -> if (error != null) fail(error) }
+            container.sendMessage(payload).whenComplete { _, error ->
+                if (error != null) failMessage(responseKind, pending, error)
+            }
         } catch (error: Throwable) {
-            fail(error)
+            failMessage(responseKind, pending, error)
         }
         return response
+    }
+
+    private fun failMessage(kind: String, pending: PendingMessage, error: Throwable) {
+        if (pendingMessages.remove(kind, pending)) {
+            mainHandler.removeCallbacks(pending.timeout)
+            pending.response.completeExceptionally(error)
+        }
     }
 
     private fun runAction(label: String, action: () -> CompletableFuture<*>) {
@@ -182,7 +199,10 @@ class ConsumerActivity : Activity() {
             val json = JSONObject(event.toString())
             events.add(json)
             json.optJSONObject("message")?.optString("kind")?.let { kind ->
-                pendingMessages.remove(kind)?.complete(json.optJSONObject("message")!!)
+                pendingMessages.remove(kind)?.let { pending ->
+                    mainHandler.removeCallbacks(pending.timeout)
+                    pending.response.complete(json.optJSONObject("message")!!)
+                }
             }
             runOnUiThread {
                 val type = json.optString("type", "event")
@@ -218,6 +238,9 @@ class ConsumerActivity : Activity() {
     }
 
     override fun onDestroy() {
+        pendingMessages.entries.toList().forEach { (kind, pending) ->
+            failMessage(kind, pending, IllegalStateException("Activity destroyed while waiting for $kind"))
+        }
         if (::containerView.isInitialized) containerView.unbind()
         if (::container.isInitialized) container.closeAsync()
         super.onDestroy()
