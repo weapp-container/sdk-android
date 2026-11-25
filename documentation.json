@@ -68,8 +68,8 @@
         "repository": "weapp-container/sdk-android",
         "path": "README.md"
       },
-      "reviewedChineseSummary": "Android SDK 与公开发行说明",
-      "reviewedChineseSha256": "15cddffe8dc088243b0cf8c858ad8333a6e70725296a30b7dab434014636ea1d",
+      "reviewedChineseSummary": "普通用户使用公开 Maven Central 发行物，维护者源码构建与历史归档已明确分开",
+      "reviewedChineseSha256": "a60652519465b5755ac39fef544f0033dee543735a31c3dfb6ac194fd725c148",
       "legacyHeadingIds": []
     },
     {
